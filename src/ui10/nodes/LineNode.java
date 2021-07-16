@@ -1,15 +1,15 @@
-package ui10.node;
+package ui10.nodes;
 
 import ui10.binding.ObservableList;
-import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.geom.Point;
-import ui10.layout.BoxConstraints;
+import ui10.geom.Size;
+import ui10.node.Node;
 
 import static ui10.geom.Point.ORIGO;
 import static ui10.geom.Rectangle.rect;
 
-public class LineNode extends Node {
+public class LineNode extends FixedSizeNode {
 
     private Point end;
 
@@ -25,14 +25,13 @@ public class LineNode extends Node {
     }
 
     @Override
-    public ObservableList<Node> children() {
+    protected ObservableList<Node> createChildren() {
         // TODO melyik legyen a primitív?
         return null;
     }
 
     @Override
-    public Layout layout(BoxConstraints constraints) {
-        return new Layout(rect(ORIGO, end).size(), () -> {
-        });
+    protected Size fixedSize() {
+        return rect(ORIGO, end).size();
     }
 }

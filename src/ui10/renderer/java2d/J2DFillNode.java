@@ -7,7 +7,7 @@ class J2DFillNode extends J2DNode {
     public final Paint fill;
     public final Shape shape;
 
-    public J2DFillNode(Stroke stroke, Paint fill, Shape shape) {
+    public J2DFillNode(Shape shape, Paint fill) {
         this.fill = fill;
         this.shape = shape;
     }

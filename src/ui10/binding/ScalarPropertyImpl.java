@@ -25,10 +25,11 @@ record ScalarPropertyImpl<N extends PropertyHolder, T>(
     }
 
     @Override
-    public void set(T value) {
+    public ScalarProperty<T> set(T value) {
         T oldValue = definition.get(container);
         definition.set(container, value);
         container.onChange(new ChangeEvent<>(definition, oldValue, value));
+        return this;
     }
 
     @Override

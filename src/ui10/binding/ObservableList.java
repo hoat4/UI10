@@ -2,6 +2,7 @@ package ui10.binding;
 
 import ui10.node.Node;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -19,6 +20,10 @@ public interface ObservableList<E> extends List<E> {
 
     void unsubscribe(Consumer<ListChange<E>> listChangeConsumer);
 
+    default StreamBinding<E> streamBinding() {
+        return new StreamBinding<>(this);
+    }
+
     static <E> ObservableList<E> ofConstantElement(E element) {
         return new ObservableListImpl<>(List.of(element));
     }
@@ -34,5 +39,14 @@ public interface ObservableList<E> extends List<E> {
             else
                 throw new IllegalArgumentException(change.toString());
         };
+    }
+
+    static <E> ObservableList<E> of(ScalarProperty<E> p) {
+        @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
+        List<E> l = Arrays.asList(p.get());
+
+        ObservableList<E> o = new ObservableListImpl<>(l);
+        p.subscribe(c->o.set(0, c.newValue()));
+        return o;
     }
 }

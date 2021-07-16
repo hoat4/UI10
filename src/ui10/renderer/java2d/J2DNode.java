@@ -9,12 +9,12 @@ import java.awt.*;
 abstract class J2DNode extends Node {
 
     @Override
-    public ObservableList<Node> children() {
+    public ObservableList<Node> createChildren() {
         return null;
     }
 
     @Override
-    public Layout layout(BoxConstraints constraints) {
+    protected Node.Layout computeLayout(BoxConstraints constraints) {
         throw new UnsupportedOperationException();
     }
 

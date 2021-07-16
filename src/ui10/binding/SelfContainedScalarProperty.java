@@ -33,10 +33,11 @@ class SelfContainedScalarProperty<T> implements ScalarProperty<T> {
     }
 
     @Override
-    public void set(T value) {
+    public ScalarProperty<T> set(T value) {
         T oldValue = this.value;
         this.value = value;
         subscribers.forEach(c -> c.accept(new ChangeEvent<>(null, oldValue, value)));
+        return this;
     }
 
     @Override

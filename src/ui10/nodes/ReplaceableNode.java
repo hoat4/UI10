@@ -1,9 +1,12 @@
-package ui10.node;
+package ui10.nodes;
 
 import ui10.binding.ObservableList;
 import ui10.layout.BoxConstraints;
+import ui10.node.Node;
 
 import java.util.Objects;
+
+import static ui10.geom.Point.ORIGO;
 
 public abstract class ReplaceableNode extends Node {
 
@@ -20,13 +23,18 @@ public abstract class ReplaceableNode extends Node {
     }
 
     @Override
-    public ObservableList<Node> children() {
+    protected ObservableList<Node> createChildren() {
         return ObservableList.ofConstantElement(replacement());
     }
 
     @Override
-    public Layout layout(BoxConstraints constraints) {
+    protected Node.Layout computeLayout(BoxConstraints constraints) {
         Layout contentLayout = replacement().layout(constraints);
-        return new Layout(contentLayout.size, contentLayout::apply);
+        return new Layout(constraints, contentLayout.size) {
+            @Override
+            protected void apply() {
+                contentLayout.apply(ORIGO);
+            }
+        };
     }
 }

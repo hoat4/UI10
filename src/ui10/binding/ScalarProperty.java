@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 public interface ScalarProperty<T> extends ObservableScalar<T> {
 
-    void set(T value);
+    ScalarProperty<T> set(T value);
 
     // nonnull. vagy legyen nullable, ami kitörli az eddigi bindet?
     void bindTo(ObservableScalar<T> other) ;

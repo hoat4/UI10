@@ -53,7 +53,8 @@ public class ObservableListImpl<E> extends AbstractList<E> implements Observable
     }
 
     private void onChange(ListChange<E> change) {
-        subscribers.forEach(s -> s.accept(change));
+        for (int i = 0; i < subscribers.size(); i++)
+            subscribers.get(i).accept(change);
     }
 
     @Override

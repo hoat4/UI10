@@ -1,0 +1,570 @@
+abstract class Node implements PropertyContainer {
+			
+    private final PropertyHolder properties = new PropertyHolder<>();
+
+    @Property
+    Node parent;
+    
+    @Property
+    Point position;
+    
+    @Property
+    Size size;
+
+    @Property
+    List<NodeTransformer> localTransformers;
+    
+    @Property
+    Map<NodeType, ObservableList<NodeTransformer>> descendantTransformers;
+    
+    @Property
+    ScalarProperty<BoxConstraints> layoutConstraints;
+
+    public abstract ObservableList<? extends Node> children();
+    
+    public abstract Layout layout(BoxConstraints constraints);
+    
+    @Override
+    public final PropertyHolder properties() {
+        return properties;
+    }
+    
+    public final ObservableList<NodeTransformer> localNodeTransformers() {
+        return NodeProps.selfNodeTransformers(this);
+    }
+    
+    public final ObservableMap<NodeType, ObservableList<NodeTransformer>> descendantNodeTransformers() {
+        return NodeProps.descendantNodeTransformers(this);
+    }
+    
+    public NodeType nodeType() {
+        return new ClassNodeType(getClass());
+    }
+    
+    public ObservableScalar<Size> size() {
+        return NodeProps.size(size);
+    }
+
+    public class Layout {
+    
+        public final Size size;
+        private final Runnable applier;
+        
+        public Layout(Size size, Runnable applier) {
+            this.size = size;
+            this.applier = applier;
+        }
+    
+        public void apply() {
+            NodeProps.size(Node.this).set(size);
+            applier.run();
+        }
+    } 
+}
+
+abstract class SingleNodeLayoutNode extends Node {
+
+    @Property
+    Node content;
+    
+    public ObservableScalar<Node> content() {
+        return SingleNodeLayoutProps.content(this);
+    }
+    
+    @Overide
+    public ObservableList<Node> children() {
+        return ObservableList.of(content());
+    }
+}
+
+class Centered extends SingleNodeLayoutNode {
+    
+    @Override
+    protected Layout layout(BoxConstraints constraints) {
+        return new Layout(constraints.maximum(), () -> {
+            Layout contentLayout = content.layout(constraints.withMinimum(Size.zero()));
+            content.position().set(Rectangle.of(size()).centered(contentLayout.size()).topLeft());
+            contentLayout.apply();
+        });
+    }
+}
+
+
+interface NodeTransformer extends Function<Node, Node> {
+}
+
+interface NodeType {
+
+    boolean equals(Object o);
+    
+    int hashCode();
+ 
+    // toString?
+}
+
+primitive record ClassNodeType(Class<? extends Node> nodeClass) implements NodeType {}
+
+record Point(NumericValue x, NumericValue y, NumericValue z) {}
+
+record Rectangle(Point topLeft, Point rightBottom) {}
+
+interface NumericValue {
+
+    NumericValue add(int i);
+
+    NumericValue sub(int i);
+
+    NumericValue mul(int i);
+
+    NumericValue div(int i);
+
+    default NumericValue percent(int i) {
+        return mul(i).div(100);
+    }
+
+
+    NumericValue add(NumericValue i);
+
+    NumericValue sub(NumericValue i);
+
+    NumericValue mul(NumericValue i);
+
+    NumericValue div(NumericValue i);
+}
+
+primitive record FixedPointNumber(int value, int shift) implements NumericValue {
+}
+
+primitive record FloatingPointNumber(double value) implements NumericValue {
+}
+
+interface PropertyContainer {
+
+    PropertyHolder properties();
+}
+
+interface Observable<T, E> {
+
+    void subscribe(Consumer<E> subscriber);
+
+    void unsubscribe(Consumer<E> subscriber); 
+}
+
+interface ObservableScalar<T> implements Observable<T, ScalarChangeEvent<T>> {
+
+   T get();
+   
+   <R> ObservableScalar<R> map(Function<T, R> f);
+   
+   <R> ObservableScalar<R> flatMap(Function<T, ObservableScalar<R>> f);   
+}
+
+interface ScalarProperty<T> implements ObservableScalar<T> {
+
+    void set(T value);
+    
+    void bindTo(ObservableScalar<T> other);
+    
+    default <T1> void bindTo(ObservableScalar<T1> other, Function<T1, T> f) {
+        bindTo(ObservableScalar.binding(other, f));
+    }
+    
+    default <T1, T2> void bindTo(ObservableScalar<T1> p1, ObservableScalar<T2> p2, BiFunction<T1, T2, T> f) {
+        bindTo(ObservableScalar.binding(p1, p2, f));
+    }
+    
+    // ...
+    
+    ObservableScalar<T> original();
+    
+    ObservableScalar<ObservableScalar<T>> replacement();
+}
+
+interface PropertyDefinition<N, T> {}
+
+record SimplePropertyDefinition<N, T>(Function<N, T> getter, BiConsumer<N, T> setter) implements PropertyDefinition<N, T> { // name?
+}
+
+record ExtendedPropertyDefinition<N, T>() implements PropertyDefinition<N, T> {}
+
+primitive class ObservableScalarImpl<N extends PropertyController, T> implements ObservableScalar<T> {
+
+    private final N container;
+    private final PropertyDefinition<N, T> definition;
+
+    @Override
+    public T get() {
+        return definition.getter().apply(container);
+    }   
+
+    @Override
+    public void set(T value) {
+        definition.setter().accept(container, value);
+    }
+
+    @Override
+    public void subscribe(Consumer<ChangeEvent> subscriber) {
+        n.properties().subscribe(subscriber, definition);
+    }
+
+    @Override
+    public void unsubscribe(Consumer<ChangeEvent> subscriber) {
+        n.properties().unsubscribe(subscriber, definition);
+    }
+}
+
+class PropertyHolder {
+    
+    private final Map<PropertyDefinition<?, ?>, List<Subscription>> subscriptions = new HashMap<>();
+    private final Map<Object, Object> extendedProperties = new HashMap<>();
+
+    public void onChange(ChangeEvent<?> changeEvent) {
+        subscriptions.getOrDefault(changeEvent.property, List.of()).forEach(c -> c.accept(changeEvent));
+    }
+
+    public void subscribe(Consumer<ChangeEvent> subscriber, PropertyDefinition property) {
+        subscriptions.computeIfAbsent(property, __ -> new ArrayList<>()).add(subscriber));
+    }
+
+    public void unsubscribe(Consumer<ChangeEvent> subscriber) {
+        subscriptions.forEach((prop, subscriptions) -> {
+            subscriptions.removeIf(s -> Objects.equals(subscriber, s.subscriber));
+        });
+    }
+}
+
+class TextNode extends Node {
+
+    @Property
+    String text;
+    
+    @Property
+    Point origin;
+    
+    public TextNode() {
+    }
+    
+    public TextNode(String text) {
+        this.text = text;
+    }
+    
+    public ObservableScalar<String> text() {
+        return TextNodeProps.text(this);
+    }
+    
+    public ObservableScalar<Point> origin() {
+        return TextNodeProps.origin(this);
+    }
+}
+
+class Control extends Node {
+}
+
+abstract class ControlImpl<C extends Control> {
+
+    protected abstract ObservableScalar<Node> createContent();
+}
+
+class Button<N extends Node> extends Control {
+
+    @Property
+    N content;
+    
+    @Property
+    boolean armed;
+    
+    public Button() {
+    }
+    
+    public Button(N graphic) {
+        this.graphic = graphic;
+    }
+    
+    public Button(String text) {
+        this(new Label(text));
+    }
+    
+    public ObservableScalar<N> content() {
+        return ButtonProps.content(this);
+    }
+    
+    public ObservableScalar<Boolean> armed() {
+        return ButtonProps.armed(this);
+    }
+
+    @EventBusIzé
+    public EventBus onClick() {
+        return ButtonProps.onClick(this);
+    }
+}
+
+class ButtonImpl extends ControlImpl<Button> {
+
+    public ButtonImpl(Button button) {
+        super(button);
+    }
+    
+    @Override
+    public ObservableScalar<Node> createContent() {
+        return ObservableScalar.ofConstant(new Border(
+            new Background(binding(control.armed(), armed -> armed ? Color.GRAY : Color.YELLOW), 
+                new Centered(
+                    button.content()
+                )
+            )
+        ));
+    }
+}
+
+record Subscription(Consumer<ChangeEvent> subscriber, List<PropertyDefinition<?, ?>> properties) {
+}
+
+// sealed interface PrimitiveNode extends Node permits DrawMesh, Group {}
+
+class FillRectangle extends Node {
+
+    @Property    
+    Rectangle rectangle;
+    
+    @Property
+    Color color;
+    
+    public FillRectangle() {
+    }
+    
+    public FillRectangle(Rectangle rectangle, Color color) {
+        this.rectangle = rectangle;
+        this.color = color;
+    }
+
+    public ObservableScalar<Rectangle> rectangle() {
+        return FillRectangleProps.rectangle(this);
+    }
+
+    public ObservableScalar<Color> color() {
+        return FillRectangleProps.color(this);
+    }
+}
+
+class DrawLine implements Node {
+
+    @Property
+    Point start, end;
+    
+    public ObservableScalar<Point> start() {
+        return DrawLineProps.start(this);
+    }
+    
+    public ObservableScalar<Point> end() {
+        return DrawLineProps.end(this);
+    }
+    
+    @Override
+    public ObservableList<? extends Node> children() {
+        // TODO melyik legyen a primitív?
+    }
+    
+    @Override
+    public ObservableScalar<Rectangle> boundingBox() {
+        return binding(start(), end(), Rectangle::ofCorners);
+    }
+}
+
+class Group implements Node {
+
+    private final ObservableList<Node> nodes = new ObservableList<>();
+
+    @Override
+    public ObservableList<Node> children() {
+        return nodes;
+    }
+    
+    @Override
+    public ObservableScalar<Rectangle> boundingBox() {
+        return nodes.streamBinding().reduce(Rectangle::union);
+    } 
+}
+
+class DrawMesh<V extends AbstractVector, VI, FI> extends Node {
+
+    public final MemorySegment vertices;
+    public final Function<VI, Function<MemorySegment, V>> vertexShader;
+    public final Function<FI, Function<V, PointData>> fragmentShader;
+    
+    @Property
+    VI vertexShaderInput;
+    
+    @Property
+    FI fragmentShaderInput;
+
+    public DrawMesh(MemorySegment vertices, 
+                    Function<SI, Function<MemorySegment, V>> vertexShader, 
+                    Function<V, PointData> fragmentShader) {
+        this.vertices = vertices;
+        this.vertexShader = vertexShader;
+        this.fragmentShader = fragmentShader;
+    }
+
+    public DrawMesh(MemorySegment vertices, 
+                    Function<SI, Function<MemorySegment, V>> vertexShader, 
+                    Function<V, PointData> fragmentShader, 
+                    VI vertexShaderInput, FI fragmentShaderInput) {
+        this.vertices = vertices;
+        this.vertexShader = vertexShader;
+        this.fragmentShader = fragmentShader;
+        this.vertexShaderInput = vertexShaderInput;
+        this.fragmentShaderInput = fragmentShaderInput;
+    }
+    
+    public ObservableScalar<VI> vertexShaderInput() {
+        return DrawMeshProps.vertexShaderInput(this);
+    }
+    
+    public ObservableScalar<FI> fragmentShaderInput() {
+        return DrawMeshProps.fragmentShaderInput(this);
+    }
+}
+
+class Decomposer {
+
+    private final Node root;
+    private final Set<Class<? extends Node>> primitives;
+    private final Map<Class<? extends Node>, Function<? extends Node, ? extends Node>> transformers;
+
+    private final ObservableList<Node> nodes = new ObservableList<>();
+    private final Map<Node, Node> transformedNodes = new HashMap<>();
+
+    public Decomposer(Node root, Set<Class<?>> primitives, 
+                      Map<Class<? extends Node>, Function<? extends Node, ? extends Node>> transformers) {
+        this.root = root;
+        this.primitives = primitives;
+        this.transformers = transformers;
+        add(root);
+    }
+
+    private void onListChange(ListChange<Node> node) {
+        switch (evt) {
+            case ListAdd(int index, List<Node> elements) -> elements.forEach(this::add);
+            case ListRemove(int index, List<Node> elements) -> elements.forEach(this::remove);
+            default throw;
+        }
+    }
+    
+    private void add(Node node) {
+        if (primitives.contains(node.getClass())
+            nodes.add(node);
+        else if (transformers.containsKey(node.getClass())) {
+            Node newNode = transformers.get(node.getClass()).apply(node);
+            transformedNodes.put(node, newNode);
+            add(newNode);
+        } else
+            node.children().enumerateAndSubscribe(listChangeConsumer);
+    }
+    
+    private void remove(Node node) {
+        if (primitives.contains(node.getClass()))
+            nodes.remove(node);
+        else if (transformedNodes.containsKey(node))
+            remove(transformedNodes.remove(node));
+        else
+            node.children().unsubscribe(listChangeConsumer);
+    }
+    
+    public ObservableList<Node> nodes() {
+        return nodes;
+    }
+}
+
+class Java2DNode extends Node {
+
+    abstract void draw(Graphics2D g);
+}
+
+class Java2DShapeNode extends Node {
+
+    public final Stroke stroke;
+    public final Paint fill;
+    public final Shape shape;
+    
+    @Override
+    public void draw(Graphics2D g) {
+        
+    }
+}	
+
+class Java2DRenderer {
+    
+    private final Decomposer decomposer;   
+    private final Consumer<ListChange<Node>> listChangeConsumer;
+    private final List<Primitive> primitives;
+    
+    public Java2DRenderer(Node root) {
+        decomposer = new Decomposer();
+    }
+    
+    public void render(Graphics2D g) {
+    	for (Node node : decomposer.nodes()) {
+    	    ((Java2DNode) node).draw(g);
+    	}
+    }
+}
+
+
+
+
+
+
+
+        FillRectangle bg = new FillRectangle();
+        bg.color().bindTo(control.armed(), armed -> armed ? Color.GRAY : Color.YELLOW);
+        
+        TextNode label = new TextNode();
+        label.text().bindTo(button.text());
+
+        Node n = new Stack(bg, new Centered(label));
+        n.onMouseRelease().subscribe(evt -> button.onClick().fire());
+
+        return ObservableScalar.ofConstant(n);
+        
+        return ObservableScalar.ofConstant(
+            new Stack(
+                new FillRectangle() {{
+                    color().bindTo(control.armed(), armed -> armed ? Color.GRAY : Color.YELLOW));
+                }}, 
+                new Centered(
+                    new TextNode() {{
+                        text().bindTo(button.text());
+                    }}
+                )
+            ) {{
+                onMouseRelease().subscribe(evt -> button.onClick().fire());
+            }}
+        );
+  
+        return Stack(
+            FillRectangle().color(control.armed(), armed -> armed ? Color.GRAY : Color.YELLOW),
+            TextNode().text(button.text())
+        ).onClick(evt -> button.onClick.fire());
+              
+        
+//        <Stack>
+//            <FillRectangle color="control.armed(), armed -> armed ? Color.GRAY : Color.YELLOW" />
+//            <Centered>
+//                <TextNode text="button.text()" />
+//            </Centered>
+//        </Stack>
+        
+//        return Stack {
+//            FillRectangle {
+//              color: control.armed(), armed -> armed ? Color.GRAY : Color.YELLOW)
+//            }, 
+//            
+//            Centered {
+//              TextNode {
+//                text: button.text
+//              }
+//            }, 
+//            
+//            onMouseRelease: evt -> button.onClick().fire()
+//        };      
+
