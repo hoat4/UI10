@@ -16,20 +16,12 @@ public class StackPane extends Pane {
 
     @Override
     protected Node.Layout computeLayout(BoxConstraints constraints) {
-        if (children().isEmpty())
-            return new Layout(constraints, constraints.min()) {
-
-                @Override
-                protected void apply() {
-                }
-            }; // TODO
-
-        Size size = children().stream().map(n -> n.layout(constraints).size).reduce(Size::max).get();
+        Size size = children().stream().map(n -> n.layout(constraints).size).reduce(Size::max).orElse(constraints.min());
         return new Layout(constraints, size) {
             @Override
             protected void apply() {
                 children().forEach(n -> {
-                    n.layout(new BoxConstraints(size, size)).apply(ORIGO);
+                    n.layout(BoxConstraints.fixed(size)).apply(ORIGO);
                 });
             }
         };

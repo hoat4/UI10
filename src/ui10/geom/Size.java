@@ -2,33 +2,50 @@ package ui10.geom;
 
 import java.util.function.UnaryOperator;
 
-import static ui10.geom.NumericValue.num;
+import static ui10.geom.Num.num;
 
-public record Size(NumericValue width, NumericValue height, NumericValue depth) {
-    public static final Size ZERO = new Size(0, 0, 0);
+public record Size(Num width, Num height) {
+    public static final Size ZERO = new Size(0, 0);
 
-    public Size(int width, int height, int depth) {
-        this(num(width), num(height), num(depth));
+    public Size {
+        if (width.isNegative() || height.isNegative())
+            throw new IllegalArgumentException(width+" × "+height);
+    }
+
+    public Size(int width, int height) {
+        this(num(width), num(height));
     }
 
     public static Size max(Size a, Size b) {
-        return new Size(NumericValue.max(a.width, b.width),
-                NumericValue.max(a.height, b.height),
-                NumericValue.max(a.depth, b.depth));
+        return new Size(Num.max(a.width, b.width),
+                Num.max(a.height, b.height));
+    }
+
+    public Size add(Size s) {
+        return new Size(width.add(s.width()), height.add(s.height()));
     }
 
     public Size subtract(Point point) {
-        return new Size(width.sub(point.x()), height.sub(point.y()), depth.sub(point.z()));
+        return new Size(width.sub(point.x()), height.sub(point.y()));
     }
+
     public Size subtract(Size s) {
-        return new Size(width.sub(s.width()), height.sub(s.height()), depth.sub(s.depth()));
+        return new Size(width.sub(s.width()), height.sub(s.height()));
     }
 
-    public Size divide(NumericValue divisor) {
-        return lanewise(n->n.div(divisor));
+    public Size subtractOrClamp(Size s) {
+        return new Size(Num.max(Num.ZERO, width.sub(s.width())), Num.max(Num.ZERO, height.sub(s.height())));
     }
 
-    private Size lanewise(UnaryOperator<NumericValue> op) {
-        return new Size(op.apply(width), op.apply(height), op.apply(depth));
+    public Size divide(Num divisor) {
+        return lanewise(n -> n.div(divisor));
+    }
+
+    private Size lanewise(UnaryOperator<Num> op) {
+        return new Size(op.apply(width), op.apply(height));
+    }
+
+    public Point asPoint() {
+        return new Point(width, height);
     }
 }

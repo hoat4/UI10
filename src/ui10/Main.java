@@ -1,13 +1,12 @@
 package ui10;
 
 import ui10.animation.Animation;
+import ui10.controls.Button;
 import ui10.geom.Point;
 import ui10.geom.Size;
+import ui10.image.RGBColor;
 import ui10.node.*;
-import ui10.nodes.AnchorPane;
-import ui10.nodes.Desktop;
-import ui10.nodes.LineNode;
-import ui10.nodes.RectangleNode;
+import ui10.nodes.*;
 import ui10.renderer.java2d.AWTDesktop;
 
 import java.time.Duration;
@@ -19,12 +18,12 @@ public class Main {
         Desktop desktop = new AWTDesktop(eventLoop).desktop;
 
         Window window = new Window();
-        RectangleNode r = new RectangleNode(new Size(100, 100, 0));
+        Node r = new FixedSize(new RectangleNode(RGBColor.RED), new Size(100, 100));
         AnchorPane p = new AnchorPane(
-                new AnchorPane.AnchoredItem(r, new Point(50, 50, 0)),
-                new AnchorPane.AnchoredItem(new LineNode(new Point(100, 100, 0)), new Point(0, 0, 0))
+                new AnchorPane.AnchoredItem(new Point(50, 50), r),
+                new AnchorPane.AnchoredItem(new Point(0, 0), new LineNode(new Point(100, 100)))
         );
-        window.content().set(p);
+        window.content().set(new Centered(new Button("Gomb")));
         desktop.windows().add(window);
         window.shown().getAndSubscribe(b->{
             if (!b)
@@ -32,12 +31,14 @@ public class Main {
         });
 
         Thread.sleep(1000);
-        AnchorPane.AnchoredItem i = new AnchorPane.AnchoredItem(new RectangleNode(
-                new Size(100, 100, 0)), new Point(200, 200, 0));
+        AnchorPane.AnchoredItem i = new AnchorPane.AnchoredItem(
+                new Point(200, 200),
+                new FixedSize(new RectangleNode(RGBColor.BLUE), new Size(100, 100))
+        );
         p.items().add(i);
         Thread.sleep(1000);
         Animation.playTransition(i.pos(), Animation.Interpolator.FOR_POINTS, Animation.EasingFunction.VACAK,
-                eventLoop, new Point(50, 200, 0), new Point(200, 200, 0),
+                eventLoop, new Point(50, 200), new Point(200, 200),
                 Duration.ofMillis(1000));
         /*for (int j = 0; j < 200; j++) {
             Thread.sleep(10);

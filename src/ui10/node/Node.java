@@ -1,6 +1,7 @@
 package ui10.node;
 
 import ui10.binding.*;
+import ui10.font.FontContext;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
@@ -16,6 +17,8 @@ public abstract class Node extends PropertyHolder {
     private Size size;
 
     private Layout appliedLayout;
+
+    private FontContext font;
 
     public Object rendererData;
 
@@ -58,6 +61,8 @@ public abstract class Node extends PropertyHolder {
         if (prevLayout != null && prevLayout.valid.get() &&
                 prevLayout.inputConstraints.equals(constraints))
             return prevLayout;
+
+        children();
 
         return prevLayout = computeLayout(constraints);
     }
@@ -104,6 +109,10 @@ public abstract class Node extends PropertyHolder {
         return property((Node n) -> n.appliedLayout, (n, v) -> n.appliedLayout = v);
     }
 
+    public ScalarProperty<FontContext> font() {
+        return inheritableProperty(Node::parent, (Node n) -> n.font, (n, v) -> n.font = v);
+    }
+
     public abstract class Layout {
 
         public final Size size;
@@ -113,7 +122,7 @@ public abstract class Node extends PropertyHolder {
         public Layout(BoxConstraints inputConstraints, Size size) {
             this.inputConstraints = inputConstraints;
             Objects.requireNonNull(size);
-            this.size = size;
+            this.size = inputConstraints.clamp(size);
 
             if (children() != null)
                 children().subscribe(c -> valid.set(false));

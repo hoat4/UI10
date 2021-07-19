@@ -1,6 +1,6 @@
 package ui10.geom;
 
-import static ui10.geom.NumericValue.num;
+import static ui10.geom.Num.num;
 
 public record Rectangle(Point topLeft, Point rightBottom) {
 
@@ -9,8 +9,7 @@ public record Rectangle(Point topLeft, Point rightBottom) {
     }
 
     public Size size() {
-        return new Size(rightBottom.x().sub(topLeft.x()),
-                rightBottom.y().sub(topLeft.y()), rightBottom.z().sub(topLeft.z()));
+        return new Size(rightBottom.x().sub(topLeft.x()), rightBottom.y().sub(topLeft.y()));
     }
 
     public static Rectangle rect(Point a, Point b) {
@@ -27,12 +26,12 @@ public record Rectangle(Point topLeft, Point rightBottom) {
     }
 
     public static Rectangle of(Size size) {
-        return new Rectangle(Point.ORIGO, new Point(size.width(), size.height(), size.depth()));
+        return new Rectangle(Point.ORIGO, new Point(size.width(), size.height()));
     }
 
     public Rectangle centered(Size size) {
         // (size() - size) / 2
-        return new Rectangle(topLeft.add(size().subtract(size).divide(num(2))), size);
+        return new Rectangle(topLeft.add(size().asPoint().subtract(size).divide(num(2))), size);
     }
 
 }

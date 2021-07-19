@@ -15,12 +15,12 @@ public class Centered extends SingleNodeLayoutNode {
 
     @Override
     protected Layout computeLayout(BoxConstraints constraints) {
-        return new Layout(constraints, constraints.max()) {
+        Node n = content().get();
+        Layout contentLayout = n.layout(constraints.withMinimum(Size.ZERO));
+        return new Layout(constraints, contentLayout.size) {
 
             @Override
             protected void apply() {
-                Node n = content().get();
-                Layout contentLayout = n.layout(constraints.withMinimum(Size.ZERO));
                 applyChild(contentLayout, Rectangle.of(size).centered(contentLayout.size).topLeft());
             }
         };

@@ -3,26 +3,32 @@ package ui10.nodes;
 import ui10.binding.ObservableList;
 import ui10.binding.ScalarProperty;
 import ui10.geom.Size;
+import ui10.image.Color;
+import ui10.layout.BoxConstraints;
 import ui10.node.Node;
 
-public class RectangleNode extends FixedSizeNode {
+public class RectangleNode extends Node {
 
-    private Size size;
+    private Color color;
 
     public RectangleNode() {
     }
 
-    public RectangleNode(Size size) {
-        this.size = size;
+    public RectangleNode(Color color) {
+        this.color = color;
     }
 
-    public ScalarProperty<Size> rectangleSize() {
-        return property((RectangleNode n) -> n.size, (n, v) -> n.size = v);
+    public ScalarProperty<Color> color() {
+        return property((RectangleNode n) -> n.color, (n, v) -> n.color = v);
     }
 
     @Override
-    protected Size fixedSize() {
-        return size;
+    protected Layout computeLayout(BoxConstraints constraints) {
+        return new Layout(constraints, constraints.min()) {
+            @Override
+            protected void apply() {
+            }
+        };
     }
 
     @Override
@@ -30,4 +36,8 @@ public class RectangleNode extends FixedSizeNode {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "RectangleNode (" + color + ", " + position().get() + ", " + size().get() + ")";
+    }
 }

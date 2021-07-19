@@ -21,7 +21,7 @@ public class NodeRendererComponent extends Canvas {
         root.getAndSubscribe(v -> {
             eventLoop.runLater(() -> {
                 if (v != null)
-                    renderer = new J2DRenderer(v, this::requestRepaint);
+                    renderer = new J2DRenderer(v, this::requestRepaint, this);
                 else if (renderer != null) {
                     renderer.dispose();
                     renderer = null;

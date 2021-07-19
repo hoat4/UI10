@@ -1,18 +1,21 @@
 package ui10.renderer.java2d;
 
 import ui10.binding.ObservableList;
+import ui10.font.FontContext;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
 import ui10.nodes.LineNode;
 import ui10.node.Node;
 import ui10.nodes.RectangleNode;
+import ui10.nodes.TextNode;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
+import static ui10.geom.Num.num;
 import static ui10.geom.Point.ORIGO;
 
 public class J2DRenderer {
@@ -20,12 +23,16 @@ public class J2DRenderer {
     public int canvasWidth, canvasHeight;
     private final Node root;
     private final Runnable requestUpdate;
+    private final J2DFontRenderer fontRenderer;
 
     private Rectangle dirtyRegion;
 
-    public J2DRenderer(Node root, Runnable requestUpdate) {
+    public J2DRenderer(Node root, Runnable requestUpdate, Component awtComponent) {
         this.root = root;
         this.requestUpdate = requestUpdate;
+        this.fontRenderer = new J2DFontRenderer(awtComponent);
+
+        root.font().set(new FontContext(fontRenderer, num(12)));
         init(root, new AffineTransform());
     }
 
@@ -42,10 +49,18 @@ public class J2DRenderer {
 
         if (node instanceof RectangleNode r) {
             FillItem item = new FillItem();
+            Size size = r.size().get();
+            if (size == null){
+                r.size().subscribe(e->{
+                    if (node.rendererData == null)
+                        init(node, transform);
+                });
+                return;
+            }
             item.shape = new Rectangle2D.Double(0, 0,
-                    r.rectangleSize().get().width().toDouble(),
-                    r.rectangleSize().get().height().toDouble());
-            item.fill = Color.GREEN;
+                    r.size().get().width().toDouble(),
+                    r.size().get().height().toDouble());
+            item.fill = J2DUtil.color(r.color().get());
             initPrimitive(node, item, transform);
         } else if (node instanceof LineNode line) {
             StrokeItem item = new StrokeItem();
@@ -54,6 +69,12 @@ public class J2DRenderer {
             item.shape = new Line2D.Double(0, 0,
                     line.end().get().x().toDouble(), line.end().get().y().toDouble());
             initPrimitive(node, item, transform);
+        } else if (node instanceof TextNode text) {
+            TextItem item = new TextItem();
+            item.font = node.font().get();
+            item.text = text.text().get();
+            item.fontRenderer = fontRenderer;
+            initPrimitive(text, item, transform);
         } else if (node.children() == null) {
             throw new RuntimeException("not a rendering primitive " +
                     "and not decomposable into children: " + node.children());
@@ -85,10 +106,10 @@ public class J2DRenderer {
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        Node.Layout layout = root.layout(BoxConstraints.fixed(new Size(canvasWidth, canvasHeight, 0)));
+        Node.Layout layout = root.layout(BoxConstraints.fixed(new Size(canvasWidth, canvasHeight)));
         layout.valid.subscribe(v->{
             if (!v.newValue())
-                updateDirtyRegion(Rectangle.rect(ORIGO, new ui10.geom.Point(canvasWidth, canvasHeight, 0)));
+                updateDirtyRegion(Rectangle.rect(ORIGO, new ui10.geom.Point(canvasWidth, canvasHeight)));
         });
         layout.apply(ORIGO);
 
@@ -107,7 +128,7 @@ public class J2DRenderer {
             for (Node n : node.children())
                 draw(g, n, false);
         else
-            throw new RuntimeException("unknown render data: " + node.rendererData+" for "+node);
+            System.err.println("unknown render data: " + node.rendererData+" for "+node);
 
         if (!root)
             g.translate(-node.position().get().x().toDouble(), -node.position().get().y().toDouble());

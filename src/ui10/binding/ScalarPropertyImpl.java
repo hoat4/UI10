@@ -26,6 +26,10 @@ record ScalarPropertyImpl<N extends PropertyHolder, T>(
 
     @Override
     public ScalarProperty<T> set(T value) {
+        PropertyHolder.PropertyData<T> propertyData = container().propertyDataOrNull(definition);
+        if (propertyData != null && propertyData.boundTo != null)
+            propertyData.boundTo.unsubscribe(this);
+
         T oldValue = definition.get(container);
         definition.set(container, value);
         container.onChange(new ChangeEvent<>(definition, oldValue, value));
@@ -39,6 +43,7 @@ record ScalarPropertyImpl<N extends PropertyHolder, T>(
         PropertyHolder.PropertyData propertyData = container().propertyData(definition);
         if (propertyData.boundTo != null)
             propertyData.boundTo.unsubscribe(this);
+        set(other.get());
         propertyData.boundTo = other;
         propertyData.boundTo.subscribe(this);
     }

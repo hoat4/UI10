@@ -19,6 +19,28 @@ public class PropertyHolder {
         return property(new PropertyDefinition.SimplePropertyDefinition<>(getter, setter));
     }
 
+    protected <N extends PropertyHolder, T> ScalarProperty<T> inheritableProperty(Function<N, ObservableScalar<N>> parentFunction,
+                                                                                  PropertyDefinition<N, T> def) {
+        ScalarProperty<T> prop = property(def);
+        PropertyData<?> propData = properties.get(def);
+        if (propData == null || !propData.inheritanceInitialized) {
+            prop.bindTo(parentFunction.apply((N) this).flatMap(parent -> {
+                return parent.inheritableProperty(parentFunction, def);
+            }));
+
+            if (propData == null)
+                properties.put(def, propData = new PropertyData<>());
+            propData.inheritanceInitialized = true; // TODO ezt előtte kéne, vagy így, utána?
+        }
+        return prop;
+    }
+
+    protected <N extends PropertyHolder, T> ScalarProperty<T> inheritableProperty(Function<N, ObservableScalar<N>> parentFunction,
+                                                                                  Function<N, T> getter, BiConsumer<N, T> setter) {
+        return inheritableProperty(parentFunction, new PropertyDefinition.SimplePropertyDefinition<>(getter, setter));
+    }
+
+
     public <T extends PropertyEvent> void onChange(T changeEvent) {
         // TODO ez a cast miért fordul le?
         List<? extends Consumer<T>> consumers = (List<? extends Consumer<T>>)
@@ -30,6 +52,11 @@ public class PropertyHolder {
 
     public <T> void subscribe(Consumer<? extends PropertyEvent> subscriber, PropertyDefinition<?, T> property) {
         propertyData(property).add(subscriber);
+    }
+
+    @SuppressWarnings("unchecked")
+    <T> PropertyData<T> propertyDataOrNull(PropertyDefinition<?, T> property) {
+        return (PropertyData<T>) properties.get(property);
     }
 
     <T> PropertyData<?> propertyData(PropertyDefinition<?, T> property) {
@@ -52,5 +79,6 @@ public class PropertyHolder {
     static class PropertyData<T> extends ArrayList<Consumer<? extends PropertyEvent>> {
 
         public ObservableScalar<T> boundTo;
+        public boolean inheritanceInitialized;
     }
 }

@@ -1,23 +1,23 @@
 package ui10.geom;
 
-public record FloatingPointNumber(double value) implements NumericValue {
+public record FloatingPointNumber(double value) implements Num {
     @Override
     public double toDouble() {
         return value;
     }
 
     @Override
-    public NumericValue add(NumericValue n) {
+    public Num add(Num n) {
         return new FloatingPointNumber(toDouble() + n.toDouble());
     }
 
     @Override
-    public NumericValue sub(NumericValue n) {
+    public Num sub(Num n) {
         return new FloatingPointNumber(toDouble() - n.toDouble());
     }
 
     @Override
-    public NumericValue div(NumericValue n) {
+    public Num div(Num n) {
         return new FloatingPointNumber(toDouble() / n.toDouble());
     }
 

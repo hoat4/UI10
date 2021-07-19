@@ -1,7 +1,7 @@
 package ui10.node;
 
 import ui10.geom.FloatingPointNumber;
-import ui10.geom.NumericValue;
+import ui10.geom.Num;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -27,7 +27,7 @@ public class EventLoop {
         });
     }
 
-    public void beginAnimation(Duration duration, Consumer<NumericValue> f) {
+    public void beginAnimation(Duration duration, Consumer<Num> f) {
         Animation animation = new Animation(duration, f);
         animation.scheduledFuture = executorService.scheduleAtFixedRate(animation,
                 0, 16, TimeUnit.MILLISECONDS);
@@ -37,11 +37,11 @@ public class EventLoop {
 
         private final Instant begin = now();
         private final Duration duration;
-        private final Consumer<NumericValue> consumer;
+        private final Consumer<Num> consumer;
         private ScheduledFuture<?> scheduledFuture;
         private boolean done;
 
-        public Animation(Duration duration, Consumer<NumericValue> consumer) {
+        public Animation(Duration duration, Consumer<Num> consumer) {
             this.duration = duration;
             this.consumer = consumer;
         }

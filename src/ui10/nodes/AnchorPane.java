@@ -63,7 +63,7 @@ public class AnchorPane extends Node {
         public final Node node;
         private final ScalarProperty<Point> point = ScalarProperty.create();
 
-        public AnchoredItem(Node node, Point pos) {
+        public AnchoredItem(Point pos, Node node) {
             this.node = node;
             pos().set(pos);
         }
