@@ -61,6 +61,7 @@ public abstract class AbstractPane extends PropertyHolder implements Pane {
         }
 
         protected void applyChild(Frame.FrameAndLayout childLayout, Point pos) {
+            childLayout.paneLayout().apply();
             childLayout.frame().bounds().set(new Rectangle(pos, childLayout.size()));
             childLayout.frame().appliedLayout().set(childLayout);
             childLayout.frame().layoutInvalid().subscribe(e -> { // TODO unsubscribe

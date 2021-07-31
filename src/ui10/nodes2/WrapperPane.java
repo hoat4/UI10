@@ -5,6 +5,13 @@ import ui10.layout.BoxConstraints;
 
 public class WrapperPane extends AbstractSingleNodeLayoutPane {
 
+    // TODO legyen default konstruktor is?
+    //      a Pane-es mit csinál(jon), ha nullt kap?
+
+    public WrapperPane(Pane content) {
+        super(content);
+    }
+
     public WrapperPane(ObservableScalar<? extends Pane> content) {
         super(content);
     }

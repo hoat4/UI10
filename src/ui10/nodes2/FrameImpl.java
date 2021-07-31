@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 public class FrameImpl extends PropertyHolder implements Frame {
 
-    private Pane pane;
+    private final ScalarProperty<Pane> pane = ScalarProperty.create();
 
     private Rectangle bounds;
     private FrameAndLayout appliedLayout;
@@ -23,16 +23,16 @@ public class FrameImpl extends PropertyHolder implements Frame {
     }
 
     public FrameImpl(Pane pane) {
-        this.pane = pane;
+        this.pane.set(pane);
     }
 
     @Override
     public ScalarProperty<Pane> pane() {
-        return property((FrameImpl f) -> f.pane, (f, v) -> f.pane = v);
+        return pane;
     }
 
     public FrameAndLayout layout(BoxConstraints constraints) {
-        Pane.Layout l = pane.computeLayout(constraints);
+        Pane.Layout l = pane.get().computeLayout(constraints);
         return new FrameAndLayout(this, constraints, l, l.size());
     }
 
@@ -65,6 +65,6 @@ public class FrameImpl extends PropertyHolder implements Frame {
 
     @Override
     public String toString() {
-        return pane + " @ " + bounds;
+        return pane.get() + " @ " + bounds;
     }
 }

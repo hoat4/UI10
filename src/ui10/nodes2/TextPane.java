@@ -6,7 +6,7 @@ import ui10.font.TextStyle;
 import ui10.font.FontMetrics;
 import ui10.layout.BoxConstraints;
 
-public class TextPane extends AbstractPane{
+public class TextPane extends AbstractPane {
 
     private String text;
     private TextStyle font;
@@ -14,7 +14,7 @@ public class TextPane extends AbstractPane{
     public TextPane() {
     }
 
-    public TextPane(TextStyle font ) {
+    public TextPane(TextStyle font) {
         this.font = font;
     }
 
@@ -38,6 +38,9 @@ public class TextPane extends AbstractPane{
 
     @Override
     public AbstractLayout computeLayout(BoxConstraints constraints) {
+        if (textStyle().get() == null)
+            throw new IllegalStateException("no text style specified for " + this);
+
         FontMetrics m = textStyle().get().textSize(text().get());
         return new AbstractLayout(constraints, m.size()) {
             @Override

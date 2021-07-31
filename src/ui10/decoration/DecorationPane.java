@@ -8,7 +8,7 @@ import ui10.nodes2.Pane;
 
 import java.util.Arrays;
 
-public class DecorationPane extends AbstractPane {
+public class DecorationPane extends AbstractPane implements Decorable{
 
     private final FrameImpl content;
     private final ObservableList<Decoration> decorations;
@@ -20,6 +20,7 @@ public class DecorationPane extends AbstractPane {
         this.decorations.addAll(Arrays.asList(decorations));
     }
 
+    @Override
     public ObservableList<Decoration> decorations() {
         return decorations;
     }

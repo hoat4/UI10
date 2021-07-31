@@ -44,11 +44,14 @@ public class PropertyHolder {
     public <T extends PropertyEvent> void onChange(T changeEvent) {
         // TODO ez a cast hibásan van jelezve az IDE-ben, ott akkor is lefordul ha kiveszem a belső castot,
         //      pedig nem kéne
-        List<? extends Consumer<T>> consumers = (List<? extends Consumer<T>>)(List<? extends Consumer<?>>)
+        List<? extends Consumer<T>> consumers = (List<? extends Consumer<T>>) (List<? extends Consumer<?>>)
                 properties.get(changeEvent.property());
-        if (consumers != null)
-            for (int i = 0; i < consumers.size(); i++)
+        if (consumers != null) {
+            // szándékosan kiemelve változóba, hogy az újonnan bejegyzett consumereket ne vegyük figyelembe
+            int consumerCount = consumers.size();
+            for (int i = 0; i < consumerCount; i++)
                 consumers.get(i).accept(changeEvent);
+        }
     }
 
     // itt a consumer inkább Consumer<? super ? extends PropertyEvent> lenne, de olyat nem lehet

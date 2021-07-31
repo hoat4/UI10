@@ -17,7 +17,6 @@ class SelfContainedScalarProperty<T> implements ScalarProperty<T> {
     private final Consumer<ChangeEvent<? extends T>> boundValueConsumer = evt -> set(evt.newValue());
 
     private ObservableList<PropertyTransformation<T>> transformations;
-    private boolean valid;
     private Scope transformScope;
     private T transformedValue;
 
@@ -34,50 +33,36 @@ class SelfContainedScalarProperty<T> implements ScalarProperty<T> {
 
     @Override
     public T get() {
-        if (transformations == null)
-            return value;
-
-        if (!valid) {
-            computeTransformedValue();
-        }
         return transformedValue;
-    }
-
-    private void computeTransformedValue() {
-        if (transformScope != null)
-            transformScope.close();
-        transformScope = new Scope();
-        T v = value;
-
-        for (PropertyTransformation<T> t : transformations) {
-            v = t.apply(v, transformScope);
-        }
-        transformedValue = v;
-        valid = true;
     }
 
     @Override
     public ScalarProperty<T> set(T value) {
+        // TODO unbind?
         if (!Objects.equals(this.value, value))
             setImpl(value);
         return this;
     }
 
     private void setImpl(T value) {
-        T oldValue = get();
+        T oldValue = transformedValue;
         this.value = value;
 
-        if (transformations == null) {
-            subscribers.forEach(c -> c.accept(new ChangeEvent<>(null, oldValue, value)));
-            return;
-        }
+        if (transformScope != null)
+            transformScope.close();
+        transformScope = new Scope();
+        T v = value;
 
-        if (subscribers.isEmpty())
-            valid = false;
-        else {
-            computeTransformedValue();
-            if (!Objects.equals(oldValue, transformedValue))
-                subscribers.forEach(c -> c.accept(new ChangeEvent<>(null, oldValue, transformedValue)));
+        if (transformations != null)
+            for (PropertyTransformation<T> t : transformations) {
+                v = t.apply(v, transformScope);
+            }
+        transformedValue = v;
+
+        if (!Objects.equals(oldValue, transformedValue)) {
+            int n = subscribers.size();
+            for (int i = 0; i < n; i++)
+                subscribers.get(i).accept(new ChangeEvent<>(null, oldValue, transformedValue));
         }
     }
 

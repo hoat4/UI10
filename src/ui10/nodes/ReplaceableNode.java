@@ -1,6 +1,7 @@
 package ui10.nodes;
 
 import ui10.binding.ObservableList;
+import ui10.decoration.Decorable;
 import ui10.layout.BoxConstraints;
 import ui10.node.Node;
 
