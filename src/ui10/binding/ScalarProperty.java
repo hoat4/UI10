@@ -1,7 +1,5 @@
 package ui10.binding;
 
-import ui10.node.Node;
-
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -10,7 +8,11 @@ public interface ScalarProperty<T> extends ObservableScalar<T> {
     ScalarProperty<T> set(T value);
 
     // nonnull. vagy legyen nullable, ami kitörli az eddigi bindet?
-    void bindTo(ObservableScalar<T> other) ;
+    default void bindTo(ObservableScalar<? extends T> other) {
+        bindTo(other, (Scope) null);
+    }
+
+    void bindTo(ObservableScalar<? extends T> other, Scope scope);
 
     default <T1> void bindTo(ObservableScalar<T1> other, Function<T1, T> f) {
         bindTo(ObservableScalar.binding(other, f));
@@ -22,11 +24,10 @@ public interface ScalarProperty<T> extends ObservableScalar<T> {
 
     // ...
 
-    ObservableScalar<T> original();
-
-    ObservableScalar<ObservableScalar<T>> replacement();
+    ObservableList<PropertyTransformation<T>> transformations();
 
     static <T> ScalarProperty<T> create() {
         return new SelfContainedScalarProperty<>();
     }
+
 }

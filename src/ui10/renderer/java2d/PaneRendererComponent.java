@@ -2,21 +2,20 @@ package ui10.renderer.java2d;
 
 import ui10.binding.ScalarProperty;
 import ui10.node.EventLoop;
-import ui10.node.Node;
+import ui10.nodes2.Pane;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.time.Instant;
 
-public class NodeRendererComponent extends Canvas {
+public class PaneRendererComponent extends Canvas {
 
-    public final ScalarProperty<Node> root = ScalarProperty.create();
+    public final ScalarProperty<Pane> root = ScalarProperty.create();
 
     private final EventLoop eventLoop;
     private J2DRenderer renderer;
 
-    public NodeRendererComponent(EventLoop eventLoop) {
+    public PaneRendererComponent(EventLoop eventLoop) {
         this.eventLoop = eventLoop;
         root.getAndSubscribe(v -> {
             eventLoop.runLater(() -> {

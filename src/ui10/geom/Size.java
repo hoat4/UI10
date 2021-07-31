@@ -21,6 +21,10 @@ public record Size(Num width, Num height) {
                 Num.max(a.height, b.height));
     }
 
+    public static Size of(Point end) {
+        return new Size(end.x(), end.y());
+    }
+
     public Size add(Size s) {
         return new Size(width.add(s.width()), height.add(s.height()));
     }

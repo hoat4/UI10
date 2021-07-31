@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 public interface Observable<E> {
 
-    void subscribe(Consumer<E> subscriber);
+    void subscribe(Consumer<? super E> subscriber);
 
-    void unsubscribe(Consumer<E> subscriber);
+    void unsubscribe(Consumer<? super E> subscriber);
 }

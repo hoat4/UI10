@@ -34,4 +34,7 @@ public record Rectangle(Point topLeft, Point rightBottom) {
         return new Rectangle(topLeft.add(size().asPoint().subtract(size).divide(num(2))), size);
     }
 
+    public Rectangle withSize(Size size) {
+        return new Rectangle(topLeft, topLeft.add(size));
+    }
 }

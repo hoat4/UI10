@@ -7,6 +7,7 @@ import ui10.node.Node;
 import static ui10.geom.Point.ORIGO;
 
 public class StackPane extends Pane {
+
     public StackPane() {
     }
 

@@ -23,6 +23,7 @@ public interface ObservableScalar<T> extends Observable<ChangeEvent<T>> {
         return o;
     }
 
+    // TODO ez így nem használható, mert nem lehet unsubscribeolni
     default void getAndSubscribe(Consumer<T> c) {
         c.accept(get());
         subscribe(evt -> c.accept(evt.newValue()));
@@ -30,6 +31,28 @@ public interface ObservableScalar<T> extends Observable<ChangeEvent<T>> {
 
     default <R> ObservableScalar<R> map(Function<T, R> f) {
         return binding(this, f);
+    }
+
+    default <R> ObservableScalar<R> mapCloseable(Function<T, CloseableResult<R>> f) {
+        ScalarProperty<R> o = ScalarProperty.create();
+        getAndSubscribe(e->new Consumer<T>(){
+
+            private Runnable lastCloser;
+
+            @Override
+            public void accept(T t) {
+                if (lastCloser != null)
+                    lastCloser.run();
+
+                CloseableResult<R> r = f.apply(t);
+                lastCloser = r.close;
+                o.set(r.result);
+            }
+        });
+        return o;
+    }
+
+    record CloseableResult<R>(R result, Runnable close) {
     }
 
     default <R> ObservableScalar<R> flatMap(Function<T, ObservableScalar<R>> f) {

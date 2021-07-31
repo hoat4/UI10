@@ -1,7 +1,7 @@
 package ui10.node;
 
 import ui10.binding.*;
-import ui10.font.FontContext;
+import ui10.font.TextStyle;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
@@ -18,7 +18,7 @@ public abstract class Node extends PropertyHolder {
 
     private Layout appliedLayout;
 
-    private FontContext font;
+    private TextStyle font;
 
     public Object rendererData;
 
@@ -109,7 +109,7 @@ public abstract class Node extends PropertyHolder {
         return property((Node n) -> n.appliedLayout, (n, v) -> n.appliedLayout = v);
     }
 
-    public ScalarProperty<FontContext> font() {
+    public ScalarProperty<TextStyle> font() {
         return inheritableProperty(Node::parent, (Node n) -> n.font, (n, v) -> n.font = v);
     }
 

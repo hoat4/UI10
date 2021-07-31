@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
         EventLoop eventLoop = new EventLoop();
-        Desktop desktop = new AWTDesktop(eventLoop).desktop;
+        Desktop desktop = null;//new AWTDesktop(eventLoop).desktop;
 
         Window window = new Window();
         Node r = new FixedSize(new RectangleNode(RGBColor.RED), new Size(100, 100));

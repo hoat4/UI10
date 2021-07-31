@@ -4,7 +4,7 @@ import ui10.binding.ObservableList;
 import ui10.binding.ScalarProperty;
 import ui10.node.Node;
 
-public abstract class SingleNodeLayoutNode extends Node{
+public abstract class SingleNodeLayoutNode extends Node {
 
     // TODO a Layout-ot invalidálni kéne, ha a content megváltozik
 

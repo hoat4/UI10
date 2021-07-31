@@ -28,7 +28,7 @@ public class TextNode extends Node {
 
     @Override
     protected Layout computeLayout(BoxConstraints constraints) {
-        FontMetrics m = font().get().renderer().measure(text, font().get());
+        FontMetrics m = null;//font().get().renderer().measure(text, font().get());
         return new Layout(constraints, m.size()) {
             @Override
             protected void apply() {

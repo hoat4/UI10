@@ -1,9 +1,9 @@
 package ui10.renderer.java2d;
 
 import ui10.binding.ObservableList;
-import ui10.nodes.Desktop;
 import ui10.node.EventLoop;
-import ui10.node.Window;
+import ui10.nodes2.Desktop;
+import ui10.nodes2.Window;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -25,8 +25,9 @@ public class AWTDesktop {
 
     private void showWindow(Window window) {
         JFrame frame = new JFrame("Ablak");
-        window.rendererData = frame;
-        NodeRendererComponent comp = new NodeRendererComponent(eventLoop);
+        window.extendedProperties().put(JFrame.class, frame);
+        window.shown().set(true);
+        PaneRendererComponent comp = new PaneRendererComponent(eventLoop);
         comp.root.bindTo(window.content());
         frame.add(comp);
         frame.setSize(400, 300);
@@ -41,6 +42,7 @@ public class AWTDesktop {
     }
 
     private void hideWindow(Window window) {
-        ((JFrame) window.rendererData).dispose();
+        window.shown().set(false);
+        ((JFrame) window.extendedProperties().get(JFrame.class)).dispose();
     }
 }

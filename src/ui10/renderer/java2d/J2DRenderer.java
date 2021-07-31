@@ -1,96 +1,89 @@
 package ui10.renderer.java2d;
 
 import ui10.binding.ObservableList;
-import ui10.font.FontContext;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
-import ui10.nodes.LineNode;
-import ui10.node.Node;
-import ui10.nodes.RectangleNode;
-import ui10.nodes.TextNode;
+import ui10.nodes2.*;
+import ui10.nodes2.Frame;
+import ui10.nodes2.FrameImpl;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
-import static ui10.geom.Num.num;
 import static ui10.geom.Point.ORIGO;
 
 public class J2DRenderer {
 
     public int canvasWidth, canvasHeight;
-    private final Node root;
+    private final Frame root;
     private final Runnable requestUpdate;
-    private final J2DFontRenderer fontRenderer;
 
     private Rectangle dirtyRegion;
 
-    public J2DRenderer(Node root, Runnable requestUpdate, Component awtComponent) {
-        this.root = root;
+    public J2DRenderer(Pane root, Runnable requestUpdate, Component awtComponent) {
+        this.root = new FrameImpl(root);
         this.requestUpdate = requestUpdate;
-        this.fontRenderer = new J2DFontRenderer(awtComponent);
 
-        root.font().set(new FontContext(fontRenderer, num(12)));
-        init(root, new AffineTransform());
+        init(this.root, new AffineTransform());
     }
 
-    private void init(Node node, AffineTransform transform) {
-        if (node != root) {
-            if (node.position().get() == null) {
-                node.position().subscribe(change -> {
-                    if (node.rendererData == null)
-                        init(node, transform);
-                });
-                return;
-            }
+    private Object renderItem(Pane pane) {
+        return pane.extendedProperties().get(J2DRenderer.class);
+    }
+
+    private void init(Frame frame, AffineTransform transform) {
+        Pane pane = frame.pane().get();
+
+        if (frame.bounds().get() == null) {
+            frame.bounds().subscribe(change -> {
+                if (renderItem(pane) == null)
+                    init(frame, transform);
+            });
+            return;
         }
 
-        if (node instanceof RectangleNode r) {
+        Size size = frame.bounds().get().size();
+
+        if (pane instanceof FilledPane r) {
             FillItem item = new FillItem();
-            Size size = r.size().get();
-            if (size == null){
-                r.size().subscribe(e->{
-                    if (node.rendererData == null)
-                        init(node, transform);
-                });
-                return;
-            }
             item.shape = new Rectangle2D.Double(0, 0,
-                    r.size().get().width().toDouble(),
-                    r.size().get().height().toDouble());
+                    size.width().toDouble(),
+                    size.height().toDouble());
             item.fill = J2DUtil.color(r.color().get());
-            initPrimitive(node, item, transform);
-        } else if (node instanceof LineNode line) {
+            initPrimitive(frame, item, transform);
+        } else if (pane instanceof LinePane line) {
             StrokeItem item = new StrokeItem();
             item.stroke = new BasicStroke();
             item.paint = Color.BLACK;
             item.shape = new Line2D.Double(0, 0,
-                    line.end().get().x().toDouble(), line.end().get().y().toDouble());
-            initPrimitive(node, item, transform);
-        } else if (node instanceof TextNode text) {
+                    size.width().toDouble(), size.height().toDouble());
+            initPrimitive(frame, item, transform);
+        } else if (pane instanceof TextPane text) {
             TextItem item = new TextItem();
-            item.font = node.font().get();
+            item.font = (AWTTextStyle) text.textStyle().get();
             item.text = text.text().get();
-            item.fontRenderer = fontRenderer;
-            initPrimitive(text, item, transform);
-        } else if (node.children() == null) {
+            initPrimitive(frame, item, transform);
+        } else if (pane.children() == null) {
             throw new RuntimeException("not a rendering primitive " +
-                    "and not decomposable into children: " + node.children());
+                    "and not decomposable into children: " + pane.children());
         } else {
-            node.rendererData = RenderItem.HAS_CHILDREN;
-            node.children().enumerateAndSubscribe(ObservableList.simpleListSubscriber(
-                    newNode -> init(newNode, transform),
+            pane.extendedProperties().put(J2DRenderer.class, RenderItem.HAS_CHILDREN);
+            pane.children().enumerateAndSubscribe(ObservableList.simpleListSubscriber(
+                    newPane -> init(newPane, transform),
                     remove -> {
                     }));
         }
     }
 
-    private void initPrimitive(Node node, RenderItem renderItem, AffineTransform transform) {
+    private void initPrimitive(Frame frame, RenderItem renderItem, AffineTransform transform) {
         renderItem.transform = (AffineTransform) transform.clone();
-        renderItem.transform.translate(node.position().get().x().toDouble(), node.position().get().y().toDouble());
-        node.rendererData = renderItem;
+        renderItem.transform.translate(
+                frame.bounds().get().topLeft().x().toDouble(),
+                frame.bounds().get().topLeft().y().toDouble());
+        frame.pane().get().extendedProperties().put(J2DRenderer.class, renderItem);
         renderItem.bounds = renderItem.computeBounds(renderItem.transform);
         updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
     }
@@ -106,32 +99,37 @@ public class J2DRenderer {
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        Node.Layout layout = root.layout(BoxConstraints.fixed(new Size(canvasWidth, canvasHeight)));
-        layout.valid.subscribe(v->{
+        Size canvasSize = new Size(canvasWidth, canvasHeight);
+        Frame.FrameAndLayout layout = root.layout(BoxConstraints.fixed(canvasSize));
+        layout.frame().bounds().set(new Rectangle(ORIGO, canvasSize));
+        layout.paneLayout().valid().subscribe(v -> {
             if (!v.newValue())
                 updateDirtyRegion(Rectangle.rect(ORIGO, new ui10.geom.Point(canvasWidth, canvasHeight)));
         });
-        layout.apply(ORIGO);
+        layout.paneLayout().apply();
 
         draw(g, root, true);
 
         dirtyRegion = null;
     }
 
-    private void draw(Graphics2D g, Node node, boolean root) {
+    private void draw(Graphics2D g, Frame frame, boolean root) {
         if (!root)
-            g.translate(node.position().get().x().toDouble(), node.position().get().y().toDouble());
+            g.translate(frame.bounds().get().topLeft().x().toDouble(),
+                    frame.bounds().get().topLeft().y().toDouble());
 
-        if (node.rendererData instanceof RenderItem)
-            ((RenderItem) node.rendererData).draw(g);
-        else if (node.rendererData == RenderItem.HAS_CHILDREN)
-            for (Node n : node.children())
-                draw(g, n, false);
+        Object renderItem = renderItem(frame.pane().get());
+        if (renderItem instanceof RenderItem ri)
+            ri.draw(g);
+        else if (renderItem == RenderItem.HAS_CHILDREN)
+            for (Frame childFrame : frame.pane().get().children())
+                draw(g, childFrame, false);
         else
-            System.err.println("unknown render data: " + node.rendererData+" for "+node);
+            System.err.println("unknown render data: " + renderItem + " for " + frame);
 
         if (!root)
-            g.translate(-node.position().get().x().toDouble(), -node.position().get().y().toDouble());
+            g.translate(-frame.bounds().get().topLeft().x().toDouble(),
+                    -frame.bounds().get().topLeft().y().toDouble());
     }
 
     public void dispose() {

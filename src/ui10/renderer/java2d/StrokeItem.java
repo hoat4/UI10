@@ -1,7 +1,5 @@
 package ui10.renderer.java2d;
 
-import ui10.geom.Rectangle;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;

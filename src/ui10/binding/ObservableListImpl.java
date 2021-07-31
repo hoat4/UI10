@@ -14,6 +14,11 @@ public class ObservableListImpl<E> extends AbstractList<E> implements Observable
         list = new ArrayList<>();
     }
 
+    public ObservableListImpl(Consumer<ListChange<E>> initialSubscriber) {
+        list = new ArrayList<>();
+        subscribers.add(initialSubscriber);
+    }
+
     public ObservableListImpl(List<E> list) {
         this.list = list;
     }

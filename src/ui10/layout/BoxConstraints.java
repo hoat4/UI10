@@ -31,4 +31,8 @@ public record BoxConstraints(Size min, Size max) {
                 Num.max(min.height(), Num.min(max.height(), size.height()))
         );
     }
+
+    public boolean contains(Size size) {
+        return true; // TODO
+    }
 }

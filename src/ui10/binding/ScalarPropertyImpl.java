@@ -6,16 +6,16 @@ import java.util.function.Consumer;
 record ScalarPropertyImpl<N extends PropertyHolder, T>(
         N container, PropertyDefinition<N, T> definition)
         implements ScalarProperty<T>,
-        Consumer<ChangeEvent<T>> // bindhoz
+        Consumer<ChangeEvent<? extends T>> // bindhoz
 {
 
     @Override
-    public void subscribe(Consumer<ChangeEvent<T>> subscriber) {
+    public void subscribe(Consumer<? super ChangeEvent<T>> subscriber) {
         container.subscribe(subscriber, definition);
     }
 
     @Override
-    public void unsubscribe(Consumer<ChangeEvent<T>> subscriber) {
+    public void unsubscribe(Consumer<? super ChangeEvent<T>> subscriber) {
         container.unsubscribe(subscriber, definition);
     }
 
@@ -37,7 +37,7 @@ record ScalarPropertyImpl<N extends PropertyHolder, T>(
     }
 
     @Override
-    public void bindTo(ObservableScalar<T> other) {
+    public void bindTo(ObservableScalar<? extends T> other, Scope scope) {
         Objects.requireNonNull(other);
 
         PropertyHolder.PropertyData propertyData = container().propertyData(definition);
@@ -46,20 +46,25 @@ record ScalarPropertyImpl<N extends PropertyHolder, T>(
         set(other.get());
         propertyData.boundTo = other;
         propertyData.boundTo.subscribe(this);
-    }
+
+        if (scope != null)
+            scope.onClose(() -> {
+                if (propertyData.boundTo != other)
+                    throw new IllegalStateException();
+                else {
+                    propertyData.boundTo = null;
+                    other.unsubscribe(ScalarPropertyImpl.this);
+                }
+            });
+}
 
     @Override
-    public ObservableScalar<T> original() {
-        return null;
-    }
-
-    @Override
-    public ObservableScalar<ObservableScalar<T>> replacement() {
-        return null;
-    }
-
-    @Override
-    public void accept(ChangeEvent<T> e) {
+    public void accept(ChangeEvent<? extends T> e) {
         set(e.newValue());
+    }
+
+    @Override
+    public ObservableList<PropertyTransformation<T>> transformations() {
+        throw new UnsupportedOperationException();
     }
 }

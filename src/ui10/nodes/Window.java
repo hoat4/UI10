@@ -1,8 +1,8 @@
-package ui10.node;
+package ui10.nodes;
 
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
-import ui10.nodes.ReplaceableNode;
+import ui10.node.Node;
 
 import java.util.Objects;
 
