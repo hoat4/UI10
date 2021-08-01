@@ -43,7 +43,7 @@ public abstract class AbstractPane extends PropertyHolder implements Pane {
          * clamped to constraints
          */
         protected final Size size;
-        private final ScalarProperty<Boolean> valid = ScalarProperty.create();
+        private final ScalarProperty<Boolean> valid = ScalarProperty.<Boolean>create().set(false);
 
         public AbstractLayout(BoxConstraints inputConstraints, Size size) {
             this.inputConstraints = inputConstraints;

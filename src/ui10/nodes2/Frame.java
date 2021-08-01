@@ -7,6 +7,8 @@ import ui10.layout.BoxConstraints;
 
 public interface Frame {
 
+    ScalarProperty<Pane> parent();
+
     ScalarProperty<Pane> pane();
 
     ScalarProperty<Rectangle> bounds();

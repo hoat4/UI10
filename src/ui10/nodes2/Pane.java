@@ -20,6 +20,7 @@ public interface Pane {
 
         Size size();
 
+        // ezt úgy kéne csinálni, hogy ne lehessen null az értéke, mert így a renderer crashelhet
         ScalarProperty<Boolean> valid();
 
         void apply();

@@ -10,6 +10,7 @@ public class FrameImpl extends PropertyHolder implements Frame {
 
     private final ScalarProperty<Pane> pane = ScalarProperty.create();
 
+    private Pane parent;
     private Rectangle bounds;
     private FrameAndLayout appliedLayout;
     private boolean layoutInvalid;
@@ -29,6 +30,11 @@ public class FrameImpl extends PropertyHolder implements Frame {
     @Override
     public ScalarProperty<Pane> pane() {
         return pane;
+    }
+
+    @Override
+    public ScalarProperty<Pane> parent() {
+        return property((FrameImpl f) -> f.parent, (f, v) -> f.parent = v);
     }
 
     public FrameAndLayout layout(BoxConstraints constraints) {

@@ -6,10 +6,9 @@ import java.awt.geom.Rectangle2D;
 
 public abstract class RenderItem {
 
-    public static final Object HAS_CHILDREN = new Object();
-
     public Rectangle2D bounds;
     public AffineTransform transform;
+    public RenderItem parent;
 
     abstract Rectangle2D computeBounds(AffineTransform transform);
 

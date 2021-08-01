@@ -15,6 +15,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static ui10.geom.Point.ORIGO;
 
@@ -23,7 +24,7 @@ public class J2DRenderer {
     public int canvasWidth, canvasHeight;
     private final Frame root;
     private final Runnable requestUpdate;
-    final List<AWTMouseTarget> mouseTargets = new ArrayList<>();
+    final List<ParentRenderItem> mouseTargets = new ArrayList<>();
 
     private Rectangle dirtyRegion;
 
@@ -31,30 +32,49 @@ public class J2DRenderer {
         this.root = new FrameImpl(root);
         this.requestUpdate = requestUpdate;
 
-        init(this.root, new AffineTransform());
+        init(this.root, new AffineTransform(), null);
     }
 
-    private Object renderItem(Pane pane) {
-        return pane.extendedProperties().get(J2DRenderer.class);
+    private RenderItem renderItem(Pane pane) {
+        return (RenderItem) pane.extendedProperties().get(J2DRenderer.class);
     }
 
-    private void init(Frame frame, AffineTransform transform) {
+    private void init(Frame frame, AffineTransform transform, RenderItem parent) {
         Pane pane = frame.pane().get();
 
         if (frame.bounds().get() == null) {
             frame.bounds().subscribe(change -> {
                 if (renderItem(pane) == null)
-                    init(frame, transform);
+                    init(frame, transform, parent);
             });
             return;
         }
 
 
-AffineTransform t = (AffineTransform) transform.clone();
+        AffineTransform t = (AffineTransform) transform.clone();
         t.translate(
                 frame.bounds().get().topLeft().x().toDouble(),
                 frame.bounds().get().topLeft().y().toDouble());
 
+        frame.bounds().subscribe(e -> {
+            recomputeBounds(frame);
+        });
+
+        RenderItem renderItem = makeRenderItem(frame, pane);
+        frame.pane().get().extendedProperties().put(J2DRenderer.class, renderItem);
+        renderItem.parent = parent;
+        renderItem.transform = transform;
+        renderItem.bounds = renderItem.computeBounds(renderItem.transform);
+        updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
+
+        if (pane.children() != null)
+            pane.children().enumerateAndSubscribe(ObservableList.simpleListSubscriber(
+                    newPane -> init(newPane, t, renderItem),
+                    remove -> {
+                    }));
+    }
+
+    private RenderItem makeRenderItem(Frame frame, Pane pane) {
         Size size = frame.bounds().get().size();
 
         if (pane instanceof FilledPane r) {
@@ -67,42 +87,50 @@ AffineTransform t = (AffineTransform) transform.clone();
                 item.fill = J2DUtil.color(r.color().get());
                 updateDirtyRegion(J2DUtil.rect(item.bounds));
             });
-            initPrimitive(frame, item, t);
+            return item;
         } else if (pane instanceof LinePane line) {
             StrokeItem item = new StrokeItem();
             item.stroke = new BasicStroke();
             item.paint = Color.BLACK;
             item.shape = new Line2D.Double(0, 0,
                     size.width().toDouble(), size.height().toDouble());
-            initPrimitive(frame, item, t);
+            return item;
         } else if (pane instanceof TextPane text) {
             TextItem item = new TextItem();
             item.font = (AWTTextStyle) text.textStyle().get();
             item.text = text.text().get();
-            initPrimitive(frame, item, t);
+            return item;
         } else if (pane.children() == null) {
             throw new RuntimeException("not a rendering primitive " +
                     "and not decomposable into children: " + pane.children());
         } else {
+            ParentRenderItem r = new ParentRenderItem(frame);
+
             if (pane instanceof MouseTarget mt) {
-                // TOOD tetszőleges shape lehessen
-                Rectangle2D rect = new Rectangle2D.Double(0, 0, size.width().toDouble(), size.height().toDouble());
-                mouseTargets.add(new AWTMouseTarget(t.createTransformedShape(rect), mt));
+                r.mouseTarget = mt;
+                mouseTargets.add(r);
             }
 
-            pane.extendedProperties().put(J2DRenderer.class, RenderItem.HAS_CHILDREN);
-            pane.children().enumerateAndSubscribe(ObservableList.simpleListSubscriber(
-                    newPane -> init(newPane, t),
-                    remove -> {
-                    }));
+            return r;
         }
     }
 
-    private void initPrimitive(Frame frame, RenderItem renderItem, AffineTransform transform) {
-        renderItem.transform = transform;
-        frame.pane().get().extendedProperties().put(J2DRenderer.class, renderItem);
+    private void recomputeBounds(Frame frame) {
+        RenderItem renderItem = renderItem(frame.pane().get());
+        Objects.requireNonNull(renderItem);
+
+        updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
+        renderItem.transform = renderItem.parent == null ? new AffineTransform() :
+                (AffineTransform) renderItem.parent.transform.clone();
+        renderItem.transform.translate(frame.bounds().get().topLeft().x().toDouble(),
+                frame.bounds().get().topLeft().y().toDouble());
+
         renderItem.bounds = renderItem.computeBounds(renderItem.transform);
         updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
+
+        if (frame.pane().get().children() != null)
+            for (Frame child : frame.pane().get().children())
+                recomputeBounds(child);
     }
 
     private void updateDirtyRegion(Rectangle r) {
@@ -139,14 +167,14 @@ AffineTransform t = (AffineTransform) transform.clone();
             g.translate(bounds.topLeft().x().toDouble(),
                     bounds.topLeft().y().toDouble());
 
-        Object renderItem = renderItem(frame.pane().get());
-        if (renderItem instanceof RenderItem ri)
-            ri.draw(g);
-        else if (renderItem == RenderItem.HAS_CHILDREN)
+        RenderItem renderItem = renderItem(frame.pane().get());
+        if (renderItem == null) {
+            System.err.println("unknown render data: " + renderItem + " for " + frame);
+        } else if (renderItem instanceof ParentRenderItem)
             for (Frame childFrame : frame.pane().get().children())
                 draw(g, childFrame, false);
         else
-            System.err.println("unknown render data: " + renderItem + " for " + frame);
+            renderItem.draw(g);
 
         if (!root)
             g.translate(-bounds.topLeft().x().toDouble(),

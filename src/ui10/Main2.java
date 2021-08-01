@@ -12,6 +12,7 @@ import ui10.renderer.java2d.AWTTextStyle;
 import java.util.List;
 import java.util.Map;
 
+import static ui10.geom.Num.ZERO;
 import static ui10.geom.Num.num;
 
 public class Main2 {
@@ -35,10 +36,11 @@ public class Main2 {
         ));
 
         TextButton button = new TextButton("Gomb");
+        Padding padding = new Padding(ZERO, ZERO, ZERO, ZERO, button);
         button.onClick().subscribe(v->{
-            System.out.println("Hello world!");
+            padding.top().set(padding.top().get().add(num(15)));
         });
-        Centered content = new Centered(button);
+        Centered content = new Centered(padding);
         DecorationPane dp = new DecorationPane(content, d);
 
         Window window = new Window(dp);

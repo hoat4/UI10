@@ -49,8 +49,8 @@ public class PaneRendererComponent extends Canvas {
         if (e.isConsumed())
             return;
 
-        for (AWTMouseTarget t : renderer.mouseTargets) {
-            if (t.shape.contains(e.getPoint())) {
+        for (ParentRenderItem t : renderer.mouseTargets) {
+            if (t.bounds.contains(e.getPoint())) {
                 dispatchMouseEvent(t.mouseTarget, e);
                 return;
             }
