@@ -4,8 +4,10 @@ import ui10.binding.ObservableList;
 import ui10.binding.ScalarProperty;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
+import ui10.pane.AbstractPane;
+import ui10.pane.FrameImpl;
 
-public class FilledPane extends AbstractPane{
+public class FilledPane extends AbstractPane {
 
     private Color color;
 

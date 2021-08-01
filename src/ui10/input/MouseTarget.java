@@ -3,8 +3,8 @@ package ui10.input;
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;
 import ui10.binding.ObservableScalar;
-import ui10.nodes2.Pane;
-import ui10.nodes2.WrapperPane;
+import ui10.pane.Pane;
+import ui10.pane.WrapperPane;
 
 public class MouseTarget extends WrapperPane {
 

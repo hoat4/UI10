@@ -1,7 +1,7 @@
 package ui10.renderer.java2d;
 
 import ui10.input.MouseTarget;
-import ui10.nodes2.Frame;
+import ui10.pane.Frame;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

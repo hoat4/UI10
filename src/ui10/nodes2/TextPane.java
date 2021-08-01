@@ -5,6 +5,8 @@ import ui10.binding.ScalarProperty;
 import ui10.font.TextStyle;
 import ui10.font.FontMetrics;
 import ui10.layout.BoxConstraints;
+import ui10.pane.AbstractPane;
+import ui10.pane.FrameImpl;
 
 public class TextPane extends AbstractPane {
 

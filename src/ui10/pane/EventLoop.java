@@ -1,4 +1,4 @@
-package ui10.node;
+package ui10.pane;
 
 import ui10.geom.FloatingPointNumber;
 import ui10.geom.Num;

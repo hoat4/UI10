@@ -1,3 +1,5 @@
+
+/*
 package ui10;
 
 import ui10.animation.Animation;
@@ -46,7 +48,8 @@ public class Main {
             eventLoop.runLater(()-> {
                 i.pos().set(new Point(50 + k, 200, 0));
             });
-        }*/
+        }*//*
 
     }
 }
+*/

@@ -1,10 +1,11 @@
-package ui10.nodes2;
+package ui10.layout;
 
 import ui10.binding.ScalarProperty;
 import ui10.geom.Num;
 import ui10.geom.Point;
 import ui10.geom.Size;
-import ui10.layout.BoxConstraints;
+import ui10.pane.Frame;
+import ui10.pane.Pane;
 
 public class Padding extends AbstractSingleNodeLayoutPane {
 

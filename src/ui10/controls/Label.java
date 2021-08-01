@@ -1,8 +1,10 @@
-package ui10.nodes2;
+package ui10.controls;
 
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.font.TextStyle;
+import ui10.nodes2.TextPane;
+import ui10.pane.Pane;
 
 public class Label extends Control{
 

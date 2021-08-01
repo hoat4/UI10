@@ -2,8 +2,8 @@ package ui10.renderer.java2d;
 
 import ui10.binding.ScalarProperty;
 import ui10.input.MouseTarget;
-import ui10.node.EventLoop;
-import ui10.nodes2.Pane;
+import ui10.pane.EventLoop;
+import ui10.pane.Pane;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;

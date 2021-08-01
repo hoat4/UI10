@@ -1,4 +1,4 @@
-package ui10.nodes2;
+package ui10.pane;
 
 import ui10.binding.ScalarProperty;
 import ui10.geom.Rectangle;

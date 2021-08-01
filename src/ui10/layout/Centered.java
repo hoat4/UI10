@@ -1,9 +1,10 @@
-package ui10.nodes2;
+package ui10.layout;
 
 import ui10.binding.ObservableScalar;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.layout.BoxConstraints;
+import ui10.pane.Frame;
+import ui10.pane.Pane;
 
 public class Centered extends AbstractSingleNodeLayoutPane{
 

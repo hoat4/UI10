@@ -2,8 +2,8 @@ package ui10.decoration;
 
 import ui10.binding.ObservableList;
 import ui10.binding.Scope;
-import ui10.nodes2.Frame;
-import ui10.nodes2.Pane;
+import ui10.pane.Frame;
+import ui10.pane.Pane;
 
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package ui10.nodes2;
+package ui10.pane;
 
 import ui10.binding.ObservableList;
 import ui10.binding.PropertyHolder;

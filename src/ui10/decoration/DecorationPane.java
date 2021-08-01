@@ -2,9 +2,9 @@ package ui10.decoration;
 
 import ui10.binding.ObservableList;
 import ui10.layout.BoxConstraints;
-import ui10.nodes2.AbstractPane;
-import ui10.nodes2.FrameImpl;
-import ui10.nodes2.Pane;
+import ui10.pane.AbstractPane;
+import ui10.pane.FrameImpl;
+import ui10.pane.Pane;
 
 import java.util.Arrays;
 

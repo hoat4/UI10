@@ -1,6 +1,7 @@
 package ui10.nodes2;
 
 import ui10.binding.ObservableList;
+import ui10.layout.AbstractLayoutPane;
 import ui10.layout.BoxConstraints;
 
 public class Desktop extends AbstractLayoutPane {

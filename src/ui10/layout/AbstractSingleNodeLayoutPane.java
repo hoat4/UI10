@@ -1,8 +1,10 @@
-package ui10.nodes2;
+package ui10.layout;
 
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.binding.SingleElementObservableList;
+import ui10.pane.FrameImpl;
+import ui10.pane.Pane;
 
 public abstract class AbstractSingleNodeLayoutPane extends AbstractLayoutPane{
 

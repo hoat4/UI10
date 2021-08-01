@@ -4,10 +4,9 @@ import ui10.binding.PropertyHolder;
 import ui10.binding.PropertyTransformation;
 import ui10.binding.ScalarProperty;
 import ui10.binding.Scope;
-import ui10.nodes2.Pane;
+import ui10.pane.Pane;
 
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 public abstract class Decoration extends PropertyHolder implements PropertyTransformation<Pane> {
 

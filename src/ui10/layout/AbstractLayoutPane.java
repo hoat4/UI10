@@ -1,11 +1,14 @@
-package ui10.nodes2;
+package ui10.layout;
 
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;
+import ui10.pane.AbstractPane;
+import ui10.pane.FrameImpl;
+import ui10.pane.Pane;
 
 import java.util.Arrays;
 
-public abstract class AbstractLayoutPane extends AbstractPane{
+public abstract class AbstractLayoutPane extends AbstractPane {
 
     public final ObservableList<Pane> children;
 

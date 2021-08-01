@@ -1,6 +1,7 @@
-package ui10.nodes2;
+package ui10.pane;
 
 import ui10.binding.ObservableScalar;
+import ui10.layout.AbstractSingleNodeLayoutPane;
 import ui10.layout.BoxConstraints;
 
 public class WrapperPane extends AbstractSingleNodeLayoutPane {

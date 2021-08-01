@@ -1,4 +1,4 @@
-package ui10.nodes2;
+package ui10.controls;
 
 import ui10.binding.ScalarProperty;
 import ui10.decoration.Tag;

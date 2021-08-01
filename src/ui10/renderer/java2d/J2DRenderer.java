@@ -6,8 +6,9 @@ import ui10.geom.Size;
 import ui10.input.MouseTarget;
 import ui10.layout.BoxConstraints;
 import ui10.nodes2.*;
-import ui10.nodes2.Frame;
-import ui10.nodes2.FrameImpl;
+import ui10.pane.Frame;
+import ui10.pane.FrameImpl;
+import ui10.pane.Pane;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
