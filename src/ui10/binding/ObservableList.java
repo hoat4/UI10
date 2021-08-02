@@ -1,7 +1,5 @@
 package ui10.binding;
 
-import ui10.pane.Node;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;

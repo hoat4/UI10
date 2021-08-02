@@ -27,7 +27,7 @@ public abstract class AbstractLayoutPane extends AbstractPane {
 
     @Override
     protected ObservableList<? extends FrameImpl> makeChildList() {
-        return children.streamBinding().map(FrameImpl::new).toList();
+        return children.streamBinding().map(c->new FrameImpl( c)).toList();
     }
 
 }

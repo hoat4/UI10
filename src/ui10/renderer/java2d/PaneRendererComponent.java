@@ -1,11 +1,13 @@
 package ui10.renderer.java2d;
 
 import ui10.binding.ScalarProperty;
-import ui10.input.MouseTarget;
+import ui10.input.keyboard.KeyTypeEvent;
+import ui10.input.pointer.MouseTarget;
 import ui10.pane.EventLoop;
 import ui10.pane.Pane;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.time.Instant;
@@ -19,6 +21,7 @@ public class PaneRendererComponent extends Canvas {
 
     private final EventLoop eventLoop;
     private J2DRenderer renderer;
+    final AWTInputEnvironment inputEnvironment = new AWTInputEnvironment();
 
     public PaneRendererComponent(EventLoop eventLoop) {
         this.eventLoop = eventLoop;
@@ -35,7 +38,7 @@ public class PaneRendererComponent extends Canvas {
 
         root.subscribe(evt -> requestRepaint());
 
-        enableEvents(AWTEvent.MOUSE_EVENT_MASK);
+        enableEvents(AWTEvent.MOUSE_EVENT_MASK| AWTEvent.KEY_EVENT_MASK);
     }
 
     @Override
@@ -61,6 +64,17 @@ public class PaneRendererComponent extends Canvas {
         }
     }
 
+    @Override
+    protected void processKeyEvent(KeyEvent e) {
+        super.processKeyEvent(e);
+        if (e.isConsumed())
+            return;
+
+        if (e.getID() == KeyEvent.KEY_TYPED) {
+            inputEnvironment.dispatchEvent(new AWTKeyTypeEvent(new String(new char[]{e.getKeyChar()})));
+        }
+    }
+
     private void dispatchMouseEvent(MouseTarget mouseTarget, MouseEvent e) {
         switch (e.getID()) {
             case MOUSE_PRESSED:
@@ -74,14 +88,14 @@ public class PaneRendererComponent extends Canvas {
         }
     }
 
-    private ui10.input.MouseEvent.MouseButton translateMouseButton(int mouseButton) {
+    private ui10.input.pointer.MouseEvent.MouseButton translateMouseButton(int mouseButton) {
         switch (mouseButton) {
             case MouseEvent.BUTTON1:
-                return ui10.input.MouseEvent.MouseButton.LEFT_BUTTON;
+                return ui10.input.pointer.MouseEvent.MouseButton.LEFT_BUTTON;
             case MouseEvent.BUTTON2:
-                return ui10.input.MouseEvent.MouseButton.WHEEL;
+                return ui10.input.pointer.MouseEvent.MouseButton.WHEEL;
             case MouseEvent.BUTTON3:
-                return ui10.input.MouseEvent.MouseButton.RIGHT_BUTTON;
+                return ui10.input.pointer.MouseEvent.MouseButton.RIGHT_BUTTON;
             default:
                 throw new UnsupportedOperationException(Integer.toString(mouseButton));
                 // vagy nyeljük le? vagy logozzuk/beepeljünk?

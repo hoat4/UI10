@@ -1,4 +1,4 @@
-package ui10.input;
+package ui10.input.pointer;
 
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;

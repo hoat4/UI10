@@ -3,6 +3,7 @@ package ui10.pane;
 import ui10.binding.ObservableList;
 import ui10.binding.ScalarProperty;
 import ui10.geom.Size;
+import ui10.input.InputEnvironment;
 import ui10.layout.BoxConstraints;
 
 import java.util.Map;
@@ -13,6 +14,10 @@ public interface Pane {
 
     // null, ha primitive
     ObservableList<? extends FrameImpl> children();
+
+    ScalarProperty<Frame> frame();
+
+    ScalarProperty<InputEnvironment> inputEnvironment();
 
     Map<Object, Object> extendedProperties();
 

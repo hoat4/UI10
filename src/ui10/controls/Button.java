@@ -5,8 +5,8 @@ import ui10.binding.ObservableList;
 import ui10.binding.ScalarProperty;
 import ui10.binding.StandaloneEventBus;
 import ui10.decoration.Tag;
-import ui10.input.MouseEvent;
-import ui10.input.MouseTarget;
+import ui10.input.pointer.MouseEvent;
+import ui10.input.pointer.MouseTarget;
 import ui10.pane.Pane;
 import ui10.pane.WrapperPane;
 

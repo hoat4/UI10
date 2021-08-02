@@ -3,6 +3,7 @@ package ui10;
 import ui10.controls.Button;
 import ui10.controls.Label;
 import ui10.controls.TextButton;
+import ui10.controls.TextField;
 import ui10.decoration.Decoration;
 import ui10.decoration.DecorationPane;
 import ui10.decoration.RuleBasedDecoration;
@@ -38,6 +39,18 @@ public class Main2 {
                 ),
                 TextButton.LABEL_TAG, List.of(
                         Decoration.ofModify((p, s) -> ((Label) p).textStyle().set(AWTTextStyle.of(12)))
+                ),
+                TextField.TAG, List.of(
+                        Decoration.ofReplace((container, p, s)->{
+                            FilledPane filledPane = new FilledPane();
+                            filledPane.color().bindTo(((TextField) container).focused(),
+                                    b -> RGBColor.ofRGBShort(b ? 0xFFF : 0xDDD)); // TODO scope
+
+                            return new StackPane(filledPane, new Padding(num(10), p));
+                        })
+                ),
+                TextField.LABEL_TAG, List.of(
+                        Decoration.ofModify((p, s) -> ((Label) p).textStyle().set(AWTTextStyle.of(12)))
                 )
         ));
 
@@ -46,7 +59,9 @@ public class Main2 {
         button.onClick().subscribe(v->{
             padding.top().set(padding.top().get().add(num(15)));
         });
-        Centered content = new Centered(padding);
+        final TextField f = new TextField();
+        f.text().set("szöveg");
+        Centered content = new Centered(f);
         DecorationPane dp = new DecorationPane(content, d);
 
         Window window = new Window(dp);

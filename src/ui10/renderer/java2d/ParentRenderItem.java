@@ -1,6 +1,6 @@
 package ui10.renderer.java2d;
 
-import ui10.input.MouseTarget;
+import ui10.input.pointer.MouseTarget;
 import ui10.pane.Frame;
 
 import java.awt.*;

@@ -6,6 +6,7 @@ import ui10.binding.ScalarProperty;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
+import ui10.input.InputEnvironment;
 import ui10.layout.BoxConstraints;
 
 import java.util.Map;
@@ -16,11 +17,25 @@ public abstract class AbstractPane extends PropertyHolder implements Pane {
 
     private boolean childrenCreated;
     private ObservableList<? extends FrameImpl> children;
+    private Frame frame;
+    private InputEnvironment inputEnvironment;
 
     protected abstract ObservableList<? extends FrameImpl> makeChildList();
 
     @Override
     public abstract AbstractLayout computeLayout(BoxConstraints constraints);
+
+    public ScalarProperty<Frame> frame() {
+        return property((AbstractPane p) -> p.frame, (p, v) -> p.frame = v);
+    }
+
+    public ScalarProperty<InputEnvironment> inputEnvironment() {
+        return property((AbstractPane p) -> p.inputEnvironment, (p, v) -> p.inputEnvironment = v);
+    }
+
+    //public ObservableScalar<Pane> parent() {
+//        return frame().map(f->f.container());
+//    }
 
     @Override
     public ObservableList<? extends FrameImpl> children() {

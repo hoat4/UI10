@@ -3,7 +3,7 @@ package ui10.renderer.java2d;
 import ui10.binding.ObservableList;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.input.MouseTarget;
+import ui10.input.pointer.MouseTarget;
 import ui10.layout.BoxConstraints;
 import ui10.nodes2.*;
 import ui10.pane.Frame;
@@ -25,13 +25,15 @@ public class J2DRenderer {
     public int canvasWidth, canvasHeight;
     private final Frame root;
     private final Runnable requestUpdate;
+    private final PaneRendererComponent awtComponent;
     final List<ParentRenderItem> mouseTargets = new ArrayList<>();
 
     private Rectangle dirtyRegion;
 
-    public J2DRenderer(Pane root, Runnable requestUpdate, Component awtComponent) {
+    public J2DRenderer(Pane root, Runnable requestUpdate, PaneRendererComponent awtComponent) {
         this.root = new FrameImpl(root);
         this.requestUpdate = requestUpdate;
+        this.awtComponent = awtComponent;
 
         init(this.root, new AffineTransform(), null);
     }
@@ -42,6 +44,7 @@ public class J2DRenderer {
 
     private void init(Frame frame, AffineTransform transform, RenderItem parent) {
         Pane pane = frame.pane().get();
+        pane.inputEnvironment().set(awtComponent.inputEnvironment);
 
         if (frame.bounds().get() == null) {
             frame.bounds().subscribe(change -> {
@@ -100,6 +103,10 @@ public class J2DRenderer {
             TextItem item = new TextItem();
             item.font = (AWTTextStyle) text.textStyle().get();
             item.text = text.text().get();
+            text.text().subscribe(change -> {
+                item.text = text.text().get();
+                updateDirtyRegion(J2DUtil.rect(item.bounds));
+            });
             return item;
         } else if (pane.children() == null) {
             throw new RuntimeException("not a rendering primitive " +
