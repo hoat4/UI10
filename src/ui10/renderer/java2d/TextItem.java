@@ -1,6 +1,5 @@
 package ui10.renderer.java2d;
 
-import ui10.font.TextStyle;
 import ui10.geom.Rectangle;
 
 import java.awt.*;

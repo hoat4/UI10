@@ -1,73 +1,60 @@
 package ui10.controls;
 
 import ui10.binding.EventBus;
-import ui10.binding.ObservableList;
+import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.binding.StandaloneEventBus;
 import ui10.decoration.Tag;
+import ui10.input.EventTarget;
+import ui10.input.InputEventHandler;
 import ui10.input.pointer.MouseEvent;
-import ui10.input.pointer.MouseTarget;
-import ui10.pane.Pane;
-import ui10.pane.WrapperPane;
+import ui10.nodes.Node;
+import ui10.nodes.Pane;
 
-import static ui10.decoration.Tag.tag;
-
-public class Button<P extends Pane> extends Control {
+public class Button<P extends Pane> extends Pane {
 
     public static final Tag TAG = new Tag("Button");
 
-    private P content;
+    public final ScalarProperty<P> content = ScalarProperty.create();
     private final ScalarProperty<Boolean> pressed = ScalarProperty.<Boolean>create().set(false);
-    private final EventBus<Void> onClick = new StandaloneEventBus<>();
+    public final EventBus<Void> onClick = new StandaloneEventBus<>();
 
     {
-        tag(this, TAG);
+        tags().add(TAG);
     }
 
     public Button() {
     }
 
     public Button(P content) {
-        this.content = content;
+        this.content.set(content);
     }
 
-    public ScalarProperty<P> content() {
-        return property((Button<P> b) -> b.content, (b, v) -> b.content = v);
+    public Button(ObservableScalar<? extends P> content) {
+        this.content.bindTo(content);
     }
 
-    public ScalarProperty<Boolean> pressed() {
+    @Override
+    protected ObservableScalar<? extends Node> paneContent() {
+        return content;
+    }
+
+    public ObservableScalar<Boolean> pressed() {
         return pressed;
     }
 
     @Override
-    protected Pane makeContent() {
-        return new WrapperPane(content());
-    }
+    protected Node wrapDecoratedContent(Node decoratedContent) {
+        EventTarget mouseTarget = new EventTarget(decoratedContent);
+        mouseTarget.eventHandlers.add(InputEventHandler.of(e -> {
+            if (e instanceof MouseEvent.MousePressEvent)
+                pressed.set(true);
 
-    @Override
-    protected Pane wrapDecoratedContent(Pane decoratedContent) {
-        MouseTarget mouseTarget = new MouseTarget(decoratedContent);
-        mouseTarget.pressedButtons.subscribe(ObservableList.simpleListSubscriber(this::mousePressed, this::mouseReleased));
+            if (e instanceof MouseEvent.MouseReleaseEvent) {
+                pressed.set(false);
+                onClick.postEvent(null);
+            }
+        }));
         return mouseTarget;
     }
-
-    public EventBus<Void> onClick() {
-        return onClick;
-    }
-
-    private void mousePressed(MouseEvent.MouseButton button) {
-        if (button != MouseEvent.MouseButton.LEFT_BUTTON)
-            return;
-
-        pressed.set(true);
-    }
-
-    private void mouseReleased(MouseEvent.MouseButton button) {
-        if (button != MouseEvent.MouseButton.LEFT_BUTTON)
-            return;
-
-        pressed.set(false);
-        onClick.postEvent(null);
-    }
-
 }

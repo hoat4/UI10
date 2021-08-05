@@ -4,7 +4,7 @@ import ui10.binding.ScalarProperty;
 import ui10.geom.FloatingPointNumber;
 import ui10.geom.Num;
 import ui10.geom.Point;
-import ui10.pane.EventLoop;
+import ui10.nodes.EventLoop;
 
 import java.time.Duration;
 

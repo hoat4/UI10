@@ -1,57 +1,25 @@
 package ui10.controls;
 
-import ui10.binding.ObservableList;
-import ui10.binding.ObservableListImpl;
-import ui10.binding.Scope;
-import ui10.decoration.Decorable;
-import ui10.decoration.Decoration;
-import ui10.layout.BoxConstraints;
-import ui10.pane.AbstractPane;
-import ui10.pane.Frame;
-import ui10.pane.FrameImpl;
-import ui10.pane.Pane;
+import ui10.binding.ObservableScalar;
+import ui10.input.EventTarget;
+import ui10.input.InputEnvironment;
+import ui10.input.InputEvent;
+import ui10.input.InputEventHandler;
+import ui10.nodes.Node;
+import ui10.nodes.Pane;
 
-import static ui10.geom.Point.ORIGO;
+public abstract class Control extends Pane {
 
-public abstract class Control extends AbstractPane implements Decorable {
-
-    private final ObservableList<Decoration> decorations = new ObservableListImpl<>();
-
-    protected abstract Pane makeContent();
-
-    /**
-     * to be overridden if needed, by default it does nothing
-     */
-    protected Pane wrapDecoratedContent(Pane decoratedContent) {
-        return decoratedContent;
-    }
+    protected final EventTarget eventTarget = new EventTarget(InputEventHandler.of(this::handleEvent));
+    public final ObservableScalar<Boolean> focused = inputEnvironment.
+            flatMap(InputEnvironment::focus).map(e -> e == eventTarget);
 
     @Override
-    public ObservableList<Decoration> decorations() {
-        return decorations;
+    protected Node wrapDecoratedContent(Node decoratedContent) {
+        eventTarget.content.set(decoratedContent);
+        return eventTarget;
     }
 
-    @Override
-    protected ObservableList<? extends FrameImpl> makeChildList() {
-        // TODO ezt frissítsük ha a decorationök invalidálódnak
-        Scope scope = new Scope();
-        Pane pane = makeContent();
-        for (Decoration decoration : decorations) {
-            pane = decoration.decorateContent(this, pane, scope);
-        }
-        pane = wrapDecoratedContent(pane);
+    protected abstract void handleEvent(InputEvent e);
 
-        return ObservableList.ofConstantElement(new FrameImpl(pane));
-    }
-
-    @Override
-    public AbstractLayout computeLayout(BoxConstraints constraints) {
-        Frame.FrameAndLayout contentLayout = children().get(0).layout(constraints);
-        return new AbstractLayout(constraints, contentLayout.size()) {
-            @Override
-            public void apply() {
-                applyChild(contentLayout, ORIGO);
-            }
-        };
-    }
 }

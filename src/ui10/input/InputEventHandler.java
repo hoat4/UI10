@@ -4,19 +4,21 @@ import java.util.function.Consumer;
 
 public interface InputEventHandler {
 
-    void capture(InputEvent event);
+    boolean capture(InputEvent event);
 
-    void bubble(InputEvent event);
+    boolean bubble(InputEvent event);
 
     static InputEventHandler of(Consumer<InputEvent> handler) {
         return new InputEventHandler() {
             @Override
-            public void capture(InputEvent event) {
+            public boolean capture(InputEvent event) {
+                return false;
             }
 
             @Override
-            public void bubble(InputEvent event) {
+            public boolean bubble(InputEvent event) {
                 handler.accept(event);
+                return false;
             }
         };
     }

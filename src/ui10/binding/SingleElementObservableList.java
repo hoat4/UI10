@@ -20,16 +20,16 @@ public class SingleElementObservableList<E> extends AbstractList<E> implements O
     }
 
     @Override
-    public void subscribe(Consumer<ListChange<E>> consumer) {
+    public void subscribe(Consumer<? super ListChange<E>> consumer) {
         o.subscribe(new SubscriberWrapper<>(consumer));
     }
 
     @Override
-    public void unsubscribe(Consumer<ListChange<E>> listChangeConsumer) {
+    public void unsubscribe(Consumer<? super ListChange<E>> listChangeConsumer) {
         o.unsubscribe(new SubscriberWrapper<>(listChangeConsumer));
     }
 
-    private static record SubscriberWrapper<E>(Consumer<ListChange<E>> consumer) implements Consumer<ChangeEvent<E>> {
+    private static record SubscriberWrapper<E>(Consumer<? super ListChange<E>> consumer) implements Consumer<ChangeEvent<E>> {
 
         @Override
         public void accept(ChangeEvent<E> c) {

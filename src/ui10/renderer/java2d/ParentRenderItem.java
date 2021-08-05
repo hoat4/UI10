@@ -1,24 +1,28 @@
 package ui10.renderer.java2d;
 
-import ui10.input.pointer.MouseTarget;
-import ui10.pane.Frame;
+import ui10.geom.Rectangle;
+import ui10.input.EventTarget;
+import ui10.nodes.Node;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.Objects;
 
 public class ParentRenderItem extends RenderItem {
 
-    private final Frame frame;
-    public MouseTarget mouseTarget;
+    private final Node node;
+    public EventTarget mouseTarget;
 
-    public ParentRenderItem(Frame frame) {
-        this.frame = frame;
+    public ParentRenderItem(Node node) {
+        this.node = node;
     }
 
     @Override
     Rectangle2D computeBounds(AffineTransform transform) {
-        return transform.createTransformedShape(J2DUtil.rect(frame.bounds().get())).getBounds2D();
+        Objects.requireNonNull(node.size.get(), node+" has no size");
+        Rectangle rect = new Rectangle(node.position.get(), node.size.get());
+        return transform.createTransformedShape(J2DUtil.rect(rect)).getBounds2D();
     }
 
     @Override

@@ -29,12 +29,24 @@ public record Size(Num width, Num height) {
         return new Size(width.add(s.width()), height.add(s.height()));
     }
 
+    public Size add(Point s) {
+        return new Size(width.add(s.x()), height.add(s.y()));
+    }
+
     public Size subtract(Point point) {
         return new Size(width.sub(point.x()), height.sub(point.y()));
     }
 
     public Size subtract(Size s) {
-        return new Size(width.sub(s.width()), height.sub(s.height()));
+        try {
+            return new Size(width.sub(s.width()), height.sub(s.height()));
+        }catch(IllegalArgumentException e) {
+            throw new IllegalArgumentException("couldn't subtract "+s +" from "+this);
+        }
+    }
+
+    public Size subtractOrClamp(Point p) {
+        return new Size(Num.max(Num.ZERO, width.sub(p.x())), Num.max(Num.ZERO, height.sub(p.y())));
     }
 
     public Size subtractOrClamp(Size s) {

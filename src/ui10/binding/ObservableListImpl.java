@@ -2,13 +2,14 @@ package ui10.binding;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class ObservableListImpl<E> extends AbstractList<E> implements ObservableList<E> {
 
     private final List<E> list;
-    private final List<Consumer<ListChange<E>>> subscribers = new ArrayList<>();
+    private final List<Consumer<? super ListChange<E>>> subscribers = new ArrayList<>();
 
     public ObservableListImpl() {
         list = new ArrayList<>();
@@ -23,13 +24,25 @@ public class ObservableListImpl<E> extends AbstractList<E> implements Observable
         this.list = list;
     }
 
+    public static <E> ObservableList<E> createMutable(List<E> children) {
+        if (children instanceof ArrayList<E> a)
+            return new ObservableListImpl<>(a);
+        else
+            return new ObservableListImpl<>(new ArrayList<>(children));
+    }
+
+
+    public static <E> ObservableList<E> createMutable(E... children) {
+        return new ObservableListImpl<>(new ArrayList<>(Arrays.asList(children)));
+    }
+
     @Override
-    public void subscribe(Consumer<ListChange<E>> consumer) {
+    public void subscribe(Consumer<? super ListChange<E>> consumer) {
         subscribers.add(consumer);
     }
 
     @Override
-    public void unsubscribe(Consumer<ListChange<E>> listChangeConsumer) {
+    public void unsubscribe(Consumer<? super ListChange<E>> listChangeConsumer) {
         if (!subscribers.remove(listChangeConsumer))
             throw new IllegalArgumentException("not subscribed: " + listChangeConsumer);
     }
@@ -43,6 +56,8 @@ public class ObservableListImpl<E> extends AbstractList<E> implements Observable
     public int size() {
         return list.size();
     }
+
+    // TODO ez a List.of itt nem jó, mert nem fogad el nullt
 
     @Override
     public void add(int index, E element) {
@@ -64,9 +79,9 @@ public class ObservableListImpl<E> extends AbstractList<E> implements Observable
 
     @Override
     public E set(int index, E element) {
-        E prev = remove(index);
-        add(index, element);
-        return prev;
+        E oldValue = list.set(index, element);
+        onChange(new ListChange.ListReplace<>(index, List.of(oldValue), List.of(element)));
+        return oldValue;
     }
 
 

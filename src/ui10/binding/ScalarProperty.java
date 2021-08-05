@@ -27,7 +27,22 @@ public interface ScalarProperty<T> extends ObservableScalar<T> {
     ObservableList<PropertyTransformation<T>> transformations();
 
     static <T> ScalarProperty<T> create() {
-        return new SelfContainedScalarProperty<>();
+        return new SelfContainedScalarProperty<>(null);
     }
 
+    static <T> ScalarProperty<T> create(String name) {
+        return new SelfContainedScalarProperty<>(name);
+    }
+
+    static <T> ScalarProperty<T> createWithDefault(T defaultValue) {
+        SelfContainedScalarProperty<T> prop = new SelfContainedScalarProperty<>(null);
+        prop.set(defaultValue);
+        return prop;
+    }
+
+    static <T> ScalarProperty<T> createWithDefault(String name, T defaultValue) {
+        SelfContainedScalarProperty<T> prop = new SelfContainedScalarProperty<>(name);
+        prop.set(defaultValue);
+        return prop;
+    }
 }

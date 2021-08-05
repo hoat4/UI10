@@ -9,18 +9,15 @@ public class TextButton extends Button<Label> {
 
     public static final Tag LABEL_TAG = new Tag("TextButtonLabel");
 
-    private String text;
+    public final ScalarProperty<String> text = ScalarProperty.create();
 
     public TextButton() {
         this(null);
     }
 
     public TextButton(String text) {
-        this.text = text;
-        content().set(tag(new Label(text()), LABEL_TAG));
+        this.text.set(text);
+        content.set(tag(new Label(this.text), LABEL_TAG));
     }
 
-    public ScalarProperty<String> text() {
-        return property((TextButton n) -> n.text, (n, v) -> n.text = v);
-    }
 }

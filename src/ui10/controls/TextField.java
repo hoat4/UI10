@@ -3,57 +3,92 @@ package ui10.controls;
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.decoration.Tag;
-import ui10.input.EventTargetPane;
-import ui10.input.InputEnvironment;
+import ui10.font.TextStyle;
+import ui10.geom.Point;
+import ui10.geom.Size;
+import ui10.image.RGBColor;
 import ui10.input.InputEvent;
-import ui10.input.InputEventHandler;
 import ui10.input.keyboard.KeyTypeEvent;
-import ui10.input.pointer.MouseTarget;
-import ui10.pane.Pane;
+import ui10.input.keyboard.Keyboard;
+import ui10.input.pointer.MouseEvent;
+import ui10.layout.PreferredSize;
+import ui10.layout.Positioned;
+import ui10.layout.StackPane;
+import ui10.nodes.LinePane;
+import ui10.nodes.Node;
+import ui10.nodes.Pane;
+import ui10.nodes.TextPane;
 
-import static ui10.decoration.Tag.tag;
+
+import static ui10.binding.ObservableScalar.binding;
+import static ui10.geom.Num.ZERO;
+import static ui10.geom.Num.num;
 
 public class TextField extends Control {
 
     public static final Tag TAG = new Tag("TextField");
-    public static final Tag LABEL_TAG = new Tag("TextFieldLabel");
+    public static final Tag TEXT_TAG = new Tag("TextFieldText");
 
-    private String text;
-    private boolean focused;
+    public final ScalarProperty<String> text = ScalarProperty.create();
+    public final ScalarProperty<TextStyle> textStyle = ScalarProperty.create();
 
-    public ScalarProperty<String> text() {
-        return property((TextField t) -> t.text, (t, v) -> t.text = v);
-    }
+    private final ScalarProperty<Integer> caretPosition = ScalarProperty.createWithDefault(0);
 
     {
-        tag(this, TAG);
+        tags().add(TAG);
     }
 
     @Override
-    protected Pane makeContent() {
-        return tag(new Label(text()), LABEL_TAG);
+    protected ObservableScalar<? extends Node> paneContent() {
+        TextPane textPane = new TextPane(textStyle, text);
+        textPane.tags().add(TEXT_TAG);
+
+        ObservableScalar<Point> caretPos = binding(caretPosition, textStyle, text, (pos, textStyle, text) ->
+                new Point(textStyle == null ? ZERO : textStyle.textSize(text.substring(0, pos)).width(), ZERO));
+
+        return ObservableScalar.ofConstant(new StackPane(
+                textPane,
+                new Positioned(ObservableScalar.ofConstant(new Caret()), caretPos)
+        ));
     }
 
-    private ScalarProperty<Boolean> focusedProp() {
-        return property((TextField f) -> f.focused, (f, v) -> f.focused = v);
+    protected void handleEvent(InputEvent e) {
+        if (e instanceof MouseEvent.MousePressEvent) {
+            inputEnvironment.get().focus().set(eventTarget);
+        } else if (e instanceof KeyTypeEvent k) {
+            k.symbol().standardSymbol().ifPresent(sym -> {
+                if (sym instanceof Keyboard.StandardTextSymbol textSymbol) {
+                    String s = text.get();
+                    text.set(s.substring(0, caretPosition.get()) + textSymbol.text() + s.substring(caretPosition.get()));
+                    caretPosition.set(caretPosition.get() + 1);
+                } else if (sym instanceof Keyboard.StandardFunctionSymbol functionSymbol) {
+                    switch (functionSymbol) {
+                        case LEFT -> {
+                            if (caretPosition.get() > 0)
+                                caretPosition.set(caretPosition.get() - 1);
+                        }
+                        case RIGHT->{
+                            if (caretPosition.get() < text.get().length())
+                                caretPosition.set(caretPosition.get() + 1);
+                        }
+                    }
+                }
+
+            });
+        }
     }
 
-    public ObservableScalar<Boolean> focused() {
-        return focusedProp();
-    }
+    public class Caret extends Pane {
 
-    @Override
-    protected Pane wrapDecoratedContent(Pane decoratedContent) {
-        EventTargetPane e = new EventTargetPane(InputEventHandler.of(this::handleEvent), decoratedContent);
-        MouseTarget m = new MouseTarget(e);
-        m.pressedButtons.subscribe(l -> inputEnvironment().get().focus().set(e));
-        focusedProp().bindTo(inputEnvironment().flatMap(InputEnvironment::focus), f -> f == e);
-        return m;
-    }
+        @Override
+        protected ObservableScalar<? extends Node> paneContent() {
+            LinePane line = new LinePane(num(1), RGBColor.BLACK);
 
-    private void handleEvent(InputEvent event) {
-        if (event instanceof KeyTypeEvent e) {
-            text().set(text + e.text());
+            PreferredSize fs = new PreferredSize();
+            fs.content.set(line);
+            fs.size.bindTo(textStyle.map(ts -> new Size(line.width.get(), ts == null ? ZERO : ts.height())));
+
+            return ObservableScalar.ofConstant(fs);
         }
     }
 }

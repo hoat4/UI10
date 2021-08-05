@@ -2,6 +2,8 @@ package ui10.input.keyboard;
 
 import ui10.input.InputEvent;
 
+import java.util.Optional;
+
 public interface KeyTypeEvent extends InputEvent {
 
     // Set<Keyboard> keyboard();
@@ -10,5 +12,8 @@ public interface KeyTypeEvent extends InputEvent {
 
     // ClipboardContent content(); // ?
 
-    String text();
+    Keyboard.Symbol symbol();
+
+    // Keyboard.Key key();
+
 }

@@ -1,11 +1,13 @@
 package ui10.geom;
 
+import java.util.Objects;
+
 import static ui10.geom.Num.num;
 
 public record Rectangle(Point topLeft, Point rightBottom) {
 
     public Rectangle(Point topLeft, Size size) {
-        this(topLeft, topLeft.add(size));
+        this(topLeft, topLeft.add(Objects.requireNonNull(size, "size")));
     }
 
     public Size size() {

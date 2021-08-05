@@ -7,6 +7,7 @@ public interface Num {
     Num ZERO = num(0);
 
     Num ONE = num(1);
+    Num TWO = num(2);
 
     static Num num(int i) {
         return new FixedPointNumber(i * 1000);
@@ -15,6 +16,8 @@ public interface Num {
     Num add(Num n);
 
     Num sub(Num n);
+
+    Num mul(Num n);
 
     Num div(Num n);
 
@@ -29,4 +32,5 @@ public interface Num {
     default boolean isNegative() {
         return toDouble() < 0;
     }
+
 }

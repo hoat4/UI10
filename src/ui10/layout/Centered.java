@@ -3,31 +3,95 @@ package ui10.layout;
 import ui10.binding.ObservableScalar;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.pane.Frame;
-import ui10.pane.Pane;
+import ui10.nodes.Node;
+import ui10.nodes.WrapperPane;
 
-public class Centered extends AbstractSingleNodeLayoutPane{
+public class Centered extends WrapperPane {
 
     public Centered() {
     }
 
-    public Centered(Pane content) {
+    public Centered(Node content) {
         super(content);
     }
 
-    public Centered(ObservableScalar<? extends Pane> content) {
+    public Centered(ObservableScalar<Node> content) {
         super(content);
     }
 
     @Override
-    public AbstractLayout computeLayout(BoxConstraints constraints) {
-        Frame.FrameAndLayout contentLayout = currentContentFrame().layout(constraints.withMinimum(Size.ZERO));
-        return new AbstractLayout(constraints, contentLayout.size()) {
+    protected ObservableScalar<? extends Node> paneContent() {
+        return ObservableScalar.ofConstant(new OneChildOnePassLayout(content) {
+            @Override
+            protected BoxConstraints childConstraints(BoxConstraints thisConstraints) {
+                return thisConstraints.withMinimum(Size.ZERO);
+            }
 
             @Override
-            public void apply() {
-                applyChild(contentLayout, Rectangle.of(size).centered(contentLayout.size()).topLeft());
+            protected Size layout(BoxConstraints constraints, Node content, Size contentSize, boolean apply) {
+                Size thisSize = constraints.clamp(contentSize);
+                if (apply)
+                    content.position.set(Rectangle.of(thisSize).centered(contentSize).topLeft());
+                return thisSize;
             }
-        };
+        });
     }
+
+//    return ObservableScalar.ofConstant(new LayoutNode(ObservableList.of(content)) {
+//
+//        {
+//            content.flatMapProp(c -> c.activeLayout).
+//                    bindTo(activeLayout.flatMap(t -> ((LayoutThreadImpl) t).contentLayoutThread));
+//
+//            content.flatMapProp(c -> c.position).
+//                    bindTo(activeLayout.flatMap(t -> ((LayoutThreadImpl)t).contentPosition()));
+//        }
+//
+//        @Override
+//        public LayoutThread makeLayoutThread() {
+//            return new LayoutThreadImpl();
+//        }
+//
+//        class LayoutThreadImpl extends LayoutThread {
+//
+//            final ObservableScalar<LayoutThread> contentLayoutThread = content.map(Node::makeLayoutThread);
+//
+//            {
+//                contentLayoutThread.flatMapProp(t -> t.constraints).bindTo(constraints.map(c -> c.withMinimum(Size.ZERO)));
+//                size.bindTo(constraints, contentLayoutThread.flatMap(t -> t.size), BoxConstraints::clamp);
+//            }
+//
+//            ObservableScalar<Point> contentPosition() {
+//                return binding(size, contentLayoutThread.flatMap(t -> t.size),
+//                        (s, cs) -> Rectangle.of(s).centered(cs).topLeft());
+//            }
+//        }
+//    });
+
+//    @Override
+//    public LayoutThread makeLayoutThread(boolean apply, Scope scope) {
+//        LayoutThread contentThread = content.get().makeLayoutThread(apply, scope);
+//        return constraints -> {
+//            Size contentSize = contentThread.layout(constraints.withMinimum(Size.ZERO));
+//            Size thisSize = constraints.clamp(contentSize);
+//            if (apply)
+//                content.get().position.set(Rectangle.of(thisSize).centered(contentSize).topLeft());
+//            return thisSize;
+//        };
+//    }
+
+//    @Override
+//    public LayoutThread makeLayoutThread(boolean apply, Scope scope) {
+//        ObservableScalar<LayoutThread> contentThread = content.map(c -> c.makeLayoutThread(apply, scope));
+//        LayoutThread thisThread = new LayoutThread();
+//        ObservableScalar<Size> contentSize = contentThread.flatMap(t -> t.size);
+//
+//        thisThread.size.bindTo(binding(thisThread.constraints, contentSize, BoxConstraints::clamp));
+//        if (apply) {
+//            ObservableScalar<Point> contentPos = binding(thisThread.size, contentSize,
+//                    (s, cs) -> Rectangle.of(s).centered(cs).topLeft());
+//            content.flatMapProp(n -> n.position).bindTo(contentPos);
+//        }
+//        return thisThread;
+//    }
 }

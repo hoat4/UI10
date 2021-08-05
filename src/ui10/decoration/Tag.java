@@ -1,11 +1,11 @@
 package ui10.decoration;
 
-import ui10.pane.Pane;
+import ui10.nodes.Pane;
 
 public record Tag(String name) {
     @SuppressWarnings("unchecked")
     public static <P extends Pane> P tag(P pane, Tag tag) {
-        pane.extendedProperties().put(tag, Boolean.TRUE);
+        pane.tags().add(tag);
         return pane;
     }
 }

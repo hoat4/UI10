@@ -3,6 +3,7 @@ package ui10.renderer.java2d;
 import ui10.font.FontMetrics;
 import ui10.font.TextStyle;
 import ui10.geom.FloatingPointNumber;
+import ui10.geom.Num;
 
 import java.awt.*;
 
@@ -29,5 +30,10 @@ public class AWTTextStyle implements TextStyle {
     public FontMetrics textSize(String text) {
         return new FontMetrics(new FloatingPointNumber(fontMetrics.stringWidth(text)),
                 new FloatingPointNumber(fontMetrics.getAscent()), new FloatingPointNumber(fontMetrics.getDescent()));
+    }
+
+    @Override
+    public Num height() {
+        return new FloatingPointNumber(fontMetrics.getHeight());
     }
 }

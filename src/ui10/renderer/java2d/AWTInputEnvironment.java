@@ -1,25 +1,30 @@
 package ui10.renderer.java2d;
 
 import ui10.binding.ScalarProperty;
-import ui10.input.EventTargetPane;
-import ui10.input.InputEnvironment;
-import ui10.input.InputEvent;
+import ui10.input.*;
 
 public class AWTInputEnvironment implements InputEnvironment {
 
-    private final ScalarProperty<EventTargetPane> focus = ScalarProperty.create();
+    private final ScalarProperty<EventTarget> focus = ScalarProperty.create();
 
     public void dispatchEvent(InputEvent event) {
-        EventTargetPane p = focus.get();
+        EventTarget p = focus.get();
         if (p == null)
             return;
-        p.eventHandler.capture(event);
-        if (!event.consumed().get())
-            p.eventHandler.bubble(event);
+
+        for (InputEventHandler h : p.eventHandlers) {
+            if (h.capture(event))
+                return;
+        }
+
+        for (InputEventHandler h : p.eventHandlers) {
+            if (h.bubble(event))
+                return;
+        }
     }
-    
+
     @Override
-    public ScalarProperty<EventTargetPane> focus() {
+    public ScalarProperty<EventTarget> focus() {
         return focus;
     }
 

@@ -3,38 +3,31 @@ package ui10.controls;
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.font.TextStyle;
-import ui10.nodes2.TextPane;
-import ui10.pane.Pane;
+import ui10.nodes.Node;
+import ui10.nodes.Pane;
+import ui10.nodes.TextPane;
 
-public class Label extends Control{
+public class Label extends Pane {
 
-    private String text;
-    private TextStyle textStyle;
+    // TODO legyen külön TextPane és Label is?
+    //      https://stackoverflow.com/questions/24374867/label-and-text-differences-in-javafx
+
+    public final ScalarProperty<String> text = ScalarProperty.create();
+    public final ScalarProperty<TextStyle> textStyle = ScalarProperty.create();
 
     public Label() {
     }
 
     public Label(ObservableScalar<String> text) {
-        text().bindTo(text);
+        this.text.bindTo(text);
     }
 
     public Label(String text) {
-        this.text = text;
-    }
-
-    public ScalarProperty<String> text() {
-        return property((Label l)->l.text, (l, v)->l.text = v);
-    }
-
-    public ScalarProperty<TextStyle> textStyle() {
-        return property((Label l)->l.textStyle, (l, v)->l.textStyle = v);
+        this.text.set(text);
     }
 
     @Override
-    protected Pane makeContent() {
-        final TextPane textPane = new TextPane();
-        textPane.text().bindTo(text());
-        textPane.textStyle().bindTo(textStyle());
-        return textPane;
+    protected ObservableScalar<Node> paneContent() {
+        return ObservableScalar.ofConstant(new TextPane(textStyle, text));
     }
 }

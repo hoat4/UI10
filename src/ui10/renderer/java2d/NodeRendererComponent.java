@@ -1,10 +1,13 @@
 package ui10.renderer.java2d;
 
 import ui10.binding.ScalarProperty;
-import ui10.input.keyboard.KeyTypeEvent;
-import ui10.input.pointer.MouseTarget;
-import ui10.pane.EventLoop;
-import ui10.pane.Pane;
+import ui10.geom.Point;
+import ui10.input.EventTarget;
+import ui10.input.InputEvent;
+import ui10.input.pointer.MouseEvent.MousePressEvent;
+import ui10.input.pointer.MouseEvent.MouseReleaseEvent;
+import ui10.nodes.Node;
+import ui10.nodes.EventLoop;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -15,20 +18,20 @@ import java.time.Instant;
 import static java.awt.event.MouseEvent.MOUSE_PRESSED;
 import static java.awt.event.MouseEvent.MOUSE_RELEASED;
 
-public class PaneRendererComponent extends Canvas {
+public class NodeRendererComponent extends Canvas {
 
-    public final ScalarProperty<Pane> root = ScalarProperty.create();
+    public final ScalarProperty<Node> root = ScalarProperty.create();
 
     private final EventLoop eventLoop;
     private J2DRenderer renderer;
     final AWTInputEnvironment inputEnvironment = new AWTInputEnvironment();
 
-    public PaneRendererComponent(EventLoop eventLoop) {
+    public NodeRendererComponent(EventLoop eventLoop) {
         this.eventLoop = eventLoop;
         root.getAndSubscribe(v -> {
             eventLoop.runLater(() -> {
                 if (v != null)
-                    renderer = new J2DRenderer(v, this::requestRepaint, this);
+                    renderer = new J2DRenderer(root.get(), this::requestRepaint, this);
                 else if (renderer != null) {
                     renderer.dispose();
                     renderer = null;
@@ -70,20 +73,26 @@ public class PaneRendererComponent extends Canvas {
         if (e.isConsumed())
             return;
 
-        if (e.getID() == KeyEvent.KEY_TYPED) {
-            inputEnvironment.dispatchEvent(new AWTKeyTypeEvent(new String(new char[]{e.getKeyChar()})));
+        System.out.println(e);
+
+        if (e.getID() == KeyEvent.KEY_PRESSED) {
+            inputEnvironment.dispatchEvent(new AWTKeyTypeEvent(e));
         }
     }
 
-    private void dispatchMouseEvent(MouseTarget mouseTarget, MouseEvent e) {
+    private void dispatchEvent(EventTarget eventTarget, InputEvent event) {
+        eventTarget.eventHandlers.forEach(e->e.bubble(event)); // TODO
+    }
+
+    private void dispatchMouseEvent(EventTarget mouseTarget, MouseEvent e) {
         switch (e.getID()) {
             case MOUSE_PRESSED:
                 // System.out.println("press"+mouseTarget.pressedButtons);
-                mouseTarget.pressedButtons.add(translateMouseButton(e.getButton()));
+                dispatchEvent(mouseTarget, new MousePressEvent(Point.ORIGO, translateMouseButton(e.getButton())));
                 break;
             case MOUSE_RELEASED:
                 // System.out.println("release"+e.getButton());
-                mouseTarget.pressedButtons.remove(translateMouseButton(e.getButton()));
+                dispatchEvent(mouseTarget, new MouseReleaseEvent(Point.ORIGO, translateMouseButton(e.getButton())));
                 break;
         }
     }

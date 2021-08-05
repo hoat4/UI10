@@ -17,6 +17,11 @@ public record FloatingPointNumber(double value) implements Num {
     }
 
     @Override
+    public Num mul(Num n) {
+        return new FloatingPointNumber(toDouble() * n.toDouble());
+    }
+
+    @Override
     public Num div(Num n) {
         return new FloatingPointNumber(toDouble() / n.toDouble());
     }

@@ -20,6 +20,11 @@ public record FixedPointNumber(int value) implements Num {
     }
 
     @Override
+    public Num mul(Num n) {
+        return apply(n, (a, b) -> a * b / 1000, (a, b) -> a * b);
+    }
+
+    @Override
     public Num div(Num n) {
         return apply(n, (a, b) -> a * 1000 / b, (a, b) -> a / b);
     }

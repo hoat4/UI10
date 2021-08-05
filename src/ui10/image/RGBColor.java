@@ -6,6 +6,7 @@ public record RGBColor(double red, double green, double blue, double alpha,
     public static final RGBColor RED = new RGBColor(1, 0, 0, 1, ColorSpace.SRGB);
     public static final RGBColor GREEN = new RGBColor(0, 1, 0, 1, ColorSpace.SRGB);
     public static final RGBColor BLUE = new RGBColor(0, 0, 1, 1, ColorSpace.SRGB);
+    public static final RGBColor BLACK = ofRGB(0x000000);
 
     public RGBColor {
         if (red < 0 || red > 1)
@@ -36,5 +37,11 @@ public record RGBColor(double red, double green, double blue, double alpha,
     public int toIntRGBA() {
         return (int) (red * 255 + 0.5) << 24 | (int) (green * 255 + 0.5) << 16 |
                 (int) (blue * 255 + 0.5) << 8 | (int) (alpha * 255 + 0.5);
+    }
+
+    @Override
+    public String toString() {
+        // TODO alpha
+        return String.format("#%02X%02X%02X", (int) (red*255+.5), (int) (green*255+.5), (int) (blue*255+.5));
     }
 }
