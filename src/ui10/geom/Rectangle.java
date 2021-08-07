@@ -1,8 +1,11 @@
 package ui10.geom;
 
+import org.w3c.dom.css.Rect;
+
 import java.util.Objects;
 
 import static ui10.geom.Num.num;
+import static ui10.geom.Point.ORIGO;
 
 public record Rectangle(Point topLeft, Point rightBottom) {
 
@@ -28,7 +31,7 @@ public record Rectangle(Point topLeft, Point rightBottom) {
     }
 
     public static Rectangle of(Size size) {
-        return new Rectangle(Point.ORIGO, new Point(size.width(), size.height()));
+        return new Rectangle(ORIGO, new Point(size.width(), size.height()));
     }
 
     public Rectangle centered(Size size) {
@@ -38,5 +41,13 @@ public record Rectangle(Point topLeft, Point rightBottom) {
 
     public Rectangle withSize(Size size) {
         return new Rectangle(topLeft, topLeft.add(size));
+    }
+
+    public Rectangle withInsets(Num top, Num right, Num left, Num bottom) {
+        return new Rectangle(topLeft.add(new Size(left, top)), rightBottom.subtract(new Size(right, bottom)));
+    }
+
+    public Rectangle atOrigo() {
+        return new Rectangle(ORIGO, Point.of(size()));
     }
 }

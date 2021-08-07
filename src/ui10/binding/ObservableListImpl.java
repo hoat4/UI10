@@ -62,13 +62,13 @@ public class ObservableListImpl<E> extends AbstractList<E> implements Observable
     @Override
     public void add(int index, E element) {
         list.add(index, element);
-        onChange(new ListChange.ListAdd<>(index, List.of(element)));
+        onChange(new ListChange<>(index, List.of(), List.of(element)));
     }
 
     @Override
     public E remove(int index) {
         E value = list.remove(index);
-        onChange(new ListChange.ListRemove<>(index, List.of(value)));
+        onChange(new ListChange<>(index, List.of(value), List.of()));
         return value;
     }
 
@@ -80,7 +80,7 @@ public class ObservableListImpl<E> extends AbstractList<E> implements Observable
     @Override
     public E set(int index, E element) {
         E oldValue = list.set(index, element);
-        onChange(new ListChange.ListReplace<>(index, List.of(oldValue), List.of(element)));
+        onChange(new ListChange<>(index, List.of(oldValue), List.of(element)));
         return oldValue;
     }
 

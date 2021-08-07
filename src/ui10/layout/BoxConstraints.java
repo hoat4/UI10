@@ -45,4 +45,8 @@ public record BoxConstraints(Size min, Size max) {
     public BoxConstraints withHeight(Num min, Num max) {
         return new BoxConstraints(new Size(this.min.width(), min), new Size(this.max.width(), max));
     }
+
+    public boolean containsWidth(Num w) {
+        return !w.sub(min.width()).isNegative() && !max.width().sub(w).isNegative();
+    }
 }

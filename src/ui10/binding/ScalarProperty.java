@@ -1,11 +1,20 @@
 package ui10.binding;
 
+import ui10.binding.impl.SelfContainedScalarProperty;
+
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface ScalarProperty<T> extends ObservableScalar<T> {
 
     ScalarProperty<T> set(T value);
+
+    default ScalarProperty<T> set(T value, Scope scope) {
+        // itt a visszaállítási érték null legyen vagy az előző?
+        set(value);
+        scope.onClose(() -> set(null));
+        return this;
+    }
 
     // nonnull. vagy legyen nullable, ami kitörli az eddigi bindet?
     default void bindTo(ObservableScalar<? extends T> other) {

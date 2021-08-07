@@ -1,12 +1,10 @@
 package ui10.renderer.java2d;
 
 import ui10.binding.ObservableList;
-import ui10.binding.ScalarProperty;
-import ui10.binding.Scope;
+import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.input.EventTarget;
-import ui10.layout.BoxConstraints;
 import ui10.nodes.*;
 
 import java.awt.*;
@@ -17,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static ui10.geom.Point.ORIGO;
-
 public class J2DRenderer {
 
     public int canvasWidth, canvasHeight;
@@ -28,7 +24,6 @@ public class J2DRenderer {
     final List<ParentRenderItem> mouseTargets = new ArrayList<>();
 
     private Rectangle dirtyRegion;
-    private final ScalarProperty<BoxConstraints> layoutConstraints = ScalarProperty.create();
 
     public J2DRenderer(Node root, Runnable requestUpdate, NodeRendererComponent awtComponent) {
         this.root = root;
@@ -36,33 +31,32 @@ public class J2DRenderer {
         this.awtComponent = awtComponent;
 
         init(this.root, new AffineTransform(), null);
-        root.position.set(ORIGO);
+    }
+
+    private Point pos(Node n) {
+        return n.bounds.get().topLeft();
+    }
+
+    private Size size(Node n) {
+        return n.bounds.get().size();
     }
 
     private void init(Node node, AffineTransform transform, RenderItem parent) {
-        node.inputEnvironment.set(awtComponent.inputEnvironment);
+        node.context.set(awtComponent.context);
 
-        if (!node.layoutActive.get()) {
-            node.layoutActive.subscribe(change -> {
+        if (node.bounds.get() == null) {
+            node.bounds.subscribe(change -> {
                 if (node.rendererData == null)
                     init(node, transform, parent);
             });
             return;
         }
 
-        if (node.position.get() == null) {
-            System.err.println("Node has no position (2): "+node);
-            return;
-        }
-
 
         AffineTransform t = (AffineTransform) transform.clone();
-        t.translate(
-                node.position.get().x().toDouble(),
-                node.position.get().y().toDouble());
+        t.translate(pos(node).x().toDouble(), pos(node).y().toDouble());
 
-        node.position.subscribe(e -> recomputeBounds(node));
-        node.size.subscribe(e -> recomputeBounds(node));
+        node.bounds.subscribe(e -> recomputeBounds(node));
 
         RenderItem renderItem = makeRenderItem(node);
         node.rendererData = renderItem;
@@ -93,7 +87,7 @@ public class J2DRenderer {
     }
 
     private RenderItem makePrimitiveRenderItem(Node node) {
-        Size size = node.size.get();
+        Size size = size(node);
 
         if (node instanceof FilledPane r) {
             FillItem item = new FillItem();
@@ -117,7 +111,7 @@ public class J2DRenderer {
                 initLine(line, item);
                 updateDirtyRegion(J2DUtil.rect(item.bounds));
             });
-            line.size.subscribe(e -> {
+            line.bounds.map(Rectangle::size).subscribe(e -> {
                 initLine(line, item);
                 // dirty regiont már beállítja a bounds init-beli subscribere
             });
@@ -137,7 +131,7 @@ public class J2DRenderer {
     }
 
     private void initLine(LinePane line, StrokeItem item) {
-        Size size = line.size.get();
+        Size size = size(line);
         item.stroke = new BasicStroke((float) line.width.get().toDouble());
         item.paint = J2DUtil.color(line.color.get());
         item.shape = new Line2D.Double(0, 0,
@@ -152,8 +146,7 @@ public class J2DRenderer {
         updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
         renderItem.transform = renderItem.parent == null ? new AffineTransform() :
                 (AffineTransform) renderItem.parent.transform.clone();
-        renderItem.transform.translate(frame.position.get().x().toDouble(),
-                frame.position.get().y().toDouble());
+        renderItem.transform.translate(pos(frame).x().toDouble(), pos(frame).y().toDouble());
 
         renderItem.bounds = renderItem.computeBounds(renderItem.transform);
         updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
@@ -176,11 +169,8 @@ public class J2DRenderer {
 
         Size canvasSize = new Size(canvasWidth, canvasHeight);
 
-        BoxConstraints layoutConstraints = BoxConstraints.fixed(canvasSize);
-        if (this.layoutConstraints.get() == null) {
-            this.layoutConstraints.set(layoutConstraints);
-            root.layoutThread(this.layoutConstraints, true, new Scope());
-        }
+        if (root.bounds.get() == null)
+            root.bounds.set(Rectangle.of(canvasSize));
 
         draw(g, root, true);
 
@@ -188,20 +178,12 @@ public class J2DRenderer {
     }
 
     private void draw(Graphics2D g, Node node, boolean root) {
-        if (!node.layoutActive.get()) {
-            System.err.println("Node not laid out: " + node);
-            return;
-        }
-        if (node.position.get() == null) {
-            System.err.println("Node has no position: " + node);
-            return;
-        }
-        if (node.size.get() == null) {
-            System.err.println("Node has no size: " + node);
+        if (node.bounds.get() == null) {
+            System.err.println("Node has no bounds: " + node);
             return;
         }
 
-        Rectangle bounds = new Rectangle(node.position.get(), node.size.get());
+        Rectangle bounds = node.bounds.get();
 
         if (!root)
             g.translate(bounds.topLeft().x().toDouble(),

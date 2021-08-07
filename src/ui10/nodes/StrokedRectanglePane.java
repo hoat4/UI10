@@ -3,15 +3,16 @@ package ui10.nodes;
 import ui10.binding.ObservableListImpl;
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
-import ui10.binding.Scope;
 import ui10.geom.Num;
 import ui10.geom.Point;
+import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.image.Color;
 import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 
-import static ui10.binding.ObservableScalar.binding;
+import java.util.Collection;
+
 import static ui10.geom.Num.*;
 import static ui10.geom.Point.ORIGO;
 
@@ -35,34 +36,32 @@ public class StrokedRectanglePane extends Pane {
     }
 
     @Override
-    protected ObservableScalar<Node> paneContent() {
+    protected ObservableScalar<? extends Node> paneContent() {
         LinePane top = new LinePane(width, color), right = new LinePane(width, color);
         LinePane bottom = new LinePane(width, color), left = new LinePane(width, color);
 
-        return ObservableScalar.ofConstant(new LayoutNode(ObservableListImpl.createMutable(top, right, bottom, left)) {
-            @Override
-            protected ObservableScalar<Size> makeLayoutThread(ObservableScalar<BoxConstraints> in, boolean apply, Scope scope) {
-                // TODO itt inkább fixed constraints kéne
+        return new Layout(ObservableListImpl.createMutable(top, right, bottom, left)) {
 
-                ObservableScalar<BoxConstraints> cHoriz = binding(in, width, (c, w)->c.withHeight(w, w));
-                ObservableScalar<BoxConstraints> cVert = binding(in, width, (c, w)->c.withWidth(w, w));
-
-                top.layoutThread(cHoriz, apply, scope);
-                right.layoutThread(cVert, apply, scope);
-                bottom.layoutThread(cHoriz, apply, scope);
-                left.layoutThread(cVert, apply, scope);
-
-                return binding(in, width, (constraints, w)->{
-                    Size size = constraints.clamp(new Size(w.mul(TWO), w.mul(TWO)));
-                    if (apply) {
-                        top.position.set(ORIGO);
-                        right.position.set(new Point(size.width().sub(w), ZERO));
-                        bottom.position.set(new Point(ZERO, size.height().sub(w)));
-                        left.position.set(ORIGO);
-                    }
-                    return size;
-                });
+            {
+                dependsOn(width);
             }
-        });
+
+            @Override
+            protected Size determineSize(BoxConstraints constraints) {
+                // TODO itt failolni kéne, ha kisebb
+                return constraints.clamp(new Size(width.get().mul(TWO), width.get().mul(TWO)));
+            }
+
+            @Override
+            protected void layout(Collection<?> updated) {
+                Size s = bounds.get().size();
+                Num w = width.get();
+
+                top.bounds.set(new Rectangle(ORIGO, new Size(s.width(), w)));
+                right.bounds.set(new Rectangle(new Point(s.width().sub(w), ZERO), new Size(w, s.height())));
+                bottom.bounds.set(new Rectangle(new Point(ZERO, s.height().sub(w)), new Size(s.width(), w)));
+                left.bounds.set(new Rectangle(ORIGO, new Size(w, s.height())));
+            }
+        }.asNodeObservable();
     }
 }

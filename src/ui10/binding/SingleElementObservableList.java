@@ -33,10 +33,9 @@ public class SingleElementObservableList<E> extends AbstractList<E> implements O
 
         @Override
         public void accept(ChangeEvent<E> c) {
-            if (c.oldValue() != null)
-                consumer.accept(new ListChange.ListRemove<>(0, List.of(c.oldValue())));
-            if (c.newValue() != null)
-                consumer.accept(new ListChange.ListAdd<>(0, List.of(c.newValue())));
+            List<E> old = c.oldValue() == null ? List.of() : List.of(c.oldValue());
+            List<E> newL = c.newValue() == null ? List.of() : List.of(c.newValue());
+            consumer.accept(new ListChange<>(0, old, newL));
         }
     }
 

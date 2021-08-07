@@ -6,6 +6,7 @@ import ui10.input.EventTarget;
 import ui10.input.InputEvent;
 import ui10.input.pointer.MouseEvent.MousePressEvent;
 import ui10.input.pointer.MouseEvent.MouseReleaseEvent;
+import ui10.nodes.Context;
 import ui10.nodes.Node;
 import ui10.nodes.EventLoop;
 
@@ -25,6 +26,7 @@ public class NodeRendererComponent extends Canvas {
     private final EventLoop eventLoop;
     private J2DRenderer renderer;
     final AWTInputEnvironment inputEnvironment = new AWTInputEnvironment();
+    public final Context context;
 
     public NodeRendererComponent(EventLoop eventLoop) {
         this.eventLoop = eventLoop;
@@ -38,6 +40,7 @@ public class NodeRendererComponent extends Canvas {
                 }
             });
         });
+        context = new Context(eventLoop, inputEnvironment);
 
         root.subscribe(evt -> requestRepaint());
 
@@ -73,11 +76,13 @@ public class NodeRendererComponent extends Canvas {
         if (e.isConsumed())
             return;
 
-        System.out.println(e);
+        eventLoop.runLater(()->{
+            System.out.println(e);
 
-        if (e.getID() == KeyEvent.KEY_PRESSED) {
-            inputEnvironment.dispatchEvent(new AWTKeyTypeEvent(e));
-        }
+            if (e.getID() == KeyEvent.KEY_PRESSED) {
+                inputEnvironment.dispatchEvent(new AWTKeyTypeEvent(e));
+            }
+        });
     }
 
     private void dispatchEvent(EventTarget eventTarget, InputEvent event) {

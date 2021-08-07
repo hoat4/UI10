@@ -14,7 +14,7 @@ public interface ObservableList<E> extends List<E>, Observable<ListChange<E>> {
     //      is működővé tenni a subscribe-ot
 
     default void enumerateAndSubscribe(Consumer<ListChange<E>> consumer) {
-        consumer.accept(new ListChange.ListAdd<>(0, List.copyOf(this)));
+        consumer.accept(new ListChange<>(0, List.of(), List.copyOf(this)));
         subscribe(consumer);
     }
 
@@ -26,21 +26,16 @@ public interface ObservableList<E> extends List<E>, Observable<ListChange<E>> {
             consumer.accept(get(i), s);
         }
         subscribe(evt -> {
-            if (evt instanceof ListChange.ListAdd<E> a) {
-                for (int i = a.index(); i < a.index() + a.elements().size(); i++) {
-                    Scope scope = new Scope();
-                    scopes.add(i, scope);
-                    consumer.accept(a.elements().get(i - a.index()), scope);
-                }
-            } else if (evt instanceof ListChange.ListRemove<E> r) {
-                for (int i = r.index(); i < r.index() + r.elements().size(); i++) {
-                    scopes.get(i).close();
-                }
-                scopes.subList(r.index(), r.index() + r.elements().size()).clear();
-            } else {
-                throw new UnsupportedOperationException(evt.toString());
+            for (int i = evt.index(); i < evt.index() + evt.oldElements().size(); i++) {
+                scopes.get(i).close();
             }
+            scopes.subList(evt.index(), evt.index() + evt.oldElements().size()).clear();
 
+            for (int i = evt.index(); i < evt.index() + evt.newElements().size(); i++) {
+                Scope scope = new Scope();
+                scopes.add(i, scope);
+                consumer.accept(evt.newElements().get(i - evt.index()), scope);
+            }
         });
     }
 
@@ -56,12 +51,8 @@ public interface ObservableList<E> extends List<E>, Observable<ListChange<E>> {
         // TODO pattern switch deconstruction pattern-nel, majd ha végre eljutnak odáig
 
         return change -> {
-            if (change instanceof ListChange.ListAdd<E> a)
-                a.elements().forEach(addHandler);
-            else if (change instanceof ListChange.ListRemove<E> r)
-                r.elements().forEach(removeHandler);
-            else
-                throw new IllegalArgumentException(change.toString());
+            change.oldElements().forEach(removeHandler);
+            change.newElements().forEach(addHandler);
         };
     }
 

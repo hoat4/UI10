@@ -1,15 +1,17 @@
 package ui10.layout;
 
-import ui10.binding.ObservableList;
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
-import ui10.binding.Scope;
 import ui10.geom.Num;
-import ui10.geom.Point;
+import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.nodes.LayoutNode;
+import ui10.nodes.Layout;
 import ui10.nodes.Node;
 import ui10.nodes.Pane;
+
+import java.util.Collection;
+
+import static ui10.binding.ObservableScalar.binding;
 
 public class Padding extends Pane {
 
@@ -56,32 +58,28 @@ public class Padding extends Pane {
     }
 
     @Override
-    protected ObservableScalar<Node> paneContent() {
-        return ObservableScalar.ofConstant(new OneChildOnePassLayout(content) {
-
-            private Size all;
+    protected ObservableScalar<? extends Node> paneContent() {
+        ObservableScalar<Size> all = binding(left, right, top, bottom, (l, r, t, b) -> new Size(l.add(r), t.add(b)));
+        return new Layout(content) {
 
             {
-                dependsOn(left, top, right, bottom);
+                dependsOn(all);
             }
 
             @Override
-            protected void initState() {
-                all = new Size(left.get().add(right.get()), top.get().add(bottom.get()));
+            protected Size determineSize(BoxConstraints constraints) {
+                BoxConstraints c = new BoxConstraints(
+                        constraints.min().subtractOrClamp(all.get()),
+                        constraints.max().subtract(all.get()));
+
+                return content.get().determineSize(c).add(all.get());
             }
 
             @Override
-            protected BoxConstraints childConstraints(BoxConstraints constraints) {
-                return new BoxConstraints(constraints.min().subtractOrClamp(all), constraints.max().subtract(all));
+            protected void layout(Collection<?> updatedChildren) {
+                content.get().bounds.set(Rectangle.of(bounds.get().size()).
+                        withInsets(top.get(), right.get(), bottom.get(), left.get()));
             }
-
-            @Override
-            protected Size layout(BoxConstraints constraints, Node content, Size contentSize, boolean apply) {
-                if (apply)
-                    content.position.set(new Point(left.get(), top.get()));
-                return contentSize.add(all);
-            }
-
-        });
+        }.asNodeObservable();
     }
 }

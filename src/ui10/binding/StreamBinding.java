@@ -57,16 +57,14 @@ public class StreamBinding<E> {
     }
 
     @SuppressWarnings("unchecked")
-    private <F> void sourceChange(ListChange<?> c) {
+    private <F> void sourceChange(ListChange<?> evt) {
         Op<F, ?> first = (Op<F, ?>) firstOp;
-        if (c instanceof ListChange.ListAdd<?> a)
-            for (int i = 0; i < a.elements().size(); i++)
-                first.add(a.index() + i, (F) a.elements().get(i));
-        else {
-            ListChange.ListRemove<F> r = (ListChange.ListRemove<F>) c;
-            for (int i = 0; i < r.elements().size(); i++)
-                first.add(r.index() + i, (F) r.elements().get(i));
-        }
+
+        for (int i = 0; i < evt.oldElements().size(); i++)
+            first.add(evt.index() + i, (F) evt.oldElements().get(i));
+
+        for (int i = 0; i < evt.newElements().size(); i++)
+            first.add(evt.index() + i, (F) evt.newElements().get(i));
     }
 
     private static abstract class Op<S, T> {

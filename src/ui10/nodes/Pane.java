@@ -2,13 +2,12 @@ package ui10.nodes;
 
 import ui10.binding.*;
 import ui10.decoration.Decoration;
+import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-
-import static ui10.geom.Point.ORIGO;
 
 public abstract class Pane extends Node {
 
@@ -17,6 +16,13 @@ public abstract class Pane extends Node {
     private Scope decorationScope;
 
     private ObservableList<Decoration> decorations;
+
+    {
+        decoratedContent.scopedGetAndSubscribe((n, scope) -> {
+            n.bounds.bindTo(bounds.nullsafeMap(Rectangle::atOrigo), scope);
+            n.parent.set(this, scope);
+        });
+    }
 
     public final ObservableList<Decoration> decorations() {
         if (decorations == null) {
@@ -73,13 +79,8 @@ public abstract class Pane extends Node {
     }
 
     @Override
-    protected ObservableScalar<Size> makeLayoutThread(ObservableScalar<BoxConstraints> in, boolean apply, Scope scope) {
-        ObservableScalar<Size> t = content().flatMap(n -> n.layoutThread(in, apply, scope)); // TODO scope
-        if (apply)
-            content().getAndSubscribe(n -> {
-                n.position.set(ORIGO);
-            });
-        return t;
+    public Size determineSize(BoxConstraints constraints) {
+        return content().get().determineSize(constraints);
     }
 
     private class DecorationInvalidationSubscriber implements Consumer<ChangeEvent<Boolean>> {

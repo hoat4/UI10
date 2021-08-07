@@ -20,9 +20,8 @@ public class ParentRenderItem extends RenderItem {
 
     @Override
     Rectangle2D computeBounds(AffineTransform transform) {
-        Objects.requireNonNull(node.size.get(), node+" has no size");
-        Rectangle rect = new Rectangle(node.position.get(), node.size.get());
-        return transform.createTransformedShape(J2DUtil.rect(rect)).getBounds2D();
+        Rectangle bounds = Objects.requireNonNull(node.bounds.get(), node+" has no size");
+        return transform.createTransformedShape(J2DUtil.rect(bounds)).getBounds2D();
     }
 
     @Override

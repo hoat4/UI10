@@ -26,8 +26,8 @@ public class FilledPane extends Pane {
         return ObservableScalar.ofConstant(new PrimitiveNode(this) {
 
             @Override
-            protected ObservableScalar<Size> size(ObservableScalar<BoxConstraints> constraintsObservable) {
-                return constraintsObservable.map(BoxConstraints::min);
+            public Size determineSize(BoxConstraints constraints) {
+                return constraints.min();
             }
         });
     }

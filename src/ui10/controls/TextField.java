@@ -11,14 +11,13 @@ import ui10.input.InputEvent;
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.keyboard.Keyboard;
 import ui10.input.pointer.MouseEvent;
-import ui10.layout.PreferredSize;
-import ui10.layout.Positioned;
+import ui10.layout.AbsolutePositioned;
+import ui10.layout.FixedSize;
 import ui10.layout.StackPane;
 import ui10.nodes.LinePane;
 import ui10.nodes.Node;
 import ui10.nodes.Pane;
 import ui10.nodes.TextPane;
-
 
 import static ui10.binding.ObservableScalar.binding;
 import static ui10.geom.Num.ZERO;
@@ -48,13 +47,13 @@ public class TextField extends Control {
 
         return ObservableScalar.ofConstant(new StackPane(
                 textPane,
-                new Positioned(ObservableScalar.ofConstant(new Caret()), caretPos)
+                new AbsolutePositioned(ObservableScalar.ofConstant(new Caret()), caretPos)
         ));
     }
 
     protected void handleEvent(InputEvent e) {
         if (e instanceof MouseEvent.MousePressEvent) {
-            inputEnvironment.get().focus().set(eventTarget);
+            context.get().inputEnvironment.focus().set(eventTarget);
         } else if (e instanceof KeyTypeEvent k) {
             k.symbol().standardSymbol().ifPresent(sym -> {
                 if (sym instanceof Keyboard.StandardTextSymbol textSymbol) {
@@ -84,7 +83,7 @@ public class TextField extends Control {
         protected ObservableScalar<? extends Node> paneContent() {
             LinePane line = new LinePane(num(1), RGBColor.BLACK);
 
-            PreferredSize fs = new PreferredSize();
+            FixedSize fs = new FixedSize();
             fs.content.set(line);
             fs.size.bindTo(textStyle.map(ts -> new Size(line.width.get(), ts == null ? ZERO : ts.height())));
 

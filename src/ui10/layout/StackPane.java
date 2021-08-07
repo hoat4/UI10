@@ -1,13 +1,12 @@
 package ui10.layout;
 
 import ui10.binding.*;
+import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.nodes.LayoutNode;
-import ui10.nodes.LayoutThread;
-import ui10.nodes.Node;
-import ui10.nodes.Pane;
+import ui10.nodes.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static ui10.geom.Point.ORIGO;
@@ -33,28 +32,19 @@ public class StackPane extends Pane {
     }
 
     @Override
-    protected ObservableScalar<Node> paneContent() {
-        return ObservableScalar.ofConstant(new LayoutNode(children) {
+    protected ObservableScalar<? extends Node> paneContent() {
+        return new Layout(children) {
             @Override
-            protected ObservableScalar<Size> makeLayoutThread(ObservableScalar<BoxConstraints> in,
-                                                              boolean apply, Scope scope) {
-                ObservableScalar<Size> thisSize = children.streamBinding().
-                        flatMapProp(n -> n.layoutThread(in, false, null)).
-                        reduce(in.map(BoxConstraints::min), Size::max);
-
-                if (apply) {
-                    ObservableScalar<BoxConstraints> childConstraints = thisSize.map(BoxConstraints::fixed);
-
-                    // TODO original scope childje legyen
-                    children.scopedEnumerateAndSubscribe((n, scope2) -> {
-                        n.position.set(ORIGO);
-                        n.layoutThread(childConstraints, true, scope2);
-                    });
-                }
-
-                return thisSize;
+            protected Size determineSize(BoxConstraints constraints) {
+                return children.stream().map(n->n.determineSize(constraints)).reduce(Size.ZERO, Size::max);
             }
-        });
+
+            @Override
+            public void layout(Collection<?> updatedChildren) {
+                for (Node n : children)
+                    n.bounds.set(Rectangle.of(bounds.get().size()));
+            }
+        }.asNodeObservable();
     }
 
 //        return ObservableScalar.ofConstant(new LayoutNode(children) {
@@ -71,4 +61,24 @@ public class StackPane extends Pane {
 //                });
 //            }
 //        });
+
+//    @Override
+//    protected ObservableScalar<Size> makeLayoutThread(ObservableScalar<BoxConstraints> in,
+//                                                      boolean apply, Scope scope) {
+//        ObservableScalar<Size> thisSize = children.streamBinding().
+//                flatMapProp(n -> n.layoutThread(in, false, null)).
+//                reduce(in.map(BoxConstraints::min), Size::max);
+//
+//        if (apply) {
+//            ObservableScalar<BoxConstraints> childConstraints = thisSize.map(BoxConstraints::fixed);
+//
+//            // TODO original scope childje legyen
+//            children.scopedEnumerateAndSubscribe((n, scope2) -> {
+//                n.position.set(ORIGO);
+//                n.layoutThread(childConstraints, true, scope2);
+//            });
+//        }
+//
+//        return thisSize;
+//    }
 }

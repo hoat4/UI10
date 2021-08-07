@@ -18,6 +18,10 @@ public record Point(Num x, Num y) {
         return new Point(Num.max(a.x, b.x), Num.max(a.y, b.y));
     }
 
+    public static Point of(Size size) {
+        return new Point(size.width(), size.height());
+    }
+
     public Point add(Size s) {
         return new Point(x.add(s.width()), y.add(s.height()));
     }

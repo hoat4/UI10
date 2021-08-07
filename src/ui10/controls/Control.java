@@ -11,8 +11,8 @@ import ui10.nodes.Pane;
 public abstract class Control extends Pane {
 
     protected final EventTarget eventTarget = new EventTarget(InputEventHandler.of(this::handleEvent));
-    public final ObservableScalar<Boolean> focused = inputEnvironment.
-            flatMap(InputEnvironment::focus).map(e -> e == eventTarget);
+    public final ObservableScalar<Boolean> focused = context.
+            flatMap(ctx->ctx.inputEnvironment.focus()).map(e -> e == eventTarget);
 
     @Override
     protected Node wrapDecoratedContent(Node decoratedContent) {

@@ -30,11 +30,13 @@ public class LinePane extends Pane {
     protected ObservableScalar<Node> paneContent() {
         return ObservableScalar.ofConstant(new PrimitiveNode(this) {
 
-            @SuppressWarnings("SuspiciousNameCombination")
+            {
+                sizeDependsOn(width);
+            }
+
             @Override
-            protected ObservableScalar<Size> size(ObservableScalar<BoxConstraints> constraintsObservable) {
-                return ObservableScalar.binding(constraintsObservable, width,
-                        (constraints, width) -> constraints.clamp(new Size(width, width)));
+            public Size determineSize(BoxConstraints constraints) {
+                return constraints.clamp(new Size(width.get(), width.get()));
             }
         });
     }

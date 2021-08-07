@@ -8,6 +8,9 @@ public abstract class LayoutNode extends Node {
 
     public LayoutNode(ObservableList<? extends Node> children) {
         this.children = children;
+        children.enumerateAndSubscribe(c -> {
+
+        });
     }
 
     @Override

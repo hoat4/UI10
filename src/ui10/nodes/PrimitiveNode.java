@@ -1,5 +1,6 @@
 package ui10.nodes;
 
+import ui10.binding.Observable;
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableScalar;
 import ui10.binding.Scope;
@@ -14,16 +15,23 @@ public abstract class PrimitiveNode extends Node {
         this.target = target;
     }
 
+    protected void sizeDependsOn(Observable<?> o) {
+        o.subscribe(e->{
+            LayoutNodeImpl n = parentLayoutNode();
+            if (n != null)
+                n.requestLayout(this);
+        });
+    }
 
-    @Override
-    protected ObservableScalar<Size> makeLayoutThread(ObservableScalar<BoxConstraints> in, boolean apply, Scope scope) {
-        return size(in);
+    private LayoutNodeImpl parentLayoutNode() {
+        Node n = parent.get();
+        while (n != null && !(n instanceof LayoutNodeImpl))
+            n = n.parent.get();
+        return (LayoutNodeImpl) n;
     }
 
     @Override
     public ObservableList<? extends Node> children() {
         return ObservableList.constantEmpty();
     }
-
-    protected abstract ObservableScalar<Size> size(ObservableScalar<BoxConstraints> constraintsObservable);
 }

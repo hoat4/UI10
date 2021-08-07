@@ -7,8 +7,10 @@ import ui10.controls.TextField;
 import ui10.decoration.Box;
 import ui10.decoration.Decoration;
 import ui10.decoration.RuleBasedDecoration;
+import ui10.geom.Size;
 import ui10.image.RGBColor;
 import ui10.layout.Centered;
+import ui10.layout.FixedSize;
 import ui10.layout.Padding;
 import ui10.layout.StackPane;
 import ui10.nodes.Border;
@@ -49,7 +51,7 @@ public class Main3 {
 
                             Box box = new Box(p);
                             box.background.bindTo(((TextField) container).focused.
-                                    map(focused -> RGBColor.ofRGBShort(focused ? 0xFFF : 0xDDD)));
+                                    map(focused -> RGBColor.ofRGBShort(0xFFF)));
                             box.borderStyle.set(new Border.BorderStyle(num(1), RGBColor.BLACK));
                             box.padding.set(num(5));
                             return box;
@@ -67,6 +69,8 @@ public class Main3 {
         Centered content = new Centered(f);
         content.decorations().add(d);
 
+        //Window window = new Window(new Centered(new FixedSize(new FilledPane(RGBColor.RED), new Size(num(100), num(100)))));
+        //Window window = new Window(new FilledPane(RGBColor.RED));
         Window window = new Window(content);
         desktop.windows.add(window);
         window.shown.getAndSubscribe(b -> {

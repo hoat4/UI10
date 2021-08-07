@@ -20,9 +20,8 @@ public class Binding1<T, T1> implements Binding<T> {
     private T1 prevT1;
 
     public Binding1(ObservableScalar<T1> o1, Function<T1, T> valueSupplier) {
-        this.o1 = o1;
-        this.valueSupplier = valueSupplier;
-
+        this.o1 = Objects.requireNonNull(o1);
+        this.valueSupplier = Objects.requireNonNull(valueSupplier);
         value = valueSupplier.apply(prevT1 = o1.get());
     }
 

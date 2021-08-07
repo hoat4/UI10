@@ -1,4 +1,6 @@
-package ui10.binding;
+package ui10.binding.impl;
+
+import ui10.binding.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +8,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 @SuppressWarnings("rawtypes")
-class SelfContainedScalarProperty<T> implements ScalarProperty<T>, Consumer {
+public class SelfContainedScalarProperty<T> implements ScalarProperty<T>, Consumer {
 
     // Consumer raw type, hogy a bridge method ne szemetelje stack trace-t
 

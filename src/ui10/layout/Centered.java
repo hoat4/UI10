@@ -3,8 +3,11 @@ package ui10.layout;
 import ui10.binding.ObservableScalar;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
+import ui10.nodes.Layout;
 import ui10.nodes.Node;
 import ui10.nodes.WrapperPane;
+
+import java.util.Collection;
 
 public class Centered extends WrapperPane {
 
@@ -21,20 +24,20 @@ public class Centered extends WrapperPane {
 
     @Override
     protected ObservableScalar<? extends Node> paneContent() {
-        return ObservableScalar.ofConstant(new OneChildOnePassLayout(content) {
+        return new Layout(content) {
+
             @Override
-            protected BoxConstraints childConstraints(BoxConstraints thisConstraints) {
-                return thisConstraints.withMinimum(Size.ZERO);
+            protected Size determineSize(BoxConstraints constraints) {
+                return constraints.clamp(content.get().determineSize(constraints.withMinimum(Size.ZERO)));
             }
 
             @Override
-            protected Size layout(BoxConstraints constraints, Node content, Size contentSize, boolean apply) {
-                Size thisSize = constraints.clamp(contentSize);
-                if (apply)
-                    content.position.set(Rectangle.of(thisSize).centered(contentSize).topLeft());
-                return thisSize;
+            public void layout(Collection<?> updatedChildren) {
+                Node n = content.get();
+                Size childSize = n.determineSize(new BoxConstraints(Size.ZERO, bounds.get().size()));
+                n.bounds.set(Rectangle.of(bounds.get().size()).centered(childSize));
             }
-        });
+        }.asNodeObservable();
     }
 
 //    return ObservableScalar.ofConstant(new LayoutNode(ObservableList.of(content)) {

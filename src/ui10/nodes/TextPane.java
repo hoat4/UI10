@@ -38,9 +38,14 @@ public class TextPane extends Pane {
     protected ObservableScalar<Node> paneContent() {
         return ObservableScalar.ofConstant(new PrimitiveNode(this) {
 
+            {
+                sizeDependsOn(text);
+                sizeDependsOn(textStyle);
+            }
+
             @Override
-            protected ObservableScalar<Size> size(ObservableScalar<BoxConstraints> constraintsObservable) {
-                return binding(textStyle, text, (textStyle, text) -> textStyle.textSize(text).size());
+            public Size determineSize(BoxConstraints constraints) {
+                return textStyle.get().textSize(text.get()).size();
             }
         });
     }

@@ -1,54 +1,52 @@
 package ui10.layout;
 
-import ui10.binding.ObservableList;
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
-import ui10.geom.Num;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.nodes.LayoutNode;
+import ui10.nodes.Layout;
 import ui10.nodes.Node;
-import ui10.nodes.Pane;
 import ui10.nodes.WrapperPane;
 
 import java.util.Collection;
 
-public class FixedWidth extends WrapperPane {
-    public final ScalarProperty<Num> width = ScalarProperty.create();
+public class FixedSize extends WrapperPane {
 
-    public FixedWidth() {
+    public final ScalarProperty<Size> size = ScalarProperty.create();
+
+    public FixedSize() {
     }
 
-    public FixedWidth(Node content, Num width) {
+    public FixedSize(Node content, Size size) {
         super(content);
-        this.width.set(width);
+        this.size.set(size);
     }
 
-    public FixedWidth(ObservableScalar<Node> content, ObservableScalar<Num> width) {
+    public FixedSize(ObservableScalar<Node> content, ObservableScalar<Size> size) {
         super(content);
-        this.width.bindTo(width);
+        this.size.bindTo(size);
     }
 
     @Override
     protected ObservableScalar<? extends Node> paneContent() {
-        return ObservableScalar.ofConstant(new LayoutNode(ObservableList.of(content)) {
+        return new Layout(content) {
 
             {
-                layoutDependsOn(width);
+                dependsOn( size);
             }
 
             @Override
-            protected Size doDetermineSize(BoxConstraints constraints) {
-                Num w = width.get();
-                if (!constraints.containsWidth(w))
-                    throw new IllegalStateException("fixed width doesn't fits in " + constraints + " (content: " + content.get() + ")");
-                return content.get().determineSize(constraints.withWidth(w, w));
+            protected Size determineSize(BoxConstraints constraints) {
+                Size s = size.get();
+                if (!constraints.contains(s))
+                    throw new IllegalStateException("fixed size "+s+" doesn't fits in " + constraints + " (content: " + content.get() + ")");
+                return s;
             }
 
             @Override
-            public void layout(Collection<Node> updatedChildren) {
+            protected void layout(Collection<?> updatedChildren) {
                 content.get().bounds.set(Rectangle.of(bounds.get().size()));
             }
-        });
+        }.asNodeObservable();
     }
 }
