@@ -14,6 +14,7 @@ import ui10.geom.Rectangle;
 import ui10.image.LinearGradient;
 import ui10.image.RGBColor;
 import ui10.layout.Centered;
+import ui10.layout.Grid;
 import ui10.layout.Padding;
 import ui10.layout.StackPane;
 import ui10.nodes.*;
@@ -72,7 +73,7 @@ public class Main3 {
             });
             final TextField f = new TextField();
             f.text.set("szöveg");
-            Centered content = new Centered(f);
+            Centered content = new Centered(new Grid.GridBuilder().add(button).add(new Centered(f)).build());
             content.decorations().add(d);
 
             //Window window = new Window(new Centered(new FixedSize(new FilledPane(RGBColor.RED), new Size(num(100), num(100)))));
