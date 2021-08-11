@@ -1,6 +1,7 @@
 package ui10.binding.impl;
 
 import ui10.binding.*;
+import ui10.nodes.UIThread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,9 @@ public class SelfContainedScalarProperty<T> implements ScalarProperty<T>, Consum
 
     @Override
     public T get() {
+        ReadTransaction t = ((UIThread)Thread.currentThread()).currentReadTransaction;
+        if (t != null)
+            t.onRead(this);
         return transformedValue;
     }
 

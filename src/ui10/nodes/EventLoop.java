@@ -1,7 +1,6 @@
 package ui10.nodes;
 
-import ui10.geom.FloatingPointNumber;
-import ui10.geom.Num;
+import ui10.geom.Fraction;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -15,7 +14,7 @@ import static java.time.Instant.now;
 
 public class EventLoop {
 
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(UIThread::new);
 
     public void runLater(Runnable runnable) {
         executorService.execute(() -> {
@@ -27,7 +26,7 @@ public class EventLoop {
         });
     }
 
-    public void beginAnimation(Duration duration, Consumer<Num> f) {
+    public void beginAnimation(Duration duration, Consumer<Fraction> f) {
         Animation animation = new Animation(duration, f);
         animation.scheduledFuture = executorService.scheduleAtFixedRate(animation,
                 0, 16, TimeUnit.MILLISECONDS);
@@ -37,11 +36,11 @@ public class EventLoop {
 
         private final Instant begin = now();
         private final Duration duration;
-        private final Consumer<Num> consumer;
+        private final Consumer<Fraction> consumer;
         private ScheduledFuture<?> scheduledFuture;
         private boolean done;
 
-        public Animation(Duration duration, Consumer<Num> consumer) {
+        public Animation(Duration duration, Consumer<Fraction> consumer) {
             this.duration = duration;
             this.consumer = consumer;
         }
@@ -50,11 +49,12 @@ public class EventLoop {
         public void run() {
             try {
                 Duration d = Duration.between(begin, now());
-                double t = d.toMillis() * 1.0 / duration.toMillis();
+                Fraction t = new Fraction(Math.toIntExact(d.toMillis()), Math.toIntExact(duration.toMillis()));
 
                 if (!done)
-                    consumer.accept(new FloatingPointNumber(Math.min(1, t)));
-                if (t >= 1) {
+                    consumer.accept(t.isAboveOne() ? Fraction.WHOLE : t); // legyen a nevező ugyanaz, ne 1?
+
+                if (t.isAboveOne()) {
                     done = true;
                     if (scheduledFuture != null)
                         scheduledFuture.cancel(false);

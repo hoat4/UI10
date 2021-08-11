@@ -12,7 +12,7 @@ import java.util.Objects;
 public abstract class Layout {
 
     final ObservableList<? extends Node> children;
-    final LayoutNodeImpl node; // ezt később inicializáljuk, hogy lássa childrent
+    final LayoutNodeImpl node; // ezt később inicializáljuk mind childrent, hogy lássa azt
 
     public Layout(ObservableList<? extends Node> children) {
         this.children = Objects.requireNonNull(children);
@@ -36,7 +36,7 @@ public abstract class Layout {
         return node;
     }
 
-    public ObservableScalar<? extends Node>  asNodeObservable() {
+    public ObservableScalar<? extends Node> asNodeObservable() {
         return ObservableScalar.ofConstant(node);
     }
 }

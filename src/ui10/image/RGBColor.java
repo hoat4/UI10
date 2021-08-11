@@ -6,6 +6,8 @@ public record RGBColor(double red, double green, double blue, double alpha) impl
     public static final RGBColor GREEN = new RGBColor(0, 1, 0, 1);
     public static final RGBColor BLUE = new RGBColor(0, 0, 1, 1);
     public static final RGBColor BLACK = ofRGB(0x000000);
+    public static final RGBColor WHITE = ofRGB(0xFFFFFF);
+    public static final RGBColor TRANSPARENT = ofIntRGBA(0xFFFFFFFF);
 
     public RGBColor {
         if (red < 0 || red > 1)
@@ -36,6 +38,22 @@ public record RGBColor(double red, double green, double blue, double alpha) impl
     public int toIntRGBA() {
         return (int) (red * 255 + 0.5) << 24 | (int) (green * 255 + 0.5) << 16 |
                 (int) (blue * 255 + 0.5) << 8 | (int) (alpha * 255 + 0.5);
+    }
+
+    public RGBColor derive(double brightnessFactor) {
+        // ez nem pontos, text field border (#ececec, 26.4%, -15%) nálunk 205, náluk 207
+        // valójában nem tudom, hogy mit kéne jelentenie a brightness factornak, homályos a dokumentáció:
+        // https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
+
+        HSBColor hsb = HSBColor.of(this);
+        double b = hsb.brightness();
+
+        if (brightnessFactor < 0)
+            b = b + b * brightnessFactor;
+        else if (brightnessFactor > 0)
+            b = b + (1-b)*brightnessFactor;
+
+        return new HSBColor(hsb.hue(), hsb.saturation(), b).toRGB();
     }
 
     @Override

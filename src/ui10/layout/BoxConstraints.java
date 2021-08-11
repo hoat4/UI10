@@ -1,6 +1,6 @@
 package ui10.layout;
 
-import ui10.geom.Num;
+
 import ui10.geom.Point;
 import ui10.geom.Size;
 
@@ -14,7 +14,7 @@ public record BoxConstraints(Size min, Size max) {
 
     public BoxConstraints subtract(Point point) {
         Objects.requireNonNull(point);
-        if (max.width().sub(point.x()).isNegative() || max.width().sub(point.x()).isNegative())
+        if (point.x() > max.width() || point.y() > max.height())
             throw new IllegalArgumentException("couldn't subtract "+point+" from "+this);
         return new BoxConstraints(min.subtractOrClamp(point), max.subtract(point));
     }
@@ -30,8 +30,8 @@ public record BoxConstraints(Size min, Size max) {
 
     public Size clamp(Size size) {
         return new Size(
-                Num.max(min.width(), Num.min(max.width(), size.width())),
-                Num.max(min.height(), Num.min(max.height(), size.height()))
+                Math.max(min.width(), Math.min(max.width(), size.width())),
+                Math.max(min.height(), Math.min(max.height(), size.height()))
         );
     }
 
@@ -39,14 +39,18 @@ public record BoxConstraints(Size min, Size max) {
         return true; // TODO
     }
 
-    public BoxConstraints withWidth(Num min, Num max) {
+    public BoxConstraints withWidth(int min, int max) {
         return new BoxConstraints(new Size(min, this.min.height()), new Size(max, this.max.height()));
     }
-    public BoxConstraints withHeight(Num min, Num max) {
+    public BoxConstraints withHeight(int min, int max) {
         return new BoxConstraints(new Size(this.min.width(), min), new Size(this.max.width(), max));
     }
 
-    public boolean containsWidth(Num w) {
-        return !w.sub(min.width()).isNegative() && !max.width().sub(w).isNegative();
+    public boolean containsWidth(int w) {
+        return w >= min.width() && w <= max.width();
+    }
+
+    public boolean isFixed() {
+        return min.equals(max);
     }
 }

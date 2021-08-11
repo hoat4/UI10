@@ -16,6 +16,10 @@ public interface ObservableScalar<T> extends Observable<ChangeEvent<T>> {
         return ScalarProperty.createWithDefault(value); // TODO
     }
 
+    static <T> ObservableScalar<T> val(T value) {
+        return ScalarProperty.createWithDefault(value); // TODO
+    }
+
     static <T, T1> Binding<T> binding(ObservableScalar<T1> other, Function<T1, T> f) {
         return new Binding1<>(other, f);
     }

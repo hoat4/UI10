@@ -2,7 +2,6 @@ package ui10.controls;
 
 import ui10.binding.ObservableScalar;
 import ui10.input.EventTarget;
-import ui10.input.InputEnvironment;
 import ui10.input.InputEvent;
 import ui10.input.InputEventHandler;
 import ui10.nodes.Node;

@@ -4,6 +4,8 @@ import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.font.TextStyle;
 import ui10.geom.Size;
+import ui10.image.Color;
+import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 
 import static ui10.binding.ObservableScalar.binding;
@@ -12,6 +14,7 @@ public class TextPane extends Pane {
 
     public final ScalarProperty<String> text = ScalarProperty.create();
     public final ScalarProperty<TextStyle> textStyle = ScalarProperty.create();
+    public final ScalarProperty<Color> textColor = ScalarProperty.createWithDefault(RGBColor.BLACK);
 
     public TextPane() {
     }

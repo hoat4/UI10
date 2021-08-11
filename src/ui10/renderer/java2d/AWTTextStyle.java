@@ -2,20 +2,20 @@ package ui10.renderer.java2d;
 
 import ui10.font.FontMetrics;
 import ui10.font.TextStyle;
-import ui10.geom.FloatingPointNumber;
-import ui10.geom.Num;
 
 import java.awt.*;
+
+import static ui10.renderer.java2d.J2DUtil.px2i;
 
 public class AWTTextStyle implements TextStyle {
 
     public static final Canvas C = new Canvas();
 
-    private final Font font;
+    final Font font;
     private final java.awt.FontMetrics fontMetrics;
 
     public static AWTTextStyle of(float size) {
-        Font font = new Font(Font.DIALOG, 0, (int)size);
+        Font font = new Font("Segoe UI", 0, (int)size);
         if (size != (int)size)
             font = font.deriveFont((float)size);
         return new AWTTextStyle(font, C.getFontMetrics(font));
@@ -28,12 +28,12 @@ public class AWTTextStyle implements TextStyle {
 
     @Override
     public FontMetrics textSize(String text) {
-        return new FontMetrics(new FloatingPointNumber(fontMetrics.stringWidth(text)),
-                new FloatingPointNumber(fontMetrics.getAscent()), new FloatingPointNumber(fontMetrics.getDescent()));
+        return new FontMetrics(px2i(fontMetrics.stringWidth(text)),
+                px2i(fontMetrics.getAscent()), px2i(fontMetrics.getDescent()));
     }
 
     @Override
-    public Num height() {
-        return new FloatingPointNumber(fontMetrics.getHeight());
+    public int height() {
+        return px2i(fontMetrics.getHeight());
     }
 }

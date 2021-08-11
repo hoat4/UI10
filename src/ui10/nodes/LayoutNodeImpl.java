@@ -45,7 +45,9 @@ public class LayoutNodeImpl extends Node {
 
     public void requestLayout(Object origin) {
         if (layoutInProgress)
-            throw new IllegalStateException(this + " already has a layout operation in progress");
+            throw new IllegalStateException(this + " already has a layout operation in progress " +
+                    "(new layout op requested by " + origin + ")");
+
         if (!dirty.isEmpty() && !reqFailedNoCtx)
             return;
 
@@ -104,9 +106,10 @@ public class LayoutNodeImpl extends Node {
     }
 
     private void layout() {
-        boolean prev = layoutInProgress;
-        layoutInProgress = true;
+        if (layoutInProgress)
+            throw new IllegalStateException(this + " already has a layout operation in progress");
 
+        layoutInProgress = true;
         try {
             layout.layout(dirty);
 
@@ -116,7 +119,7 @@ public class LayoutNodeImpl extends Node {
 
             dirty.clear();
         } finally {
-            layoutInProgress = prev;
+            layoutInProgress = false;
         }
     }
 

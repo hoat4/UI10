@@ -13,6 +13,7 @@ public abstract class Node {
     public final ScalarProperty<Node> parent = ScalarProperty.create("Node.parent");
     public final ScalarProperty<Rectangle> bounds = ScalarProperty.create("Node.bounds");
     public final ScalarProperty<Context> context = ScalarProperty.create("Node.context");
+    public final Units units = new Units();
 
     final ObservableList<Tag> tags = new ObservableListImpl<>();
     public Object rendererData;

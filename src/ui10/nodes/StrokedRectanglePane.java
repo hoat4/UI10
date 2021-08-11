@@ -1,66 +1,84 @@
 package ui10.nodes;
 
-import ui10.binding.ObservableListImpl;
+import ui10.binding.ObservableList;
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
-import ui10.geom.Num;
 import ui10.geom.Point;
-import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.image.Color;
+import ui10.image.Fill;
 import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 
+import java.util.ArrayList;
 import java.util.Collection;
-
-import static ui10.geom.Num.*;
-import static ui10.geom.Point.ORIGO;
+import java.util.List;
 
 public class StrokedRectanglePane extends Pane {
 
-    public final ScalarProperty<Num> width = ScalarProperty.create();
-    public final ScalarProperty<Color> color = ScalarProperty.create();
+    public final ScalarProperty<Integer> thickness = ScalarProperty.create();
+    public final ScalarProperty<Fill> fill = ScalarProperty.create();
+    public final ScalarProperty<Integer> radius = ScalarProperty.create();
 
     public StrokedRectanglePane() {
-        this(ONE, RGBColor.BLACK);
+        this(1, RGBColor.BLACK);
     }
 
-    public StrokedRectanglePane(Num width, Color color) {
-        this.width.set(width);
-        this.color.set(color);
+    public StrokedRectanglePane(int thickness, Fill fill) {
+        this.thickness.set(thickness);
+        this.fill.set(fill);
     }
 
-    public StrokedRectanglePane(ObservableScalar<Num> width, ObservableScalar<Color> color) {
-        this.width.bindTo(width);
-        this.color.bindTo(color);
+    public StrokedRectanglePane(ObservableScalar<Integer> thickness, ObservableScalar<? extends Fill> fill) {
+        this.thickness.bindTo(thickness);
+        this.fill.bindTo(fill);
     }
 
     @Override
     protected ObservableScalar<? extends Node> paneContent() {
-        LinePane top = new LinePane(width, color), right = new LinePane(width, color);
-        LinePane bottom = new LinePane(width, color), left = new LinePane(width, color);
+        StrokePath path = new StrokePath(fill, thickness);
 
-        return new Layout(ObservableListImpl.createMutable(top, right, bottom, left)) {
+        return new Layout(ObservableList.ofConstantElement(path)) {
 
             {
-                dependsOn(width);
+                dependsOn(thickness);
+                dependsOn(radius);
             }
 
             @Override
             protected Size determineSize(BoxConstraints constraints) {
                 // TODO itt failolni kéne, ha kisebb
-                return constraints.clamp(new Size(width.get().mul(TWO), width.get().mul(TWO)));
+                return constraints.clamp(new Size(thickness.get() * 2, thickness.get() * 2));
             }
 
             @Override
             protected void layout(Collection<?> updated) {
-                Size s = bounds.get().size();
-                Num w = width.get();
+                List<StrokePath.PathElement> list = new ArrayList<>();
+                int t = thickness.get();
+                int ht = t / 2;
+                int w = bounds.get().size().width();
+                int h = bounds.get().size().height();
+                int r = radius.get();
 
-                top.bounds.set(new Rectangle(ORIGO, new Size(s.width(), w)));
-                right.bounds.set(new Rectangle(new Point(s.width().sub(w), ZERO), new Size(w, s.height())));
-                bottom.bounds.set(new Rectangle(new Point(ZERO, s.height().sub(w)), new Size(s.width(), w)));
-                left.bounds.set(new Rectangle(ORIGO, new Size(w, s.height())));
+                list.add(new StrokePath.MoveTo(new Point(r + ht, ht)));
+                list.add(new StrokePath.LineTo(new Point(w - ht - r, ht)));
+                list.add(new StrokePath.QuadCurveTo(new Point(w - ht, r + ht), new Point(w - ht, ht)));
+                list.add(new StrokePath.LineTo(new Point(w - ht, h - ht - r)));
+                list.add(new StrokePath.QuadCurveTo(new Point(w - ht - r, h - ht), new Point(w - ht, h - ht)));
+                list.add(new StrokePath.LineTo(new Point(ht + r, h - ht)));
+                list.add(new StrokePath.QuadCurveTo(new Point(ht, h - ht - r), new Point(ht, h-ht)));
+                list.add(new StrokePath.LineTo(new Point(ht, ht+r)));
+                list.add(new StrokePath.QuadCurveTo(new Point(ht + r, ht), new Point(ht, ht)));
+
+
+
+                /*list.add(new StrokePath.MoveTo(new Point(ht, ht)));
+                list.add(new StrokePath.LineTo(new Point(w - ht, ht)));
+                list.add(new StrokePath.LineTo(new Point(w - ht, h - ht)));
+                list.add(new StrokePath.LineTo(new Point(ht, h - ht)));
+                list.add(new StrokePath.LineTo(new Point(ht, ht)));*/
+                path.elements.setAll(list);
+
+                path.bounds.set(bounds.get().atOrigo());
             }
         }.asNodeObservable();
     }

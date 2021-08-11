@@ -5,11 +5,8 @@ import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.nodes.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static ui10.geom.Point.ORIGO;
 
 public class StackPane extends Pane {
 

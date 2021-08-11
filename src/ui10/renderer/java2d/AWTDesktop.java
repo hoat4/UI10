@@ -6,6 +6,7 @@ import ui10.window.Window;
 import ui10.nodes.EventLoop;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -28,6 +29,11 @@ public class AWTDesktop {
         window.rendererData = frame;
         NodeRendererComponent comp = new NodeRendererComponent(eventLoop);
         comp.root.bindTo(window.content);
+        JLabel label = new JLabel("               szöveg");
+        label.setFont(new Font("Segoe UI",0,20));
+        frame.setBackground(Color.WHITE);
+        frame.getContentPane().setBackground(Color.WHITE);
+        label.setBackground(Color.WHITE);
         frame.add(comp);
         frame.setSize(400, 300);
         frame.setLocationRelativeTo(null);

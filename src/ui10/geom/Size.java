@@ -2,23 +2,17 @@ package ui10.geom;
 
 import java.util.function.UnaryOperator;
 
-import static ui10.geom.Num.num;
+public record Size(int width, int height) {
 
-public record Size(Num width, Num height) {
     public static final Size ZERO = new Size(0, 0);
 
     public Size {
-        if (width.isNegative() || height.isNegative())
-            throw new IllegalArgumentException(width+" × "+height);
-    }
-
-    public Size(int width, int height) {
-        this(num(width), num(height));
+        if (width < 0 || height < 0)
+            throw new IllegalArgumentException(width + " × " + height);
     }
 
     public static Size max(Size a, Size b) {
-        return new Size(Num.max(a.width, b.width),
-                Num.max(a.height, b.height));
+        return new Size(Math.max(a.width, b.width), Math.max(a.height, b.height));
     }
 
     public static Size of(Point end) {
@@ -26,42 +20,46 @@ public record Size(Num width, Num height) {
     }
 
     public Size add(Size s) {
-        return new Size(width.add(s.width()), height.add(s.height()));
+        return new Size(width + s.width(), height + s.height());
     }
 
     public Size add(Point s) {
-        return new Size(width.add(s.x()), height.add(s.y()));
+        return new Size(width + s.x(), height + s.y());
     }
 
     public Size subtract(Point point) {
-        return new Size(width.sub(point.x()), height.sub(point.y()));
+        return new Size(width - point.x(), height - point.y());
     }
 
     public Size subtract(Size s) {
         try {
-            return new Size(width.sub(s.width()), height.sub(s.height()));
-        }catch(IllegalArgumentException e) {
-            throw new IllegalArgumentException("couldn't subtract "+s +" from "+this);
+            return new Size(width - s.width, height-s.height);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("couldn't subtract " + s + " from " + this);
         }
     }
 
     public Size subtractOrClamp(Point p) {
-        return new Size(Num.max(Num.ZERO, width.sub(p.x())), Num.max(Num.ZERO, height.sub(p.y())));
+        return new Size(Math.max(0, width - p.x()), Math.max(0, height - p.y()));
     }
 
     public Size subtractOrClamp(Size s) {
-        return new Size(Num.max(Num.ZERO, width.sub(s.width())), Num.max(Num.ZERO, height.sub(s.height())));
+        return new Size(Math.max(0, width - s.width()), Math.max(0, height-s.height()));
     }
 
-    public Size divide(Num divisor) {
-        return lanewise(n -> n.div(divisor));
+    public Size divide(int divisor) {
+        return lanewise(n -> n / divisor); // itt lehet hogy inkább kerekíteni kéne, de nem biztos
     }
 
-    private Size lanewise(UnaryOperator<Num> op) {
+    private Size lanewise(UnaryOperator<Integer> op) {
         return new Size(op.apply(width), op.apply(height));
     }
 
     public Point asPoint() {
         return new Point(width, height);
+    }
+
+    public Point leftBottom() {
+        return new Point(0, height);
     }
 }

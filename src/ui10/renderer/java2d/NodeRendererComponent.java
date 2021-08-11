@@ -44,7 +44,7 @@ public class NodeRendererComponent extends Canvas {
 
         root.subscribe(evt -> requestRepaint());
 
-        enableEvents(AWTEvent.MOUSE_EVENT_MASK| AWTEvent.KEY_EVENT_MASK);
+        enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.KEY_EVENT_MASK);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class NodeRendererComponent extends Canvas {
         if (e.isConsumed())
             return;
 
-        eventLoop.runLater(()->{
+        eventLoop.runLater(() -> {
             System.out.println(e);
 
             if (e.getID() == KeyEvent.KEY_PRESSED) {
@@ -86,20 +86,22 @@ public class NodeRendererComponent extends Canvas {
     }
 
     private void dispatchEvent(EventTarget eventTarget, InputEvent event) {
-        eventTarget.eventHandlers.forEach(e->e.bubble(event)); // TODO
+        eventTarget.eventHandlers.forEach(e -> e.bubble(event)); // TODO
     }
 
     private void dispatchMouseEvent(EventTarget mouseTarget, MouseEvent e) {
-        switch (e.getID()) {
-            case MOUSE_PRESSED:
-                // System.out.println("press"+mouseTarget.pressedButtons);
-                dispatchEvent(mouseTarget, new MousePressEvent(Point.ORIGO, translateMouseButton(e.getButton())));
-                break;
-            case MOUSE_RELEASED:
-                // System.out.println("release"+e.getButton());
-                dispatchEvent(mouseTarget, new MouseReleaseEvent(Point.ORIGO, translateMouseButton(e.getButton())));
-                break;
-        }
+        eventLoop.runLater(() -> {
+            switch (e.getID()) {
+                case MOUSE_PRESSED:
+                    // System.out.println("press"+mouseTarget.pressedButtons);
+                    dispatchEvent(mouseTarget, new MousePressEvent(Point.ORIGO, translateMouseButton(e.getButton())));
+                    break;
+                case MOUSE_RELEASED:
+                    // System.out.println("release"+e.getButton());
+                    dispatchEvent(mouseTarget, new MouseReleaseEvent(Point.ORIGO, translateMouseButton(e.getButton())));
+                    break;
+            }
+        });
     }
 
     private ui10.input.pointer.MouseEvent.MouseButton translateMouseButton(int mouseButton) {

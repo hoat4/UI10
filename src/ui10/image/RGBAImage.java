@@ -46,8 +46,8 @@ public class RGBAImage implements WriteableImageBuffer<RGBColor> {
     }
 
     @Override
-    public void setPixel(int x, int y, RGBColor color) {
-        MemoryAccess.setIntAtOffset(segment, x + y * stride, byteOrder, color.toIntRGBA());
+    public void setPixel(int x, int y, RGBColor fill) {
+        MemoryAccess.setIntAtOffset(segment, x + y * stride, byteOrder, fill.toIntRGBA());
     }
 
     @Override

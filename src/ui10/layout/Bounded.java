@@ -1,12 +1,10 @@
 package ui10.layout;
 
-import ui10.binding.ObservableList;
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.nodes.Layout;
-import ui10.nodes.LayoutNode;
 import ui10.nodes.Node;
 import ui10.nodes.WrapperPane;
 

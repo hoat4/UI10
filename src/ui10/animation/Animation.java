@@ -1,8 +1,8 @@
 package ui10.animation;
 
 import ui10.binding.ScalarProperty;
-import ui10.geom.FloatingPointNumber;
-import ui10.geom.Num;
+
+import ui10.geom.Fraction;
 import ui10.geom.Point;
 import ui10.nodes.EventLoop;
 
@@ -16,7 +16,7 @@ public class Animation {
                                           EventLoop eventLoop,
                                           T begin, T end, Duration duration) {
         eventLoop.beginAnimation(duration, t -> {
-            Num t2 = easingFunction.curve(t);
+            Fraction t2 = easingFunction.curve(t);
             //System.out.println(t+" -> "+t2);
             prop.set(interpolator.interpolate(begin, end, t2));
         });
@@ -25,10 +25,9 @@ public class Animation {
     @FunctionalInterface
     public interface Interpolator<T> {
 
-        T interpolate(T start, T end, Num t);
+        T interpolate(T start, T end, Fraction t);
 
-        Interpolator<Num> FOR_NUMBERS = (a, b, t) -> new FloatingPointNumber(
-                a.toDouble() * (1 - t.toDouble()) + b.toDouble() * t.toDouble());
+        Interpolator<Integer> FOR_NUMBERS = (a, b, t) -> t.interpolate(a, b);
 
         Interpolator<Point> FOR_POINTS = (a, b, t) -> new Point(
                 FOR_NUMBERS.interpolate(a.x(), b.x(), t),
@@ -38,10 +37,10 @@ public class Animation {
 
     @FunctionalInterface
     public interface EasingFunction {
-        Num curve(Num t);
+        Fraction curve(Fraction t);
 
         EasingFunction LINEAR = x -> x;
 
-        EasingFunction VACAK = x -> new FloatingPointNumber(Math.sin((x.toDouble() - .5) * Math.PI)/2+.5);
+        EasingFunction VACAK = x -> Fraction.of(Math.sin((x.toDouble() - .5) * Math.PI)/2+.5,  x.denominator());
     }
 }

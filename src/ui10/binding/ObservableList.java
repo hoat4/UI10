@@ -39,6 +39,11 @@ public interface ObservableList<E> extends List<E>, Observable<ListChange<E>> {
         });
     }
 
+    default void setAll(List<E> elements) {
+        clear();
+        addAll(elements);
+    }
+
     default StreamBinding<E> streamBinding() {
         return new StreamBinding<>(this);
     }

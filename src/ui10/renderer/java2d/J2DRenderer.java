@@ -8,12 +8,14 @@ import ui10.input.EventTarget;
 import ui10.nodes.*;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import static ui10.renderer.java2d.J2DUtil.i2px;
+import static ui10.renderer.java2d.J2DUtil.px2i;
 
 public class J2DRenderer {
 
@@ -54,9 +56,7 @@ public class J2DRenderer {
 
 
         AffineTransform t = (AffineTransform) transform.clone();
-        t.translate(pos(node).x().toDouble(), pos(node).y().toDouble());
-
-        node.bounds.subscribe(e -> recomputeBounds(node));
+        t.translate(i2px(pos(node).x()), i2px(pos(node).y()));
 
         RenderItem renderItem = makeRenderItem(node);
         node.rendererData = renderItem;
@@ -64,6 +64,8 @@ public class J2DRenderer {
         renderItem.transform = transform;
         renderItem.bounds = renderItem.computeBounds(renderItem.transform);
         updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
+
+        node.bounds.subscribe(e -> recomputeBounds(node));
 
         node.children().enumerateAndSubscribe(ObservableList.simpleListSubscriber(
                 newPane -> init(newPane, t, renderItem),
@@ -89,21 +91,30 @@ public class J2DRenderer {
     private RenderItem makePrimitiveRenderItem(Node node) {
         Size size = size(node);
 
-        if (node instanceof FilledPane r) {
+        if (node instanceof FilledRectanglePane r) {
             FillItem item = new FillItem();
-            item.shape = new Rectangle2D.Double(0, 0,
-                    size.width().toDouble(),
-                    size.height().toDouble());
-            item.fill = J2DUtil.color(r.color.get());
-            r.color.subscribe(change -> {
-                item.fill = J2DUtil.color(r.color.get());
+            item.fill = J2DUtil.asPaint(r.fill.get());
+            item.shape = new RoundRectangle2D.Float(0, 0, i2px(size.width()),
+                    i2px(size.height()), i2px(r.radius.get()*2), i2px(r.radius.get())*2);
+            r.bounds.map(Rectangle::size).subscribe(s -> {
+                item.shape = new RoundRectangle2D.Float(0, 0, i2px(s.newValue().width()), i2px(s.newValue().height()),
+                        i2px(r.radius.get() * 2), i2px(r.radius.get()) * 2);
+            });
+            r.radius.subscribe(s -> {
+                Size sz = size(r);
+                item.shape = new RoundRectangle2D.Float(0, 0, i2px(sz.width()), i2px(sz.height()),
+                        i2px(r.radius.get() * 2), i2px(r.radius.get()) * 2);
+                updateDirtyRegion(J2DUtil.rect(item.bounds));
+            });
+            r.fill.subscribe(change -> {
+                item.fill = J2DUtil.asPaint(r.fill.get());
                 updateDirtyRegion(J2DUtil.rect(item.bounds));
             });
             return item;
         } else if (node instanceof LinePane line) {
             StrokeItem item = new StrokeItem();
             initLine(line, item);
-            line.color.subscribe(e -> {
+            line.fill.subscribe(e -> {
                 initLine(line, item);
                 updateDirtyRegion(J2DUtil.rect(item.bounds));
             });
@@ -120,8 +131,31 @@ public class J2DRenderer {
             TextItem item = new TextItem();
             item.font = (AWTTextStyle) text.textStyle.get();
             item.text = text.text.get();
+            item.color = J2DUtil.color(text.textColor.get());
             text.text.subscribe(change -> {
                 item.text = text.text.get();
+                updateDirtyRegion(J2DUtil.rect(item.bounds));
+            });
+            text.textColor.subscribe(e -> {
+                item.color = J2DUtil.color(e.newValue());
+                updateDirtyRegion(J2DUtil.rect(item.bounds));
+            });
+            return item;
+        } else if (node instanceof StrokePath p) {
+            StrokeItem item = new StrokeItem();
+            item.paint = J2DUtil.asPaint(p.stroke.get());
+            item.stroke = new BasicStroke(i2px(p.thickness.get()));
+            initStrokePath(p, item);
+            p.stroke.subscribe(f -> {
+                item.paint = J2DUtil.asPaint(p.stroke.get());
+                updateDirtyRegion(J2DUtil.rect(item.bounds));
+            });
+            p.elements.subscribe(e -> {
+                initStrokePath(p, item);
+                updateDirtyRegion(J2DUtil.rect(item.bounds));
+            });
+            p.thickness.subscribe(f -> {
+                item.stroke = new BasicStroke(i2px(p.thickness.get()));
                 updateDirtyRegion(J2DUtil.rect(item.bounds));
             });
             return item;
@@ -130,23 +164,44 @@ public class J2DRenderer {
         }
     }
 
+    private void initStrokePath(StrokePath s, StrokeItem i) {
+        Path2D.Double p = new Path2D.Double();
+        i.shape = p;
+        for (StrokePath.PathElement e : s.elements) {
+            Objects.requireNonNull(e); // ezt elements-be kéne validatorként
+            if (e instanceof StrokePath.MoveTo m)
+                p.moveTo(i2px(m.p().x()), i2px(m.p().y()));
+            else if (e instanceof StrokePath.LineTo l)
+                p.lineTo(i2px(l.p().x()), i2px(l.p().y()));
+            else if (e instanceof StrokePath.CubicCurveTo c)
+                p.curveTo(i2px(c.p().x()), i2px(c.p().y()),
+                        i2px(c.control1().x()), i2px(c.control1().y()),
+                        i2px(c.control2().x()), i2px(c.control2().y()));
+            else if (e instanceof StrokePath.QuadCurveTo c)
+                p.quadTo(i2px(c.control().x()), i2px(c.control().y()), i2px(c.p().x()), i2px(c.p().y()));
+            else if (e instanceof StrokePath.Close)
+                p.closePath();
+            else
+                throw new UnsupportedOperationException(e.toString());
+        }
+    }
+
     private void initLine(LinePane line, StrokeItem item) {
         Size size = size(line);
-        item.stroke = new BasicStroke((float) line.width.get().toDouble());
-        item.paint = J2DUtil.color(line.color.get());
+        item.stroke = new BasicStroke(i2px(line.width.get()));
+        item.paint = J2DUtil.asPaint(line.fill.get());
         item.shape = new Line2D.Double(0, 0,
-                size.width().sub(line.width.get()).toDouble(),
-                size.height().sub(line.width.get()).toDouble());
+                i2px(size.width() - line.width.get()),
+                i2px(size.height() - line.width.get()));
     }
 
     private void recomputeBounds(Node frame) {
         RenderItem renderItem = (RenderItem) frame.rendererData;
         Objects.requireNonNull(renderItem);
 
-        updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
         renderItem.transform = renderItem.parent == null ? new AffineTransform() :
                 (AffineTransform) renderItem.parent.transform.clone();
-        renderItem.transform.translate(pos(frame).x().toDouble(), pos(frame).y().toDouble());
+        renderItem.transform.translate(i2px(pos(frame).x()), i2px(pos(frame).y()));
 
         renderItem.bounds = renderItem.computeBounds(renderItem.transform);
         updateDirtyRegion(J2DUtil.rect(renderItem.bounds));
@@ -164,10 +219,21 @@ public class J2DRenderer {
     }
 
     public void render(Graphics2D g) {
+        Map<?, ?> desktopHints = (Map<?, ?>) Toolkit.getDefaultToolkit().
+                getDesktopProperty("awt.font.desktophints");
+
+        if (desktopHints != null) {
+            g.setRenderingHints(desktopHints);
+        } else {
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        }
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        Size canvasSize = new Size(canvasWidth, canvasHeight);
+        Size canvasSize = new Size(px2i(canvasWidth), px2i(canvasHeight));
 
         if (root.bounds.get() == null)
             root.bounds.set(Rectangle.of(canvasSize));
@@ -186,8 +252,8 @@ public class J2DRenderer {
         Rectangle bounds = node.bounds.get();
 
         if (!root)
-            g.translate(bounds.topLeft().x().toDouble(),
-                    bounds.topLeft().y().toDouble());
+            g.translate(i2px(bounds.topLeft().x()),
+                    i2px(bounds.topLeft().y()));
 
         RenderItem renderItem = (RenderItem) node.rendererData;
         if (renderItem == null) {
@@ -199,8 +265,7 @@ public class J2DRenderer {
             renderItem.draw(g);
 
         if (!root)
-            g.translate(-bounds.topLeft().x().toDouble(),
-                    -bounds.topLeft().y().toDouble());
+            g.translate(-i2px(bounds.topLeft().x()), -i2px(bounds.topLeft().y()));
     }
 
     public void dispose() {

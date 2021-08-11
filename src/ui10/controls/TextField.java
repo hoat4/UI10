@@ -20,8 +20,8 @@ import ui10.nodes.Pane;
 import ui10.nodes.TextPane;
 
 import static ui10.binding.ObservableScalar.binding;
-import static ui10.geom.Num.ZERO;
-import static ui10.geom.Num.num;
+
+
 
 public class TextField extends Control {
 
@@ -43,7 +43,7 @@ public class TextField extends Control {
         textPane.tags().add(TEXT_TAG);
 
         ObservableScalar<Point> caretPos = binding(caretPosition, textStyle, text, (pos, textStyle, text) ->
-                new Point(textStyle == null ? ZERO : textStyle.textSize(text.substring(0, pos)).width(), ZERO));
+                new Point(textStyle == null ? 0 : textStyle.textSize(text.substring(0, pos)).width(), 0));
 
         return ObservableScalar.ofConstant(new StackPane(
                 textPane,
@@ -81,11 +81,11 @@ public class TextField extends Control {
 
         @Override
         protected ObservableScalar<? extends Node> paneContent() {
-            LinePane line = new LinePane(num(1), RGBColor.BLACK);
+            LinePane line = new LinePane(1000, RGBColor.BLACK); // TODO
 
             FixedSize fs = new FixedSize();
             fs.content.set(line);
-            fs.size.bindTo(textStyle.map(ts -> new Size(line.width.get(), ts == null ? ZERO : ts.height())));
+            fs.size.bindTo(textStyle.map(ts -> new Size(line.width.get(), ts == null ? 0 : ts.height())));
 
             return ObservableScalar.ofConstant(fs);
         }

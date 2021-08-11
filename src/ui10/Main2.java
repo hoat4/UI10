@@ -19,8 +19,8 @@ import ui10.renderer.java2d.AWTTextStyle;
 import java.util.List;
 import java.util.Map;
 
-import static ui10.geom.Num.ZERO;
-import static ui10.geom.Num.num;
+
+
 
 public class Main2 {
     public static void main(String[] args) {
@@ -31,7 +31,7 @@ public class Main2 {
                 Button.TAG, List.of(
                         Decoration.ofReplace((container, p, s) -> {
                             FilledPane filledPane = new FilledPane();
-                            filledPane.color().bindTo(((Button<?>) container).pressed(),
+                            filledPane.fill().bindTo(((Button<?>) container).pressed(),
                                     b -> RGBColor.ofRGBShort(b ? 0xCC2 : 0xEE3)); // TODO scope
 
                             return new StackPane(filledPane, new Padding(num(10), p));
@@ -43,7 +43,7 @@ public class Main2 {
                 TextField.TAG, List.of(
                         Decoration.ofReplace((container, p, s)->{
                             FilledPane filledPane = new FilledPane();
-                            filledPane.color().bindTo(((TextField) container).focused(),
+                            filledPane.fill().bindTo(((TextField) container).focused(),
                                     b -> RGBColor.ofRGBShort(b ? 0xFFF : 0xDDD)); // TODO scope
 
                             return new StackPane(filledPane, new Padding(num(10), p));

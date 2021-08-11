@@ -2,7 +2,8 @@ package ui10.layout;
 
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
-import ui10.geom.Num;
+import ui10.geom.Insets;
+
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.nodes.Layout;
@@ -15,24 +16,24 @@ import static ui10.binding.ObservableScalar.binding;
 
 public class Padding extends Pane {
 
-    public final ScalarProperty<Num> top = ScalarProperty.create();
-    public final ScalarProperty<Num> right = ScalarProperty.create();
-    public final ScalarProperty<Num> bottom = ScalarProperty.create();
-    public final ScalarProperty<Num> left = ScalarProperty.create();
+    public final ScalarProperty<Integer> top = ScalarProperty.create();
+    public final ScalarProperty<Integer> right = ScalarProperty.create();
+    public final ScalarProperty<Integer> bottom = ScalarProperty.create();
+    public final ScalarProperty<Integer> left = ScalarProperty.create();
     public final ScalarProperty<Node> content = ScalarProperty.create();
 
     public Padding() {
     }
 
-    public Padding(Num padding, Node content) {
+    public Padding(int padding, Node content) {
         this(padding, padding, content);
     }
 
-    public Padding(Num topBottom, Num leftRight, Node content) {
+    public Padding(int topBottom, int leftRight, Node content) {
         this(topBottom, leftRight, topBottom, leftRight, content);
     }
 
-    public Padding(Num top, Num right, Num bottom, Num left, Node content) {
+    public Padding(int top, int right, int bottom, int left, Node content) {
         this.content.set(content);
         this.top.set(top);
         this.right.set(right);
@@ -40,16 +41,16 @@ public class Padding extends Pane {
         this.left.set(left);
     }
 
-    public Padding(ObservableScalar<Num> padding, ObservableScalar<Node> content) {
+    public Padding(ObservableScalar<Integer> padding, ObservableScalar<Node> content) {
         this(padding, padding, content);
     }
 
-    public Padding(ObservableScalar<Num> topBottom, ObservableScalar<Num> leftRight, ObservableScalar<Node> content) {
+    public Padding(ObservableScalar<Integer> topBottom, ObservableScalar<Integer> leftRight, ObservableScalar<Node> content) {
         this(topBottom, leftRight, topBottom, leftRight, content);
     }
 
-    public Padding(ObservableScalar<Num> top, ObservableScalar<Num> right,
-                   ObservableScalar<Num> bottom, ObservableScalar<Num> left, ObservableScalar<Node> content) {
+    public Padding(ObservableScalar<Integer> top, ObservableScalar<Integer> right,
+                   ObservableScalar<Integer> bottom, ObservableScalar<Integer> left, ObservableScalar<Node> content) {
         this.content.bindTo(content);
         this.top.bindTo(top);
         this.right.bindTo(right);
@@ -57,9 +58,17 @@ public class Padding extends Pane {
         this.left.bindTo(left);
     }
 
+    // TODO töröljük ki a 4 property-t, és csak egy insets maradjon
+    public void bindToInsets(ObservableScalar<Insets> o) {
+        top.bindTo(o.map(Insets::top));
+        right.bindTo(o.map(Insets::right));
+        bottom.bindTo(o.map(Insets::bottom));
+        left.bindTo(o.map(Insets::left));
+    }
+
     @Override
     protected ObservableScalar<? extends Node> paneContent() {
-        ObservableScalar<Size> all = binding(left, right, top, bottom, (l, r, t, b) -> new Size(l.add(r), t.add(b)));
+        ObservableScalar<Size> all = binding(left, right, top, bottom, (l, r, t, b) -> new Size(l + r, t + b));
         return new Layout(content) {
 
             {

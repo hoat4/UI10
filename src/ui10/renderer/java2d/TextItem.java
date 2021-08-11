@@ -10,6 +10,7 @@ public class TextItem extends RenderItem {
 
     String text;
     AWTTextStyle font;
+    Paint color;
 
     @Override
     Rectangle2D computeBounds(AffineTransform transform) {
@@ -19,7 +20,8 @@ public class TextItem extends RenderItem {
 
     @Override
     public void draw(Graphics2D g) {
-        g.setColor(Color.BLACK);
-        g.drawString(text, 0, (float) font.textSize(text).ascent().toDouble());
+        g.setPaint(color);
+        g.setFont(font.font);
+        g.drawString(text, 0, J2DUtil.i2px(font.textSize(text).ascent()));
     }
 }

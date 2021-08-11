@@ -2,10 +2,6 @@ package ui10.nodes;
 
 import ui10.binding.Observable;
 import ui10.binding.ObservableList;
-import ui10.binding.ObservableScalar;
-import ui10.binding.Scope;
-import ui10.geom.Size;
-import ui10.layout.BoxConstraints;
 
 public abstract class PrimitiveNode extends Node {
 

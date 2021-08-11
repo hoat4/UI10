@@ -1,5 +1,6 @@
 package ui10.binding;
 
+import java.awt.desktop.AppReopenedEvent;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,5 +85,11 @@ public class ObservableListImpl<E> extends AbstractList<E> implements Observable
         return oldValue;
     }
 
-
+    @Override
+    public void setAll(List<E> elements) {
+        list.clear();
+        List<E> prev = List.copyOf(list);
+        list.addAll(elements);
+        onChange(new ListChange<>(0, prev, List.copyOf(list)));
+    }
 }

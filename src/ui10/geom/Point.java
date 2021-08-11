@@ -1,40 +1,41 @@
 package ui10.geom;
 
-import static ui10.geom.Num.num;
 
-public record Point(Num x, Num y) {
-
-    public Point(int x, int y) {
-        this(num(x), num(y));
-    }
+public record Point(int x, int y) {
 
     public static final Point ORIGO = new Point(0, 0);
 
     public static Point min(Point a, Point b) {
-        return new Point(Num.min(a.x, b.x), Num.min(a.y, b.y));
+        return new Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
     }
 
     public static Point max(Point a, Point b) {
-        return new Point(Num.max(a.x, b.x), Num.max(a.y, b.y));
+        return new Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
     }
 
     public static Point of(Size size) {
         return new Point(size.width(), size.height());
     }
 
+    public static int distance(Point a, Point b) {
+        // int sqrt?
+        return (int) Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+    }
+
     public Point add(Size s) {
-        return new Point(x.add(s.width()), y.add(s.height()));
+        return new Point(x + s.width(), y + s.height());
     }
 
     public Point add(Point s) {
-        return new Point(x.add(s.x()), y.add(s.y()));
+        return new Point(x + s.x(), y + s.y());
     }
 
     public Point subtract(Size s) {
-        return new Point(x.sub(s.width()), y.sub(s.height()));
+        return new Point(x - s.width(), y - s.height());
     }
 
-    public Point divide(Num num) {
-        return new Point(x.div(num), y.div(num));
+    public Point divide(int num) {
+        // round?
+        return new Point(x / num, y / num);
     }
 }

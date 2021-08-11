@@ -2,28 +2,28 @@ package ui10.nodes;
 
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
-import ui10.geom.Num;
+
 import ui10.geom.Size;
-import ui10.image.Color;
+import ui10.image.Fill;
 import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 
 public class LinePane extends Pane {
 
-    public final ScalarProperty<Num> width = ScalarProperty.create();
-    public final ScalarProperty<Color> color = ScalarProperty.createWithDefault(RGBColor.BLACK);
+    public final ScalarProperty<Integer> width = ScalarProperty.create();
+    public final ScalarProperty<Fill> fill = ScalarProperty.createWithDefault(RGBColor.BLACK);
 
     public LinePane() {
     }
 
-    public LinePane(Num width, Color color) {
+    public LinePane(int width, Fill fill) {
         this.width.set(width);
-        this.color.set(color);
+        this.fill.set(fill);
     }
 
-    public LinePane(ObservableScalar<Num> width, ObservableScalar<Color> color) {
+    public LinePane(ObservableScalar<Integer> width, ObservableScalar<? extends Fill> fill) {
         this.width.bindTo(width);
-        this.color.bindTo(color);
+        this.fill.bindTo(fill);
     }
 
     @Override

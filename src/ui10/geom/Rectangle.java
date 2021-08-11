@@ -1,10 +1,7 @@
 package ui10.geom;
 
-import org.w3c.dom.css.Rect;
-
 import java.util.Objects;
 
-import static ui10.geom.Num.num;
 import static ui10.geom.Point.ORIGO;
 
 public record Rectangle(Point topLeft, Point rightBottom) {
@@ -14,7 +11,7 @@ public record Rectangle(Point topLeft, Point rightBottom) {
     }
 
     public Size size() {
-        return new Size(rightBottom.x().sub(topLeft.x()), rightBottom.y().sub(topLeft.y()));
+        return new Size(rightBottom.x() - topLeft.x(), rightBottom.y() - topLeft.y());
     }
 
     public static Rectangle rect(Point a, Point b) {
@@ -36,18 +33,22 @@ public record Rectangle(Point topLeft, Point rightBottom) {
 
     public Rectangle centered(Size size) {
         // (size() - size) / 2
-        return new Rectangle(topLeft.add(size().asPoint().subtract(size).divide(num(2))), size);
+        return new Rectangle(topLeft.add(size().asPoint().subtract(size).divide(2)), size);
     }
 
     public Rectangle withSize(Size size) {
         return new Rectangle(topLeft, topLeft.add(size));
     }
 
-    public Rectangle withInsets(Num top, Num right, Num left, Num bottom) {
+    public Rectangle withInsets(int top, int right, int bottom, int left) {
         return new Rectangle(topLeft.add(new Size(left, top)), rightBottom.subtract(new Size(right, bottom)));
     }
 
     public Rectangle atOrigo() {
         return new Rectangle(ORIGO, Point.of(size()));
+    }
+
+    public Rectangle withInsets(Insets i) {
+        return withInsets(i.top(), i.right(), i.bottom(), i.left());
     }
 }
