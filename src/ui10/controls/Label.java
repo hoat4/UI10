@@ -3,6 +3,7 @@ package ui10.controls;
 import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.font.TextStyle;
+import ui10.image.Color;
 import ui10.nodes.Node;
 import ui10.nodes.Pane;
 import ui10.nodes.TextPane;
@@ -14,6 +15,7 @@ public class Label extends Pane {
 
     public final ScalarProperty<String> text = ScalarProperty.create();
     public final ScalarProperty<TextStyle> textStyle = ScalarProperty.create();
+    public final ScalarProperty<Color> textColor = ScalarProperty.create();
 
     public Label() {
     }
@@ -28,6 +30,8 @@ public class Label extends Pane {
 
     @Override
     protected ObservableScalar<Node> paneContent() {
-        return ObservableScalar.ofConstant(new TextPane(textStyle, text));
+        TextPane value = new TextPane(textStyle, text);
+        value.textColor.bindTo(textColor);
+        return ObservableScalar.ofConstant(value);
     }
 }

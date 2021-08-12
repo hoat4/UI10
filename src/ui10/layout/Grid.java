@@ -3,6 +3,8 @@ package ui10.layout;
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;
 import ui10.binding.ObservableScalar;
+import ui10.binding.ScalarProperty;
+import ui10.decoration.Tag;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
@@ -19,6 +21,7 @@ public class Grid extends Pane {
     private final List<List<Cell>> rows;
     private final ObservableList<Node> children;
     private int cols;
+    public final ScalarProperty<Integer> gap = ScalarProperty.create();
 
     public Grid(List<List<Cell>> rows, List<Node> children, int cols) {
         this.rows = rows;
@@ -35,13 +38,16 @@ public class Grid extends Pane {
 
             @Override
             protected Size determineSize(BoxConstraints constraints) {
+                if (rows.isEmpty())
+                    return constraints.min();
+
                 GridLayout gl = computeLayout(constraints);
 
-                int w = 0;
+                int w = gap.get()*(cols-1);
                 for (int colWidth : gl.colWidths)
                     w += colWidth;
 
-                int h = 0;
+                int h = gap.get()*(cols-1);
                 for (int rowHeight : gl.rowHeights)
                     h += rowHeight;
 
@@ -88,9 +94,9 @@ public class Grid extends Pane {
                     for (int j = 0; j < row.size(); j++) {
                          Node n = row.get(j).node;
                         n.bounds.set(new Rectangle(new Point(x, y), new Size(l.colWidths[j], l.rowHeights[i])));
-                        x += l.colWidths[j];
+                        x += l.colWidths[j] + gap.get();
                     }
-                    y += l.rowHeights[i];
+                    y += l.rowHeights[i] + gap.get();
                 }
             }
         }.asNodeObservable();
@@ -104,6 +110,15 @@ public class Grid extends Pane {
         private final List<List<Cell>> rows = new ArrayList<>();
         private final List<Node> children = new ArrayList<>();
         private int x, y, cols;
+        private final Tag tag;
+
+        public GridBuilder() {
+            this.tag = null;
+        }
+
+        public GridBuilder(Tag tag) {
+            this.tag = tag;
+        }
 
         public GridBuilder add(Node node, CellOption... options) {
             int spanX = 1, spanY = 1;
@@ -151,7 +166,10 @@ public class Grid extends Pane {
         }
 
         public Grid build() {
-            return new Grid(rows, children, cols);
+            Grid grid = new Grid(rows, children, cols);
+            if (tag != null)
+                grid.tags().add(tag);
+            return grid;
         }
     }
 
