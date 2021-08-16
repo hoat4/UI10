@@ -11,8 +11,8 @@ public class AWTTextStyle implements TextStyle {
 
     public static final Canvas C = new Canvas();
 
-    final Font font;
-    private final java.awt.FontMetrics fontMetrics;
+    public final Font font;
+    public final java.awt.FontMetrics fontMetrics;
 
     public static AWTTextStyle of(float size) {
         Font font = new Font("Segoe UI", 0, (int)size);

@@ -1,4 +1,4 @@
-package ui10.renderer.java2d;
+package ui10.renderer6.java2d;
 
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
@@ -8,7 +8,8 @@ import ui10.image.Fill;
 import ui10.image.LinearGradient;
 import ui10.image.RGBColor;
 
-import java.awt.*;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Objects;
@@ -16,11 +17,11 @@ import java.util.Objects;
 public class J2DUtil {
 
     static float i2px(int i) {
-        return i / 1000f;
+        return i / 1f;
     }
 
     static int px2i(double i) {
-        return (int) (i * 1000.0 + .5);
+        return (int) (i * 1.0 + .5);
     }
 
     public static Rectangle rect(Rectangle2D r) {

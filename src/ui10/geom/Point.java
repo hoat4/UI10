@@ -30,6 +30,10 @@ public record Point(int x, int y) {
         return new Point(x + s.x(), y + s.y());
     }
 
+    public Point add(int dx, int dy) {
+        return new Point(x + dx, y + dy);
+    }
+
     public Point subtract(Size s) {
         return new Point(x - s.width(), y - s.height());
     }
