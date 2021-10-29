@@ -41,7 +41,7 @@ public class Layouts {
         @Override
         public void setBounds(LayoutContext context, Rectangle bounds) {
             Insets i = insetsFunction.apply(context);
-            content.setBounds(context, bounds.withInsets(i));
+            content.setBounds(context, bounds.withInnerInsets(i));
         }
     }
 

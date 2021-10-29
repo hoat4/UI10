@@ -33,7 +33,6 @@ import static ui10.geom.Point.ORIGO;
 
 public class Main3 {
 
-
     static final RGBColor fxbase = RGBColor.ofRGB(0xECECEC);
     static final RGBColor fxbg = fxbase.derive(.264);
 

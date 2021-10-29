@@ -2,7 +2,9 @@ package ui10.layout;
 
 
 import ui10.geom.Point;
+import ui10.geom.Rectangle;
 import ui10.geom.Size;
+import ui10.geom.shape.Shape;
 
 import java.util.Objects;
 
@@ -33,6 +35,10 @@ public record BoxConstraints(Size min, Size max) {
                 Math.max(min.width(), Math.min(max.width(), size.width())),
                 Math.max(min.height(), Math.min(max.height(), size.height()))
         );
+    }
+
+    public Shape clamp(Shape shape) {
+        return shape.unionWith(Rectangle.of(min)).intersectionWith(Rectangle.of(max));
     }
 
     public boolean contains(Size size) {

@@ -7,13 +7,23 @@ public interface MouseEvent extends InputEvent {
 
     Point point();
 
+    MouseEvent subtract(Point offset);
+
     interface MouseButtonEvent extends MouseEvent {
     }
 
     record MousePressEvent(Point point, MouseButton button/*, Set<MouseButton> pressedButtons?*/) implements MouseButtonEvent {
+        @Override
+        public MouseEvent subtract(Point offset) {
+            return new MousePressEvent(point.subtract(offset), button);
+        }
     }
 
     record MouseReleaseEvent(Point point, MouseButton button) implements MouseButtonEvent {
+        @Override
+        public MouseEvent subtract(Point offset) {
+            return new MouseReleaseEvent(point.subtract(offset), button);
+        }
     }
 
     enum MouseButton {

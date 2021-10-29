@@ -11,9 +11,14 @@ public record Insets(int top, int right, int bottom, int left) {
     }
 
     public int horizontal() {
-        return left+right;
+        return left + right;
     }
+
     public int vertical() {
-        return top+bottom;
+        return top + bottom;
+    }
+
+    public Size all() {
+        return new Size(left + right, top + bottom);
     }
 }

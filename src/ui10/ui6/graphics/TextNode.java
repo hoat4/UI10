@@ -1,11 +1,15 @@
-package ui10.ui6;
+package ui10.ui6.graphics;
 
 import ui10.font.TextStyle;
-import ui10.geom.Size;
+import ui10.geom.Rectangle;
+import ui10.geom.shape.Shape;
 import ui10.image.Fill;
 import ui10.layout.BoxConstraints;
+import ui10.ui6.Surface;
 
-public class TextNode extends RenderableNode {
+import java.util.Objects;
+
+public class TextNode extends Surface {
 
     private String text;
     private Fill fill;
@@ -16,8 +20,10 @@ public class TextNode extends RenderableNode {
     }
 
     public TextNode text(String text) {
-        this.text = text;
-        invalidate();
+        if (!Objects.equals(text, this.text)) {
+            this.text = text;
+            invalidate();
+        }
         return this;
     }
 
@@ -42,11 +48,7 @@ public class TextNode extends RenderableNode {
     }
 
     @Override
-    public Size computeSize(BoxConstraints constraints) {
-        return textStyle.textSize(text).size();
-    }
-
-    @Override
-    public void applySize(Size size, LayoutNode.LayoutContext layoutContext) {
+    public Shape computeShape(BoxConstraints constraints) {
+        return Rectangle.of(textStyle.textSize(text).size());
     }
 }

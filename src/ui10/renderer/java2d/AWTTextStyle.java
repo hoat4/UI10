@@ -15,6 +15,7 @@ public class AWTTextStyle implements TextStyle {
     public final java.awt.FontMetrics fontMetrics;
 
     public static AWTTextStyle of(float size) {
+        size = size * 96 / 72;
         Font font = new Font("Segoe UI", 0, (int)size);
         if (size != (int)size)
             font = font.deriveFont((float)size);
@@ -24,12 +25,16 @@ public class AWTTextStyle implements TextStyle {
     public AWTTextStyle(Font font, java.awt.FontMetrics fontMetrics) {
         this.font = font;
         this.fontMetrics = fontMetrics;
+
+//        for (Font f:GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts())
+//            System.out.println(f.getName()+f.getStyle());
+//        System.out.println(fontMetrics.getHeight());
     }
 
     @Override
     public FontMetrics textSize(String text) {
-        return new FontMetrics(px2i(fontMetrics.stringWidth(text)),
-                px2i(fontMetrics.getAscent()), px2i(fontMetrics.getDescent()));
+        return new FontMetrics(px2i(fontMetrics.stringWidth(text)) / 1000,
+                px2i(fontMetrics.getAscent()) / 1000, px2i(fontMetrics.getDescent())/1000);
     }
 
     @Override

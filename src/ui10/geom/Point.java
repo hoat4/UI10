@@ -38,8 +38,17 @@ public record Point(int x, int y) {
         return new Point(x - s.width(), y - s.height());
     }
 
+    public Point subtract(int dx, int dy) {
+        return new Point(x - dx, y - dy);
+    }
+
+    public Point subtract(Point p) {
+        return new Point(x - p.x, y - p.y);
+    }
+
     public Point divide(int num) {
         // round?
         return new Point(x / num, y / num);
     }
+
 }

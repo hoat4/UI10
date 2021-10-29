@@ -1,8 +1,14 @@
 package ui10.geom;
 
+import ui10.geom.shape.Path;
+import ui10.geom.shape.Polyline;
+import ui10.geom.shape.Shape;
+
+import java.util.List;
+
 import static ui10.geom.Point.ORIGO;
 
-public record Rectangle(Point topLeft, Size size) {
+public record Rectangle(Point topLeft, Size size) implements Shape {
 
     public Rectangle(int x, int y, int w, int h) {
         this(new Point(x, y), new Size(w, h));
@@ -63,6 +69,16 @@ public record Rectangle(Point topLeft, Size size) {
                 new Size(rightBottom.x() - topLeft.x() + 1, rightBottom.y() - topLeft.y() + 1));
     }
 
+    @Override
+    public Rectangle bounds() {
+        return this;
+    }
+
+    @Override
+    public Rectangle translate(Point point) {
+        return new Rectangle(topLeft.add(point), size);
+    }
+
     public Rectangle centered(Size size) {
         // (size() - size) / 2
         return new Rectangle(topLeft.add(size().asPoint().subtract(size).divide(2)), size);
@@ -73,44 +89,63 @@ public record Rectangle(Point topLeft, Size size) {
     }
 
     public Rectangle withInsets(int top, int right, int bottom, int left) {
-        return new Rectangle(topLeft.add(new Size(left, top)), size.subtract(new Size(right, bottom)));
+        return new Rectangle(topLeft.add(new Size(left, top)), size.subtract(new Size(left + right, top + bottom)));
     }
 
     public Rectangle atOrigo() {
         return new Rectangle(ORIGO, size);
     }
 
-    public Rectangle withInsets(Insets i) {
+    public Rectangle withInnerInsets(Insets i) {
         return withInsets(i.top(), i.right(), i.bottom(), i.left());
     }
 
-    public int area() {
-        return size().width()*size.height();
+    public Rectangle withOuterInsets(Insets insets) {
+        return new Rectangle(
+                topLeft.subtract(new Size(insets.left(), insets.top())),
+                size.add(new Size(insets.left() + insets.right(), insets.top() + insets.bottom()))
+        );
     }
 
-//    @Override
+    public int area() {
+        return size().width() * size.height();
+    }
+
+    //    @Override
     public boolean contains(Point point) {
         return point.x() >= topLeft.x() && point.y() >= topLeft.y() &&
                 point.x() < topLeft.x() + size.width() && point.y() < topLeft.y() + size.height();
     }
 
-//    @Override
+    //    @Override
     public int containment(Rectangle rectangle) {
         return intersection(this, rectangle).area();
     }
 
-/*    @Override
-    public Rectangle bounds() {
-        return this;
+    //@Override
+    //public Rectangle bounds() {
+//        return this;
+//    }
+
+
+    @Override
+    public Path outline() {
+        return new Polyline(List.of(rightTop(), rightBottom(), leftBottom(), topLeft()));
     }
 
     @Override
-    public Path toPath() {
-        return new Path(topLeft, List.of(
-                new Path.LineTo(rightTop()),
-                new Path.LineTo(rightBottom()),
-                new Path.LineTo(leftBottom()),
-                new Path.LineTo(topLeft())
-        ));
-    }*/
+    public Shape unionWith(Shape other) {
+        if (!(other instanceof Rectangle))
+            throw new UnsupportedOperationException(); // ???
+
+        return union(this, (Rectangle) other);
+    }
+
+    @Override
+    public Shape intersectionWith(Shape other) {
+        if (!(other instanceof Rectangle))
+            throw new UnsupportedOperationException(); // ???
+
+        return intersection(this, (Rectangle) other);
+    }
 }

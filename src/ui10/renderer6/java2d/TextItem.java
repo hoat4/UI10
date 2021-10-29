@@ -2,7 +2,7 @@ package ui10.renderer6.java2d;
 
 import ui10.image.Fill;
 import ui10.renderer.java2d.AWTTextStyle;
-import ui10.ui6.TextNode;
+import ui10.ui6.graphics.TextNode;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -18,7 +18,7 @@ public class TextItem extends Item<TextNode> {
     }
 
     @Override
-    protected void validate() {
+    protected void validateImpl() {
         Objects.requireNonNull(node.fill());
         Objects.requireNonNull(node.text());
         Objects.requireNonNull(node.textStyle());
@@ -38,4 +38,5 @@ public class TextItem extends Item<TextNode> {
         g.setPaint(paint);
         g.drawString(node.text(), 0, textStyle.fontMetrics.getAscent());
     }
+
 }

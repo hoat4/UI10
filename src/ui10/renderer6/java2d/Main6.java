@@ -1,58 +1,35 @@
 package ui10.renderer6.java2d;
 
-import ui10.geom.Rectangle;
-import ui10.ui6.TextField;
-
-import java.awt.AWTEvent;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.HeadlessException;
-import java.awt.event.WindowEvent;
+import ui10.geom.Insets;
+import ui10.image.RGBColor;
+import ui10.ui6.graphics.ColorFill;
+import ui10.ui6.Layouts;
+import ui10.ui6.controls.TextField;
+import ui10.ui6.window.Window;
 
 public class Main6 {
 
-    private Frame frame;
-    private final J2DRenderer renderer = new J2DRenderer();
-
     public static void main(String[] args) {
-        new Main6().start();
-    }
-
-    private void start() {
+        AWTDesktop desktop = new AWTDesktop();
         TextField tf = new TextField();
 
-        renderer.root = renderer.makeItem(tf);
-        renderer.root.bounds = new Rectangle(0, 0, 640, 480);
-
-        frame = new FrameImpl();
-        renderer.c = frame;
-        frame.addNotify();
-        frame.setSize(frame.getInsets().left + 640 + frame.getInsets().right,
-                frame.getInsets().top + 480 + frame.getInsets().bottom);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-
-        renderer.requestRepaint();
+        //Layouts.roundRectangle(new ColorFill(RGBColor.YELLOW), 20),
+        Window window = Window.of(
+                Layouts.padding(
+                        Layouts.stack(
+                                new ColorFill(RGBColor.YELLOW),
+                                Layouts.padding(
+                                        Layouts.shaped(
+                                                Layouts.roundRectangle(new ColorFill(RGBColor.GREEN), 20)
+                                        ),
+                                        new Insets(50)
+                                )
+                        ),
+                        new Insets(50)
+                )
+        );
+        desktop.windows.add(window);
     }
 
-    private class FrameImpl extends Frame {
-
-        public FrameImpl() throws HeadlessException {
-            enableEvents(AWTEvent.WINDOW_EVENT_MASK);
-        }
-
-        @Override
-        public void paint(Graphics g) {
-            renderer.requestRepaint();
-        }
-
-        @Override
-        protected void processWindowEvent(WindowEvent e) {
-            if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-                dispose();
-                System.exit(0);
-            }
-        }
-    }
 
 }

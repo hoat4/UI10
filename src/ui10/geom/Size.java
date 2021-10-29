@@ -33,7 +33,7 @@ public record Size(int width, int height) {
 
     public Size subtract(Size s) {
         try {
-            return new Size(width - s.width, height-s.height);
+            return new Size(width - s.width, height - s.height);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("couldn't subtract " + s + " from " + this);
         }
@@ -44,7 +44,7 @@ public record Size(int width, int height) {
     }
 
     public Size subtractOrClamp(Size s) {
-        return new Size(Math.max(0, width - s.width()), Math.max(0, height-s.height()));
+        return new Size(Math.max(0, width - s.width()), Math.max(0, height - s.height()));
     }
 
     public Size divide(int divisor) {
@@ -61,5 +61,9 @@ public record Size(int width, int height) {
 
     public Point leftBottom() {
         return new Point(0, height);
+    }
+
+    public Size multiply(int i) {
+        return new Size(width * i, height * i);
     }
 }
