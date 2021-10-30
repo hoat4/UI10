@@ -1,9 +1,9 @@
 package ui10.renderer6.java2d;
 
 import ui10.input.pointer.MouseEvent;
-import ui10.ui6.EventHandler;
+import ui10.ui6.Control;
 import ui10.ui6.Pane;
-import ui10.ui6.Surface;
+import ui10.ui6.RenderableElement;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -21,7 +21,7 @@ public class PaneItem extends Item<Pane> {
     @Override
     protected void validateImpl() {
         children.clear();
-        for (Surface n : node.children)
+        for (RenderableElement n : node.children)
             children.add(renderer.makeItem(n));
     }
 
@@ -37,13 +37,13 @@ public class PaneItem extends Item<Pane> {
     }
 
     @Override
-    public boolean captureMouseEvent(MouseEvent p, List<EventHandler> l) {
-        if (node.eventHandler != null) {
-            if (node.eventHandler.capture(p))
-                return true;
-
-            l.add(node.eventHandler);
-        }
+    public boolean captureMouseEvent(MouseEvent p, List<Control> l) {
+        // if (node.eventHandler != null) {
+        //    if (node.eventHandler.capture(p))
+        //        return true;
+        //
+        //    l.add(node.eventHandler);
+        // }
 
         for (Item<?> item : children)  {
             if (item.shape.contains(J2DUtil.point(p.point()))) {

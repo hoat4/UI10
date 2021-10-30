@@ -5,15 +5,14 @@ import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.Surface;
+import ui10.ui6.RenderableElement;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static ui10.geom.Point.ORIGO;
 
-public class LinearGradient extends Surface {
+public class LinearGradient extends RenderableElement {
 
     private Point start, end;
     public final List<Stop> stops = new ArrayList<>();
@@ -37,7 +36,7 @@ public class LinearGradient extends Surface {
     }
 
     @Override
-    public Shape computeShape(BoxConstraints constraints) {
+    protected Shape preferredShapeImpl(BoxConstraints constraints) {
         return Rectangle.of(constraints.min());
     }
 
@@ -47,7 +46,7 @@ public class LinearGradient extends Surface {
     public static LinearGradient vertical(Color from, Color to) {
         return new LinearGradient() {
             @Override
-            protected void applyShapeImpl(Shape shape, Consumer<Surface> layoutContext) {
+            protected void onShapeChanged(Shape shape) {
                 stops.clear();
                 stops.add(new Stop(from, 0));
                 stops.add(new Stop(to, shape.bounds().size().height() - 1));

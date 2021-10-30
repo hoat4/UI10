@@ -51,4 +51,7 @@ public record Point(int x, int y) {
         return new Point(x / num, y / num);
     }
 
+    public Point negate() {
+        return new Point(-x, -y);
+    }
 }

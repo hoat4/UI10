@@ -9,28 +9,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public abstract class Pane extends Surface {
+public abstract class Pane extends RenderableElement {
 
-    public final List<Surface> children = new ArrayList<>();
-    public EventHandler eventHandler;
+    public final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
 
-    public abstract Element content();
+    protected abstract Element content();
 
-    @Override
-    public Shape computeShape(BoxConstraints constraints) {
-        return getContent().computeShape(constraints);
-    }
-
-    private Element getContent() {
+    public final Element getContent() {
         if (!valid) {
             validate();
             valid = true;
         }
 
-        Element c = content();
-        Objects.requireNonNull(c, () -> "null content in " + toString());
-        return c;
+        return Objects.requireNonNull(content(), () -> "null content in " + this);
     }
 
     protected void validate() {
@@ -43,7 +35,17 @@ public abstract class Pane extends Surface {
     }
 
     @Override
-    protected void applyShapeImpl(Shape shape, Consumer<Surface> layoutContext) {
+    public void enumerateChildren(Consumer<Element> consumer) {
+        consumer.accept(getContent());
+    }
+
+    @Override
+    protected Shape preferredShapeImpl(BoxConstraints constraints) {
+        return getContent().preferredShape(constraints);
+    }
+
+    @Override
+    protected void onShapeChanged(Shape shape) {
         children.clear();
         getContent().applyShape(shape, children::add);
     }

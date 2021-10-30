@@ -6,15 +6,15 @@ import ui10.geom.shape.Path;
 import ui10.geom.shape.Shape;
 import ui10.geom.shape.StandardPathElement;
 import ui10.input.pointer.MouseEvent;
-import ui10.ui6.EventHandler;
-import ui10.ui6.Surface;
+import ui10.ui6.Control;
+import ui10.ui6.RenderableElement;
 import ui10.ui6.RendererData;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
 import java.util.List;
 
-public abstract class Item<N extends Surface> implements RendererData {
+public abstract class Item<N extends RenderableElement> implements RendererData {
 
     protected final J2DRenderer renderer;
     private boolean valid;
@@ -59,7 +59,7 @@ public abstract class Item<N extends Surface> implements RendererData {
 
     protected abstract void drawImpl(Graphics2D g);
 
-    public boolean captureMouseEvent(MouseEvent p, List<EventHandler> l) {
+    public boolean captureMouseEvent(MouseEvent p, List<Control> l) {
         return false;
     }
 

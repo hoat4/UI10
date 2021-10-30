@@ -1,7 +1,8 @@
 package ui10.renderer6.java2d;
 
 import ui10.nodes.EventLoop;
-import ui10.ui6.*;
+import ui10.ui6.Pane;
+import ui10.ui6.RenderableElement;
 import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.LinearGradient;
 import ui10.ui6.graphics.TextNode;
@@ -41,7 +42,8 @@ public class J2DRenderer {
                 c.getWidth() - c.getInsets().left - c.getInsets().right,
                 c.getHeight() - c.getInsets().top - c.getInsets().bottom);
         System.out.println(rect);
-        root.node.applyShape(J2DUtil.rect((java.awt.Rectangle) rect), n->{});
+        root.node.applyShape(J2DUtil.rect((java.awt.Rectangle) rect), (surface) -> {
+        });
 
         //root.width = rect.width;
         //root.height = rect.height;
@@ -55,7 +57,7 @@ public class J2DRenderer {
 
 
     @SuppressWarnings("unchecked")
-    public <N extends Surface> Item<N> makeItem(N n) {
+    public <N extends RenderableElement> Item<N> makeItem(N n) {
         if (n instanceof ColorFill f)
             return (Item<N>) new ColorFillImpl(this, f);
         else if (n instanceof Pane d)

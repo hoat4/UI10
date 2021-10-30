@@ -21,4 +21,8 @@ public record Insets(int top, int right, int bottom, int left) {
     public Size all() {
         return new Size(left + right, top + bottom);
     }
+
+    public Point topLeft() {
+        return new Point(left, top);
+    }
 }

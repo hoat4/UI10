@@ -5,11 +5,11 @@ import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
 import ui10.image.Fill;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.Surface;
+import ui10.ui6.RenderableElement;
 
 import java.util.Objects;
 
-public class TextNode extends Surface {
+public class TextNode extends RenderableElement {
 
     private String text;
     private Fill fill;
@@ -22,7 +22,7 @@ public class TextNode extends Surface {
     public TextNode text(String text) {
         if (!Objects.equals(text, this.text)) {
             this.text = text;
-            invalidate();
+            invalidateRendererData();
         }
         return this;
     }
@@ -33,7 +33,7 @@ public class TextNode extends Surface {
 
     public TextNode fill(Fill fill) {
         this.fill = fill;
-        invalidate();
+        invalidateRendererData();
         return this;
     }
 
@@ -43,12 +43,12 @@ public class TextNode extends Surface {
 
     public TextNode textStyle(TextStyle textStyle) {
         this.textStyle = textStyle;
-        invalidate();
+        invalidateRendererData();
         return this;
     }
 
     @Override
-    public Shape computeShape(BoxConstraints constraints) {
+    protected Shape preferredShapeImpl(BoxConstraints constraints) {
         return Rectangle.of(textStyle.textSize(text).size());
     }
 }

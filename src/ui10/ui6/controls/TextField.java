@@ -6,7 +6,9 @@ import ui10.geom.shape.Shape;
 import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 import ui10.renderer.java2d.AWTTextStyle;
-import ui10.ui6.*;
+import ui10.ui6.Element;
+import ui10.ui6.LayoutContext;
+import ui10.ui6.Pane;
 import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.TextNode;
 
@@ -23,16 +25,23 @@ public class TextField extends Pane {
 
     @Override
     public Element content() {
-        return new Element() {
+        return new Element.TransientElement() {
             @Override
-            public Shape computeShape(BoxConstraints constraints) {
-                return textNode.computeShape(constraints);
+            public void enumerateChildren(Consumer<Element> consumer) {
+                consumer.accept(textNode);
+                consumer.accept(caret);
             }
 
             @Override
-            public void applyShape(Shape shape, Consumer<Surface> consumer) {
-                textNode.applyShape(shape, consumer);
-                caret.applyShape(new Rectangle(caretPosition.get(), 0, 1, shape.bounds().size().height()), consumer);
+            protected Shape preferredShapeImpl(BoxConstraints constraints) {
+                return textNode.preferredShape(constraints);
+            }
+
+            @Override
+            protected void applyShapeImpl(Shape shape, LayoutContext context) {
+                context.placeElement(textNode, shape);
+                context.placeElement(caret, new Rectangle(caretPosition.get(), 0, 1, shape.bounds().size().height()).
+                        translate(shape.bounds().topLeft()));
             }
         };
     }

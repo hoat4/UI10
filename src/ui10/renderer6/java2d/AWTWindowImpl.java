@@ -24,7 +24,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
         renderer = new J2DRenderer(desktop.eventLoop);
         renderer.c = this;
-        renderer.root = renderer.makeItem(Surface.of(window.content()));
+        renderer.root = renderer.makeItem(RenderableElement.of(window.getContent()));
 
         enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
     }
@@ -64,7 +64,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
     }
 
     private void dispatchMouseEvent(MouseEvent e) {
-        List<EventHandler> l = new ArrayList<>();
+        List<Control> l = new ArrayList<>();
         if (renderer.root.captureMouseEvent(e, l))
             return;
         for (int i = l.size()-1; i>=0; i--) {

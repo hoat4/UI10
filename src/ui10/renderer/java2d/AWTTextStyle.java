@@ -33,8 +33,8 @@ public class AWTTextStyle implements TextStyle {
 
     @Override
     public FontMetrics textSize(String text) {
-        return new FontMetrics(px2i(fontMetrics.stringWidth(text)) / 1000,
-                px2i(fontMetrics.getAscent()) / 1000, px2i(fontMetrics.getDescent())/1000);
+        return new FontMetrics(px2i(fontMetrics.stringWidth(text)) ,
+                px2i(fontMetrics.getAscent()), px2i(fontMetrics.getDescent()));
     }
 
     @Override

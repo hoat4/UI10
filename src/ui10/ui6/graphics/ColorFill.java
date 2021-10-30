@@ -4,9 +4,9 @@ import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.Surface;
+import ui10.ui6.RenderableElement;
 
-public class ColorFill extends Surface {
+public class ColorFill extends RenderableElement {
 
     private Color color;
 
@@ -23,12 +23,12 @@ public class ColorFill extends Surface {
 
     public ColorFill color(Color color) {
         this.color = color;
-        invalidate();
+        invalidateRendererData();
         return this;
     }
 
     @Override
-    public Shape computeShape(BoxConstraints constraints) {
+    protected Shape preferredShapeImpl(BoxConstraints constraints) {
         return Rectangle.of(constraints.min());
     }
 }

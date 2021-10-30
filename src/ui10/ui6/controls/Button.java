@@ -10,8 +10,9 @@ import ui10.ui6.*;
 import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.LinearGradient;
 import ui10.ui6.graphics.TextNode;
+import ui10.ui6.layout.Layouts;
 
-import static ui10.ui6.Layouts.padding;
+import static ui10.ui6.layout.Layouts.padding;
 
 public class Button extends Control {
 
@@ -20,7 +21,7 @@ public class Button extends Control {
 
     static final RGBColor fxctrlinnerbg = RGBColor.WHITE;
     static final RGBColor fxmidtextcolor = RGBColor.ofRGBShort(0x333);
-    static final RGBColor textColor = fxmidtextcolor; // ladderral számoljá bg-ből
+    static final RGBColor textColor = fxmidtextcolor; // ladderral számolja bg-ből
     static final RGBColor fxtextboxborder = fxbg.derive(-.15);
     static final RGBColor buttonfxcolor = fxbase;
     static final RGBColor buttonfxouterborder = buttonfxcolor.derive(-.23);
@@ -41,7 +42,7 @@ public class Button extends Control {
     }
 
     @Override
-    public Element innerContent() {
+    public Element content() {
         return Layouts.stack(
                 Layouts.roundRectangle(new ColorFill(RGBColor.ofIntRGBA(0xFFFFFFBA)), 3),
                 padding(

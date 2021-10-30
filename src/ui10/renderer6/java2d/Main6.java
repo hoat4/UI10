@@ -3,7 +3,7 @@ package ui10.renderer6.java2d;
 import ui10.geom.Insets;
 import ui10.image.RGBColor;
 import ui10.ui6.graphics.ColorFill;
-import ui10.ui6.Layouts;
+import ui10.ui6.layout.Layouts;
 import ui10.ui6.controls.TextField;
 import ui10.ui6.window.Window;
 
