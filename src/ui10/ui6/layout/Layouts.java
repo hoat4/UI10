@@ -8,7 +8,7 @@ import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
 import ui10.ui6.LayoutContext;
-import ui10.ui6.decoration.CSSClass;
+import ui10.ui6.decoration.css.CSSClass;
 
 import java.util.List;
 import java.util.function.Consumer;

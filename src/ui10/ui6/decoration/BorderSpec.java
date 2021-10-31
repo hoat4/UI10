@@ -1,6 +1,6 @@
 package ui10.ui6.decoration;
 
-import ui10.image.Color;
+import ui10.ui6.decoration.css.Length;
 
-public record BorderSpec(Length len, Color color) {
+public record BorderSpec(Length len, Fill fill) {
 }

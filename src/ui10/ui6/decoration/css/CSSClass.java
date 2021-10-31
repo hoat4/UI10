@@ -1,4 +1,4 @@
-package ui10.ui6.decoration;
+package ui10.ui6.decoration.css;
 
 import ui10.ui6.Attribute;
 import ui10.ui6.Element;

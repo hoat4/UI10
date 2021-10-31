@@ -5,6 +5,9 @@ import ui10.layout.BoxConstraints;
 import ui10.ui6.Attribute;
 import ui10.ui6.Element;
 import ui10.ui6.LayoutContext;
+import ui10.ui6.decoration.css.CSSClass;
+import ui10.ui6.decoration.css.CSSParser;
+import ui10.ui6.decoration.css.Rule;
 
 import java.util.function.Consumer;
 
@@ -36,13 +39,24 @@ public class Decorated extends Element.TransientElement {
     }
 
     private void applyDecoration(Element element) {
+        DecorationContext context = new DecorationContext();
+
+        for (Attribute a : element.attributes()) {
+            if (a instanceof CSSClass c) {
+                Rule rule = css.rulesByClass.get(c.name);
+                if (rule != null)
+                    rule.apply1(element, context);
+            }
+        }
+
         element.enumerateLogicalChildren(this::applyDecoration);
 
         Element e = element;
         for (Attribute a : element.attributes()) {
             if (a instanceof CSSClass c) {
                 Rule rule = css.rulesByClass.get(c.name);
-                e = rule.apply(e, new DecorationContext());
+                if (rule != null)
+                    e = rule.apply2(e, context);
             }
         }
 

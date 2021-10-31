@@ -1,4 +1,4 @@
-package ui10.ui6.decoration;
+package ui10.ui6.decoration.css;
 
 import java.io.IOException;
 import java.io.Reader;

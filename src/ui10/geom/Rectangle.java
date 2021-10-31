@@ -136,7 +136,12 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
 
     @Override
     public List<Path> outlines() {
-        return List.of(new Polyline(List.of(rightTop(), rightBottom(), leftBottom(), topLeft())));
+        return List.of(new Polyline(List.of(
+                rightTop().add(1, 0),
+                rightBottom().add(1, 1),
+                leftBottom().add(0, 1),
+                topLeft()
+        )));
     }
 
     @Override

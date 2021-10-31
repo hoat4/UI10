@@ -51,10 +51,15 @@ public class ShapeOperations {
 
     public static Shape intoBounds(Shape shape, Rectangle b) {
         Rectangle a = shape.bounds();
-        Shape s = transform(shape, p -> new Point(
-                b.left() + ceilDiv((p.x() - a.left()) * b.width(), a.width()),
-                b.top() + ceilDiv((p.y() - a.top()) * b.height(), a.height())));
-      //  System.out.println(s.bounds()+" vs "+b);
+        Shape s = transform(shape, p -> {
+            // ceilDiv(40 * 39, 41) == 39
+            assert  ceilDiv((p.y() - a.top()) * (b.height()-1), a.height()-1) < b.height():
+                    ceilDiv((p.y() - a.top()) * (b.height()-1), a.height()-1)+", "+b.height()+", "+(p.y()-a.top())+", "+a;
+            return new Point(
+                    b.left() + ceilDiv((p.x() - a.left()) * (b.width()-1), a.width()-1),
+                    b.top() + ceilDiv((p.y() - a.top()) * (b.height()-1), a.height()-1));
+        });
+        System.out.println(s.bounds()+" vs "+b);
         return s;
     }
 

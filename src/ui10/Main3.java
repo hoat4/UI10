@@ -46,6 +46,9 @@ public class Main3 {
     private static final Tag GRID_TAG = new Tag("main-grid");
 
     public static void main(String[] args) {
+        System.out.println("fxtextboxborder: "+fxtextboxborder);
+        System.out.println("fxtextboxborder: "+fxtextboxborder.derive(-.1));
+
         EventLoop eventLoop = new EventLoop();
         Desktop desktop = new AWTDesktop(eventLoop).desktop;
         eventLoop.runLater(() -> {

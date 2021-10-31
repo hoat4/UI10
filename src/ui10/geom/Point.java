@@ -27,7 +27,7 @@ public record Point(int x, int y) {
 
     public static int distance(Point a, Point b) {
         // int sqrt?
-        return (int) Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+        return (int) Math.ceil(Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)));
     }
 
     public Point add(Size s) {

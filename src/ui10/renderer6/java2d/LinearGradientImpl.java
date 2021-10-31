@@ -3,8 +3,10 @@ package ui10.renderer6.java2d;
 import ui10.geom.Point;
 import ui10.ui6.graphics.LinearGradient;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
+import java.awt.geom.Rectangle2D;
 
 public class LinearGradientImpl extends Item<LinearGradient> {
 
@@ -25,9 +27,10 @@ public class LinearGradientImpl extends Item<LinearGradient> {
             colors[i] = J2DUtil.color(stop.color());
         }
 
+        Rectangle2D bounds = shape.getBounds2D();
         p = new LinearGradientPaint(
-                node.start().x(), node.start().y(),
-                node.end().x(), node.end().y(),
+                (float) bounds.getX()+node.start().x(), (float) bounds.getY()+node.start().y(),
+                (float) bounds.getX()+node.end().x(), (float) bounds.getY()+node.end().y(),
                 fractions, colors);
     }
 
