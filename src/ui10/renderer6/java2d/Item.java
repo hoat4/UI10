@@ -10,8 +10,16 @@ import ui10.ui6.Control;
 import ui10.ui6.RenderableElement;
 import ui10.ui6.RendererData;
 
+import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.TexturePaint;
 import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.List;
 
 public abstract class Item<N extends RenderableElement> implements RendererData {
@@ -39,10 +47,7 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
     }
 
     private void validate() {
-        Shape shape = node.shape();
-        PathBuilder pb = new PathBuilder(IntTransformationMatrix.IDENTITY, null);
-        shape.outline().iterate(pb);
-        this.shape = pb.p;
+        this.shape = J2DUtil.shapeToPath2D(node.shape());
 
         validateImpl();
     }
@@ -50,11 +55,15 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
     protected abstract void validateImpl();
 
     public void draw(Graphics2D g) {
+        validateIfNeeded();
+        drawImpl(g);
+    }
+
+    protected void validateIfNeeded() {
         if (!valid) {
             validate();
+            valid = true;
         }
-        drawImpl(g);
-        valid = true;
     }
 
     protected abstract void drawImpl(Graphics2D g);
@@ -63,46 +72,28 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
         return false;
     }
 
-    // private BufferedImage bufferedImage;
+    private BufferedImage bufferedImage;
 
-    /*
     public Paint asPaint() {
+        validateIfNeeded();
+
+        Rectangle bounds = shape.getBounds();
         if (bufferedImage == null) {
-            bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            bufferedImage = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB);
         }
         Graphics2D g = bufferedImage.createGraphics();
+        g.translate(-bounds.x, -bounds.y);
         draw(g);
         g.dispose();
-        return new TexturePaint(bufferedImage, new Rectangle(width, height));
+
+        try(OutputStream out = Files.newOutputStream(java.nio.file.Path.of("a.png"))) {
+            ImageIO.write(bufferedImage, "png",out );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new TexturePaint(bufferedImage, bounds);
     }
-     */
 
 
-    private static class PathBuilder extends Path.PathConsumer {
-
-        public final Path2D.Double p = new Path2D.Double();
-        private boolean first = true;
-
-        public PathBuilder(Transformation transformation, Shape clip) {
-            super(transformation, clip);
-        }
-
-        @Override
-        protected void addPointImpl(ui10.geom.Point point) {
-            if (first) {
-                p.moveTo(point.x(), point.y());
-                first = false;
-            } else
-                p.lineTo(point.x(), point.y());
-        }
-
-        @Override
-        public void addSubpath(Path path) {
-            if (path instanceof StandardPathElement.QuadCurveTo) {
-                StandardPathElement.QuadCurveTo q = (StandardPathElement.QuadCurveTo) path;
-                p.quadTo(q.control().x(), q.control().y(), q.p().x(), q.p().y());
-            } else
-                super.addSubpath(path);
-        }
-    }
 }

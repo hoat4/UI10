@@ -1,8 +1,9 @@
 package ui10.renderer6.java2d;
 
-import ui10.geom.Point;
-import ui10.geom.Rectangle;
-import ui10.geom.Size;
+import ui10.geom.*;
+import ui10.geom.shape.Path;
+import ui10.geom.shape.Shape;
+import ui10.geom.shape.StandardPathElement;
 import ui10.image.Color;
 import ui10.image.Fill;
 import ui10.image.LinearGradient;
@@ -10,6 +11,7 @@ import ui10.image.RGBColor;
 
 import java.awt.LinearGradientPaint;
 import java.awt.Paint;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Objects;
@@ -65,5 +67,48 @@ public class J2DUtil {
             return new LinearGradientPaint(point(g.start()), point(g.end()), fractions, colors);
         } else
             throw new UnsupportedOperationException(fill.toString());
+    }
+
+
+    public static Path2D.Double shapeToPath2D(Shape shape) {
+        PathBuilder pb = new PathBuilder(IntTransformationMatrix.IDENTITY, null);
+        for (Path p : shape.outlines()) {
+            pb.reset();
+            p.iterate(pb);
+        }
+        return pb.p;
+    }
+
+    private static class PathBuilder extends Path.PathConsumer {
+
+        public final Path2D.Double p = new Path2D.Double(Path2D.WIND_EVEN_ODD);
+        private boolean first = true;
+
+        public PathBuilder(Transformation transformation, Shape clip) {
+            super(transformation, clip);
+        }
+
+        protected void reset() {
+            super.reset();
+            first = true;
+        }
+
+        @Override
+        protected void addPointImpl(ui10.geom.Point point) {
+            if (first) {
+                p.moveTo(point.x(), point.y());
+                first = false;
+            } else
+                p.lineTo(point.x(), point.y());
+        }
+
+        @Override
+        public void addSubpath(Path path) {
+            if (path instanceof StandardPathElement.QuadCurveTo) {
+                StandardPathElement.QuadCurveTo q = (StandardPathElement.QuadCurveTo) path;
+                p.quadTo(q.control().x(), q.control().y(), q.p().x(), q.p().y());
+            } else
+                super.addSubpath(path);
+        }
     }
 }

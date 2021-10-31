@@ -8,11 +8,58 @@ import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
 import ui10.ui6.LayoutContext;
+import ui10.ui6.decoration.CSSClass;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 public class Layouts {
+
+    public static Element empty() {
+        return new Empty();
+    }
+
+    private static class Empty extends Element.TransientElement {
+
+        @Override
+        public void enumerateLogicalChildren(Consumer<Element> consumer) {
+        }
+
+        @Override
+        protected Shape preferredShapeImpl(BoxConstraints constraints) {
+            return Rectangle.of(constraints.min());
+        }
+
+        @Override
+        protected void applyShapeImpl(Shape shape, LayoutContext context) {
+        }
+    }
+
+    public static Element wrap(Element element) {
+        return new Wrapper(element);
+    }
+
+    private static class Wrapper extends SingleNodeLayout {
+
+        public Wrapper(Element content) {
+            super(content);
+        }
+
+        @Override
+        protected Shape preferredShapeImpl(BoxConstraints constraints) {
+            return content.preferredShape(constraints);
+        }
+
+        @Override
+        protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
+            return containerShape;
+        }
+    }
+
+    // ez legyen inkább CSSClass-ban?
+    public static Element wrapWithClass(String className, Element element) {
+        return CSSClass.withClass(className, wrap(element));
+    }
 
     public static Element centered(Element n) {
         return new Centered(n);
@@ -31,8 +78,34 @@ public class Layouts {
 
         @Override
         protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            return content.preferredShape(new BoxConstraints(Size.ZERO, containerShape.bounds().size())).
-                    translate(containerShape.bounds().topLeft());
+            Shape contentShape = content.preferredShape(new BoxConstraints(Size.ZERO, containerShape.bounds().size()));
+            return contentShape.
+                    translate(contentShape.bounds().topLeft().negate()).
+                    translate(containerShape.bounds().centered(contentShape.bounds().size()).topLeft());
+        }
+    }
+
+    public static Element minSize(Element content, Size minSize) {
+        return new MinSize(content, minSize);
+    }
+
+    private static class MinSize extends SingleNodeLayout{
+
+        private final Size minSize;
+
+        public MinSize(Element content, Size minSize) {
+            super(content);
+            this.minSize = minSize;
+        }
+
+        @Override
+        protected Shape preferredShapeImpl(BoxConstraints constraints) {
+            return content.preferredShape(constraints.withMinimum(Size.max(constraints.min(), minSize)));
+        }
+
+        @Override
+        protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
+            return containerShape;
         }
     }
 
@@ -55,16 +128,21 @@ public class Layouts {
                     constraints.min().subtractOrClamp(all),
                     constraints.max().subtract(all));
 
-            return content.preferredShape(c).withOuterInsets(insets);
+            Shape cs = content.preferredShape(c);
+            //System.out.println("cs:"+cs.bounds());
+            final Shape shape = insets.addTo(cs);
+            //System.out.println(insets+" s:"+shape.bounds());
+            return shape;
         }
 
         @Override
         protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            return containerShape.withInnerInsets(insets);
+            System.out.println("padding: "+containerShape);
+            return insets.removeFrom(containerShape);
         }
     }
 
-    public static Element roundRectangle(Element content, int radius) {
+    public static Element roundRectangle(int radius, Element content) {
         return new RoundRectLayout(content, radius);
     }
 
@@ -79,7 +157,9 @@ public class Layouts {
 
         @Override
         protected Shape preferredShapeImpl(BoxConstraints constraints) {
-            return new RoundedRectangle(Rectangle.of(constraints.min()), radius);
+            Rectangle rect = content.preferredShape(constraints.withMinimum(
+                    Size.max(constraints.min(), new Size(radius * 2, radius * 2)))).bounds();
+            return new RoundedRectangle(rect, radius);
         }
 
         @Override
@@ -113,7 +193,7 @@ public class Layouts {
         }
 
         @Override
-        public void enumerateChildren(Consumer<Element> consumer) {
+        public void enumerateLogicalChildren(Consumer<Element> consumer) {
             consumer.accept(content);
         }
 
@@ -121,7 +201,7 @@ public class Layouts {
 
         @Override
         protected void applyShapeImpl(Shape shape, LayoutContext context) {
-            context.placeElement(content, computeContentShape(shape, context));
+            content.applyShape(computeContentShape(shape, context), context);
         }
     }
 
@@ -142,7 +222,7 @@ public class Layouts {
         }
 
         @Override
-        public void enumerateChildren(Consumer<Element> consumer) {
+        public void enumerateLogicalChildren(Consumer<Element> consumer) {
             nodes.forEach(consumer);
         }
 

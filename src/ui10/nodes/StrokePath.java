@@ -7,8 +7,8 @@ import ui10.binding.ScalarProperty;
 
 import ui10.geom.Point;
 import ui10.geom.Size;
+import ui10.image.Colors;
 import ui10.image.Fill;
-import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class StrokePath extends Pane {
 
     public StrokePath() {
         elements = new ObservableListImpl<>();
-        stroke.set(RGBColor.BLACK);
+        stroke.set(Colors.BLACK);
         thickness.set(1);
     }
 

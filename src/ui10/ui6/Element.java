@@ -3,11 +3,14 @@ package ui10.ui6;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public interface Element {
 
-    void enumerateChildren(Consumer<Element> consumer); // this does not honor replacement
+    void enumerateLogicalChildren(Consumer<Element> consumer); // this does not honor replacement
 
     Shape preferredShape(BoxConstraints constraints); // this honors replacement
 
@@ -17,26 +20,49 @@ public interface Element {
 
     void replacement(Element e);
 
-    abstract class TransientElement implements Element{
+    List<Attribute> attributes();
+
+    abstract class TransientElement implements Element {
 
         private Element replacement;
+        private boolean inReplacement;
+        private final List<Attribute> attributes = new ArrayList<>();
 
         @Override
-        public abstract void enumerateChildren(Consumer<Element> consumer);
+        public abstract void enumerateLogicalChildren(Consumer<Element> consumer);
 
         @Override
         public Shape preferredShape(BoxConstraints constraints) {
-            return replacement == null ? preferredShapeImpl(constraints) : replacement.preferredShape(constraints);
+            if (replacement == null || inReplacement) {
+                Shape preferredShape = preferredShapeImpl(constraints);
+                Objects.requireNonNull(preferredShape, ()->this+" returned null preferred shape");
+                return preferredShape.translate(preferredShape.bounds().topLeft().negate());
+            } else {
+                boolean r = inReplacement;
+                inReplacement = true;
+                try {
+                    return replacement.preferredShape(constraints);
+                } finally {
+                    inReplacement = r;
+                }
+            }
         }
 
         protected abstract Shape preferredShapeImpl(BoxConstraints constraints);
 
         @Override
         public void applyShape(Shape shape, LayoutContext context) {
-            if (replacement == null)
+            if (replacement == null || inReplacement)
                 applyShapeImpl(shape, context);
-            else
-                replacement.applyShape(shape, context);
+            else {
+                boolean r = inReplacement;
+                inReplacement = true;
+                try {
+                    replacement.applyShape(shape, context);
+                } finally {
+                    inReplacement = r;
+                }
+            }
         }
 
         protected abstract void applyShapeImpl(Shape shape, LayoutContext context);
@@ -49,6 +75,11 @@ public interface Element {
         @Override
         public void replacement(Element e) {
             this.replacement = e;
+        }
+
+        @Override
+        public List<Attribute> attributes() {
+            return attributes;
         }
     }
 }

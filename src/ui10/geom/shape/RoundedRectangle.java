@@ -1,6 +1,5 @@
 package ui10.geom.shape;
 
-import ui10.geom.Insets;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 
@@ -15,7 +14,7 @@ public record RoundedRectangle(Rectangle rectangle, int radius /*Fraction?*/) im
     }
 
     @Override
-    public Path outline() {
+    public List<Path> outlines() {
         List<StandardPathElement> p = new ArrayList<>();
         p.add(new StandardPathElement.MoveTo(rectangle.topLeft().add(radius, 0)));
         p.add(new StandardPathElement.LineTo(rectangle.rightTop().add(-radius, 0)));
@@ -26,21 +25,13 @@ public record RoundedRectangle(Rectangle rectangle, int radius /*Fraction?*/) im
         p.add(new StandardPathElement.QuadCurveTo(rectangle.leftBottom().add(0, -radius), rectangle.leftBottom()));
         p.add(new StandardPathElement.LineTo(rectangle.topLeft().add(0, radius)));
         p.add(new StandardPathElement.QuadCurveTo(rectangle.topLeft().add(radius, 0), rectangle.topLeft()));
-        return new CompositePath<>(p);
+        p.add(new StandardPathElement.Close());
+        return List.of(new CompositePath<>(p));
     }
 
     @Override
     public Shape translate(Point point) {
         return new RoundedRectangle(rectangle.translate(point), radius);
-    }
-
-    @Override
-    public Shape withInnerInsets(Insets insets) {
-        return null;
-    }
-    @Override
-    public Shape withOuterInsets(Insets insets) {
-        return null;
     }
 
     @Override

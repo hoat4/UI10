@@ -6,10 +6,18 @@ public record Point(int x, int y) {
     public static final Point ORIGO = new Point(0, 0);
 
     public static Point min(Point a, Point b) {
+        if (a == null)
+            return b;
+        if (b == null)
+            return a;
         return new Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
     }
 
     public static Point max(Point a, Point b) {
+        if (a == null)
+            return b;
+        if (b == null)
+            return a;
         return new Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
     }
 
@@ -46,12 +54,16 @@ public record Point(int x, int y) {
         return new Point(x - p.x, y - p.y);
     }
 
+    public Point multiply(int i) {
+        return new Point(x*i, y*i);
+    }
+
     public Point divide(int num) {
-        // round?
-        return new Point(x / num, y / num);
+        return new Point((x+num-1)/ num, (y+num-1) / num);
     }
 
     public Point negate() {
         return new Point(-x, -y);
     }
+
 }

@@ -3,6 +3,8 @@ package ui10.renderer6.java2d;
 import ui10.ui6.graphics.ColorFill;
 
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.geom.Path2D;
 import java.util.Objects;
 
 public class ColorFillImpl extends Item<ColorFill> {
@@ -30,4 +32,9 @@ public class ColorFillImpl extends Item<ColorFill> {
         g.fill(shape);
     }
 
+    @Override
+    public Paint asPaint() {
+        validateIfNeeded();
+        return awtColor;
+    }
 }

@@ -1,6 +1,5 @@
 package ui10;
 
-import ui10.binding.ObservableScalar;
 import ui10.binding.Scope;
 import ui10.controls.Button;
 import ui10.controls.Label;
@@ -13,7 +12,7 @@ import ui10.decoration.Tag;
 import ui10.geom.Insets;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
-import ui10.image.Fill;
+import ui10.image.Colors;
 import ui10.image.LinearGradient;
 import ui10.image.RGBColor;
 import ui10.layout.Centered;
@@ -36,7 +35,7 @@ public class Main3 {
     static final RGBColor fxbase = RGBColor.ofRGB(0xECECEC);
     static final RGBColor fxbg = fxbase.derive(.264);
 
-    static final RGBColor fxctrlinnerbg = RGBColor.WHITE;
+    static final RGBColor fxctrlinnerbg = Colors.WHITE;
     static final RGBColor fxmidtextcolor = RGBColor.ofRGBShort(0x333);
     static final RGBColor textColor = fxmidtextcolor; // ladderral számoljá bg-ből
     static final RGBColor fxtextboxborder = fxbg.derive(-.15);
@@ -144,7 +143,7 @@ public class Main3 {
 
         box.borderStyle.bindTo(content.bounds.nullsafeMap(Rectangle::size).map(size -> {
             if (size == null)
-                return new Border.BorderStyle(1000, RGBColor.BLACK, 2000); // TODO
+                return new Border.BorderStyle(1000, Colors.BLACK, 2000); // TODO
 
             final LinearGradient borderGradient = new LinearGradient(ORIGO, size.leftBottom(), List.of(
                     new LinearGradient.Stop(fxtextboxborder.derive(-.1), 0),

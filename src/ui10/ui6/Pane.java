@@ -35,7 +35,7 @@ public abstract class Pane extends RenderableElement {
     }
 
     @Override
-    public void enumerateChildren(Consumer<Element> consumer) {
+    public void enumerateLogicalChildren(Consumer<Element> consumer) {
         consumer.accept(getContent());
     }
 
@@ -45,7 +45,7 @@ public abstract class Pane extends RenderableElement {
     }
 
     @Override
-    protected void onShapeChanged(Shape shape) {
+    protected void onShapeApplied(Shape shape, LayoutContext context) {
         children.clear();
         getContent().applyShape(shape, children::add);
     }

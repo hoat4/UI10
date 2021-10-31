@@ -5,6 +5,8 @@ import ui10.binding.PropertyHolder;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -15,6 +17,11 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
     protected Shape shape;
 
     private Element replacement;
+    private boolean inReplacement;
+
+    // this should become a manual linked list, standard collections has large memory overhead
+
+    private final List<Attribute> attributeList = new ArrayList<>();
 
     @Override
     public <T extends PropertyEvent> void onChange(T changeEvent) {
@@ -23,17 +30,33 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
     }
 
     @Override
-    public void enumerateChildren(Consumer<Element> consumer) {
-        // all subclasses except Pane have no children
+    public List<Attribute> attributes() {
+        return attributeList; // onChange
+    }
+
+    @Override
+    public void enumerateLogicalChildren(Consumer<Element> consumer) {
+        // most subclasses have no children
     }
 
     @Override
     public final Shape preferredShape(BoxConstraints constraints) {
         Objects.requireNonNull(constraints);
 
-        return replacement == null
-                ? Objects.requireNonNull(preferredShapeImpl(constraints), this::toString)
-                : replacement.preferredShape(constraints);
+        if (replacement == null || inReplacement) {
+            Shape s = preferredShapeImpl(constraints);
+            Objects.requireNonNull(s, this::toString);
+            s = s.translate(s.bounds().topLeft().negate());
+            return s;
+        }else {
+            boolean r = inReplacement;
+            inReplacement = true;
+            try {
+                return replacement.preferredShape(constraints);
+            } finally {
+                inReplacement = r;
+            }
+        }
     }
 
     protected abstract Shape preferredShapeImpl(BoxConstraints constraints);
@@ -43,8 +66,14 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
         Objects.requireNonNull(shape);
         Objects.requireNonNull(context);
 
-        if (replacement != null) {
-            replacement.applyShape(shape, context);
+        if (replacement != null && !inReplacement) {
+            boolean r = inReplacement;
+            inReplacement = true;
+            try {
+                replacement.applyShape(shape, context);
+            } finally {
+                inReplacement = r;
+            }
             return;
         }
 
@@ -55,10 +84,10 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
 
         this.shape = shape;
         invalidateRendererData(); // vagy inkább onChange()?
-        onShapeChanged(shape);
+        onShapeApplied(shape, context);
     }
 
-    protected void onShapeChanged(Shape shape) {
+    protected void onShapeApplied(Shape shape, LayoutContext context) {
     }
 
     @Override

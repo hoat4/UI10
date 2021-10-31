@@ -48,6 +48,7 @@ public class J2DRenderer {
         //root.width = rect.width;
         //root.height = rect.height;
         root.draw(g);
+        System.err.println("done");
         g.dispose();
     }
 

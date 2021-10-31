@@ -66,4 +66,8 @@ public record Size(int width, int height) {
     public Size multiply(int i) {
         return new Size(width * i, height * i);
     }
+
+    public boolean isZero() {
+        return width == 0 || height == 0;
+    }
 }

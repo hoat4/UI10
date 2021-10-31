@@ -6,7 +6,7 @@ import ui10.decoration.Tag;
 import ui10.font.TextStyle;
 import ui10.geom.Point;
 import ui10.geom.Size;
-import ui10.image.RGBColor;
+import ui10.image.Colors;
 import ui10.input.InputEvent;
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.keyboard.Keyboard;
@@ -81,7 +81,7 @@ public class TextField extends Control {
 
         @Override
         protected ObservableScalar<? extends Node> paneContent() {
-            LinePane line = new LinePane(1000, RGBColor.BLACK); // TODO
+            LinePane line = new LinePane(1000, Colors.BLACK); // TODO
 
             FixedSize fs = new FixedSize();
             fs.content.set(line);

@@ -27,13 +27,13 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
     public Point rightTop() {
         if (isEmpty())
             throw new UnsupportedOperationException();
-        return topLeft.add(size.width(), 0).subtract(new Size(1, 1));
+        return topLeft.add(size.width(), 0).subtract(new Size(1, 0));
     }
 
     public Point leftBottom() {
         if (isEmpty())
             throw new UnsupportedOperationException();
-        return topLeft.add(0, size.height()).subtract(new Size(1, 1));
+        return topLeft.add(0, size.height()).subtract(new Size(0, 1));
     }
 
     public static Rectangle union(Rectangle a, Rectangle b) {
@@ -54,10 +54,11 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
         if (a == null || a.isEmpty() || b == null || b.isEmpty())
             return null;
 
-        return of(
+        Rectangle r = of(
                 Point.max(a.topLeft, b.topLeft),
                 Point.min(a.rightBottom(), b.rightBottom())
         );
+        return r.size.isZero() ? null : r;
     }
 
     public static Rectangle of(Size size) {
@@ -107,6 +108,11 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
         );
     }
 
+    @Override
+    public Shape intoBounds(Rectangle bounds) {
+        return bounds;
+    }
+
     public int area() {
         return size().width() * size.height();
     }
@@ -129,14 +135,17 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
 
 
     @Override
-    public Path outline() {
-        return new Polyline(List.of(rightTop(), rightBottom(), leftBottom(), topLeft()));
+    public List<Path> outlines() {
+        return List.of(new Polyline(List.of(rightTop(), rightBottom(), leftBottom(), topLeft())));
     }
 
     @Override
     public Shape unionWith(Shape other) {
+        if (isEmpty())
+            return other;
+
         if (!(other instanceof Rectangle))
-            throw new UnsupportedOperationException(); // ???
+            return Shape.super.unionWith(other);
 
         return union(this, (Rectangle) other);
     }
@@ -148,4 +157,25 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
 
         return intersection(this, (Rectangle) other);
     }
+
+    public Point center() {
+        return topLeft().add(size.divide(2));
+    }
+
+    public int left() {
+        return topLeft.x();
+    }
+
+    public int top() {
+        return topLeft.y();
+    }
+
+    public int width() {
+        return size.width();
+    }
+
+    public int height() {
+        return size.height();
+    }
+
 }

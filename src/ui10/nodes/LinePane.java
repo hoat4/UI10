@@ -4,14 +4,14 @@ import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 
 import ui10.geom.Size;
+import ui10.image.Colors;
 import ui10.image.Fill;
-import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 
 public class LinePane extends Pane {
 
     public final ScalarProperty<Integer> width = ScalarProperty.create();
-    public final ScalarProperty<Fill> fill = ScalarProperty.createWithDefault(RGBColor.BLACK);
+    public final ScalarProperty<Fill> fill = ScalarProperty.createWithDefault(Colors.BLACK);
 
     public LinePane() {
     }

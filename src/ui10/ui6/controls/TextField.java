@@ -3,6 +3,7 @@ package ui10.ui6.controls;
 import ui10.binding.ScalarProperty;
 import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
+import ui10.image.Colors;
 import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 import ui10.renderer.java2d.AWTTextStyle;
@@ -20,14 +21,14 @@ public class TextField extends Pane {
     public final ScalarProperty<Integer> caretPosition = ScalarProperty.createWithDefault("TextField.caretPosition", 0);
 
     private final TextNode textNode = new TextNode().text("mmmŰ").
-            textStyle(AWTTextStyle.of(20f)).fill(RGBColor.ofRGBShort(0x333));
-    private final ColorFill caret = new ColorFill().color(RGBColor.BLACK);
+            textStyle(AWTTextStyle.of(20f)).fill(new ColorFill(RGBColor.ofRGBShort(0x333)));
+    private final ColorFill caret = new ColorFill().color(Colors.BLACK);
 
     @Override
     public Element content() {
         return new Element.TransientElement() {
             @Override
-            public void enumerateChildren(Consumer<Element> consumer) {
+            public void enumerateLogicalChildren(Consumer<Element> consumer) {
                 consumer.accept(textNode);
                 consumer.accept(caret);
             }

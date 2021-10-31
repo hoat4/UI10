@@ -1,5 +1,7 @@
 package ui10.geom;
 
+import ui10.geom.shape.Shape;
+
 public record Insets(int top, int right, int bottom, int left) {
 
     public Insets(int all) {
@@ -24,5 +26,13 @@ public record Insets(int top, int right, int bottom, int left) {
 
     public Point topLeft() {
         return new Point(left, top);
+    }
+
+    public Shape addTo(Shape shape) {
+        return shape.intoBounds(shape.bounds().withOuterInsets(this));
+    }
+
+    public Shape removeFrom(Shape shape) {
+        return shape.intoBounds(shape.bounds().withInnerInsets(this));
     }
 }

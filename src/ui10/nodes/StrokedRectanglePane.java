@@ -5,8 +5,8 @@ import ui10.binding.ObservableScalar;
 import ui10.binding.ScalarProperty;
 import ui10.geom.Point;
 import ui10.geom.Size;
+import ui10.image.Colors;
 import ui10.image.Fill;
-import ui10.image.RGBColor;
 import ui10.layout.BoxConstraints;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class StrokedRectanglePane extends Pane {
     public final ScalarProperty<Integer> radius = ScalarProperty.create();
 
     public StrokedRectanglePane() {
-        this(1, RGBColor.BLACK);
+        this(1, Colors.BLACK);
     }
 
     public StrokedRectanglePane(int thickness, Fill fill) {
