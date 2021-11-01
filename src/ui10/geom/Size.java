@@ -70,4 +70,9 @@ public record Size(int width, int height) {
     public boolean isZero() {
         return width == 0 || height == 0;
     }
+
+    @Override
+    public String toString() {
+        return "(" + width + " × " + height + ")";
+    }
 }

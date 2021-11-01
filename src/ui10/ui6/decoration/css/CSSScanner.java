@@ -2,6 +2,7 @@ package ui10.ui6.decoration.css;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.stream.Collectors;
 
 public class CSSScanner {
 
@@ -52,6 +53,14 @@ public class CSSScanner {
         int a = take();
         if (a != e)
             throw new CSSParseException("expected " + chToString(e) + ", but got " + chToString(a));
+    }
+
+    public int expectAnyOf(String s) {
+        int a = take();
+        if (s.indexOf(a) == -1)
+            throw new CSSParseException("expected " + s.codePoints().mapToObj(CSSScanner::chToString).
+                    collect(Collectors.joining(" or ")) + ", but got " + chToString(a));
+        return a;
     }
 
     public String skipWhitespaceAndReadIdentifier() {

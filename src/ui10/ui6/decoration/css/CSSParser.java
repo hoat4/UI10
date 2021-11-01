@@ -3,6 +3,7 @@ package ui10.ui6.decoration.css;
 
 import ui10.image.Color;
 import ui10.image.RGBColor;
+import ui10.ui6.Attribute;
 import ui10.ui6.decoration.BorderSpec;
 import ui10.ui6.decoration.Fill;
 import ui10.ui6.decoration.PointSpec;
@@ -19,9 +20,7 @@ import static ui10.ui6.decoration.css.Length.zero;
 public class CSSParser {
 
     private final CSSScanner scanner;
-    public final Map<String, Rule> rulesByClass = new HashMap<>();
-
-    private final Map<String, String> vars= new HashMap<>();
+    public final Map<Attribute, Rule> rules = new HashMap<>();
 
     public CSSParser(CSSScanner scanner) {
         this.scanner = scanner;
@@ -37,13 +36,17 @@ public class CSSParser {
             //    vars.put(varName, )
             //}
 
-            scanner.expect(".");
-            String className = scanner.readIdentifier();
+            int c = scanner.expectAnyOf(".:");
+            Attribute a = switch (c) {
+                case '.' -> new CSSClass(scanner.readIdentifier());
+                case ':' -> new CSSPseudoClass(scanner.readIdentifier());
+                default -> throw new RuntimeException(Integer.toString(c));
+            };
             scanner.skipWhitespaces();
             scanner.expect("{");
 
             Rule rule = new Rule();
-            rulesByClass.put(className, rule);
+            rules.put(a, rule);
 
             scanner.skipWhitespaces();
             while (scanner.next != '}') {
@@ -95,7 +98,7 @@ public class CSSParser {
         return switch (s.length()) {
             case 3 -> RGBColor.ofRGBShort(Integer.parseInt(s, 16));
             case 6 -> RGBColor.ofRGB(Integer.parseInt(s, 16));
-            case 8 -> RGBColor.ofIntRGBA(Integer.parseInt(s, 16));
+            case 8 -> RGBColor.ofIntRGBA(Integer.parseUnsignedInt(s, 16));
             default -> throw new CSSScanner.CSSParseException("unknown fill: #" + s);
         };
     }
@@ -212,11 +215,23 @@ public class CSSParser {
         return new CSSParser.NumberWithUnit(d, unit);
     }
 
+    public List<Length> parseLengths() {
+        scanner.skipWhitespaces();
+
+        List<Length> lengths = new ArrayList<>();
+        do {
+            lengths.add(parseLength());
+            scanner.skipWhitespaces();
+        } while (scanner.next != ';');
+
+        return lengths;
+    }
+
     public record NumberWithUnit(double n, Unit unit) {
 
         public NumberWithUnit {
             if (!Double.isFinite(n))
-                throw new IllegalArgumentException(n+" "+unit);
+                throw new IllegalArgumentException(n + " " + unit);
         }
 
         public int val() {

@@ -24,18 +24,12 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
     private final List<Attribute> attributeList = new ArrayList<>();
 
     @Override
-    public <T extends PropertyEvent> void onChange(T changeEvent) {
-        invalidateRendererData();
-        super.onChange(changeEvent);
-    }
-
-    @Override
     public List<Attribute> attributes() {
         return attributeList; // onChange
     }
 
     @Override
-    public void enumerateLogicalChildren(Consumer<Element> consumer) {
+    public void enumerateStaticChildren(Consumer<Element> consumer) {
         // most subclasses have no children
     }
 
@@ -47,6 +41,7 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
             Shape s = preferredShapeImpl(constraints);
             Objects.requireNonNull(s, this::toString);
             s = s.translate(s.bounds().topLeft().negate());
+            Objects.requireNonNull(s);
             return s;
         }else {
             boolean r = inReplacement;
@@ -79,11 +74,7 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
 
         context.accept(this);
 
-        if (shape.equals(this.shape))
-            return;
-
         this.shape = shape;
-        invalidateRendererData(); // vagy inkább onChange()?
         onShapeApplied(shape, context);
     }
 

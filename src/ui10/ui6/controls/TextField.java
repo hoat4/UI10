@@ -32,7 +32,7 @@ public class TextField extends Pane {
     public Element content() {
         return new Element.TransientElement() {
             @Override
-            public void enumerateLogicalChildren(Consumer<Element> consumer) {
+            public void enumerateStaticChildren(Consumer<Element> consumer) {
                 consumer.accept(textNode);
                 consumer.accept(caret);
             }

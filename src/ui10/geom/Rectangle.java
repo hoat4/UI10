@@ -183,4 +183,9 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
         return size.height();
     }
 
+
+    @Override
+    public String toString() {
+        return "Rect {"+topLeft+" "+size+"}";
+    }
 }

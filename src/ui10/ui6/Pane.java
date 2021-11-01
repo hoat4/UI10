@@ -7,12 +7,16 @@ import ui10.layout.BoxConstraints;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 public abstract class Pane extends RenderableElement {
 
     public final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
+
+    public BiConsumer<Element, Element> decorator;
 
     protected abstract Element content();
 
@@ -22,7 +26,10 @@ public abstract class Pane extends RenderableElement {
             valid = true;
         }
 
-        return Objects.requireNonNull(content(), () -> "null content in " + this);
+        Element content = Objects.requireNonNull(content(), () -> "null content in " + this);
+        if (decorator != null)
+            decorator.accept(this, content);
+        return content;
     }
 
     protected void validate() {
@@ -30,13 +37,19 @@ public abstract class Pane extends RenderableElement {
 
     @Override
     public <T extends PropertyEvent> void onChange(T changeEvent) {
-        valid = false;
         super.onChange(changeEvent);
+        this.invalidatePane();
+    }
+
+    protected void invalidatePane() {
+        valid = false;
+        if (rendererData != null) {
+            rendererData.invalidateRendererData();
+        }
     }
 
     @Override
-    public void enumerateLogicalChildren(Consumer<Element> consumer) {
-        consumer.accept(getContent());
+    public void enumerateStaticChildren(Consumer<Element> consumer) {
     }
 
     @Override

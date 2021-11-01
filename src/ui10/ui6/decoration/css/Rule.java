@@ -5,66 +5,124 @@ import ui10.geom.Size;
 import ui10.renderer.java2d.AWTTextStyle;
 import ui10.ui6.Element;
 import ui10.ui6.decoration.Border;
-import ui10.ui6.decoration.BorderSpec;
 import ui10.ui6.decoration.DecorationContext;
-import ui10.ui6.decoration.Fill;
 import ui10.ui6.graphics.TextNode;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static ui10.ui6.layout.Layouts.*;
 
 public class Rule {
 
-    private Fill background, textColor;
-    private Length margin, padding, cornerRadius;
-    private Length minWidth, minHeight;
-    private BorderSpec border;
-    private Length fontSize;
+    private final Map<CSSProperty<?>, Object> map = new HashMap<>();
+
+    private <T> void put(CSSProperty<T> prop, T value) {
+        map.put(prop, value);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T get(CSSProperty<T> prop) {
+        return (T) map.get(prop);
+    }
 
     void parseProperty(String name, CSSParser parser) {
         switch (name) {
-            case "background" -> background = parser.parseFill();
-            case "color" -> textColor = parser.parseFill();
-            case "margin" -> margin = parser.parseLength();
-            case "padding" -> padding = parser.parseLength();
-            case "border-radius" -> cornerRadius = parser.parseLength();
-            case "min-width" -> minWidth = parser.parseLength();
-            case "min-height" -> minHeight = parser.parseLength();
-            case "border" -> border = parser.parseBorder();
-            case "font-size" -> fontSize = parser.parseLength();
+            case "background" -> put(CSSProperty.background, parser.parseFill());
+            case "color" -> put(CSSProperty.textColor, parser.parseFill());
+            case "margin" -> parseInsets(parser, CSSProperty.marginTop, CSSProperty.marginRight,
+                    CSSProperty.marginBottom, CSSProperty.marginLeft);
+            case "padding" -> parseInsets(parser, CSSProperty.paddingTop, CSSProperty.paddingRight,
+                    CSSProperty.paddingBottom, CSSProperty.paddingLeft);
+            case "border-radius" -> put(CSSProperty.cornerRadius, parser.parseLength());
+            case "min-width" -> put(CSSProperty.minWidth, parser.parseLength());
+            case "min-height" -> put(CSSProperty.minHeight, parser.parseLength());
+            case "border" -> put(CSSProperty.border, parser.parseBorder());
+            case "font-size" -> put(CSSProperty.fontSize, parser.parseLength());
             default -> throw new UnsupportedOperationException("unknown CSS property: " + name);
         }
     }
 
-    public void apply1(Element e, DecorationContext context) {
-        if (fontSize != null)
-            ((TextNode) e).textStyle(AWTTextStyle.of(context.length(fontSize)));
-
-        if (textColor != null)
-            ((TextNode) e).fill(textColor.makeElement(context));
+    private void parseInsets(CSSParser parser, CSSProperty<Length> topProp, CSSProperty<Length> rightProp,
+                             CSSProperty<Length> bottomProp, CSSProperty<Length> leftProp) {
+        List<Length> lengths = parser.parseLengths();
+        switch (lengths.size()) {
+            case 1 -> lengths = List.of(lengths.get(0), lengths.get(0), lengths.get(0), lengths.get(0));
+            case 2 -> lengths = List.of(lengths.get(0), lengths.get(1), lengths.get(0), lengths.get(1));
+            case 4 -> {
+            }
+            default -> throw new CSSScanner.CSSParseException("invalid count of lengths: " + lengths);
+        }
+        put(topProp, lengths.get(0));
+        put(rightProp, lengths.get(1));
+        put(bottomProp, lengths.get(2));
+        put(leftProp, lengths.get(3));
     }
 
-    public Element apply2(Element e, DecorationContext context) {
-        if (padding != null)
-            e = padding(e, new Insets(context.length(padding)));
+    public void defaultsFrom(Rule other) {
+        other.map.forEach(map::putIfAbsent);
+    }
 
-        if (background != null)
-            e = stack(background.makeElement(context), e);
+    private <T> void apply1(CSSProperty<T> prop, Consumer<T> consumer) {
+        T value = get(prop);
+        if (value != null)
+            consumer.accept(value);
+    }
 
-        if (cornerRadius != null)
-            e = roundRectangle(context.length(cornerRadius), e);
+    public void apply1(Element e, DecorationContext context) {
+        apply1(CSSProperty.fontSize, fontSize -> ((TextNode) e).textStyle(AWTTextStyle.of(context.length(fontSize))));
+        apply1(CSSProperty.textColor, textColor -> ((TextNode) e).fill(textColor.makeElement(context)));
+    }
 
-        if (border != null)
-            e = new Border(new Insets(context.length(border.len())), border.fill().makeElement(context), e);
+    private <T> Element prop2(CSSProperty<T> prop, Element e, BiFunction<Element, T, Element> f) {
+        T value = get(prop);
+        if (value != null)
+            return f.apply(e, value);
+        else
+            return e;
+    }
 
-        if (minWidth != null || minHeight != null)
-            e = minSize(e, new Size(
-                    minWidth == null ? 0 : context.length(minWidth),
-                    minHeight == null ? 0 : context.length(minHeight)
-            ));
+    private <T> Element prop2(List<CSSProperty<T>> prop, Element e, BiFunction<Element, List<T>, Element> f) {
+        List<T> values = prop.stream().map(this::get).collect(Collectors.toList());
+        if (values.stream().anyMatch(Objects::nonNull))
+            return f.apply(e, values);
+        else
+            return e;
+    }
 
-        if (margin != null)
-            e = padding(e, new Insets(context.length(margin)));
 
-        return e;
+    public Element apply2(Element elem, DecorationContext context) {
+        elem = prop2(List.of(CSSProperty.paddingTop, CSSProperty.paddingRight,
+                CSSProperty.paddingBottom, CSSProperty.paddingLeft), elem, (e, padding) -> makePadding(e, padding, context));
+
+        elem = prop2(CSSProperty.background, elem, (e, background) -> stack(background.makeElement(context), e));
+        elem = prop2(CSSProperty.border, elem, (e, border) ->
+                new Border(new Insets(context.length(border.len())), border.fill().makeElement(context), e));
+        elem = prop2(CSSProperty.cornerRadius, elem, (e, cornerRadius) ->
+                roundRectangle(context.length(cornerRadius), e));
+
+        elem = prop2(List.of(CSSProperty.minWidth, CSSProperty.minHeight), elem, (e, minSizes) -> minSize(e, new Size(
+                minSizes.get(0) == null ? 0 : context.length(minSizes.get(0)), // min-width
+                minSizes.get(1) == null ? 0 : context.length(minSizes.get(1)) // min-height
+        )));
+
+        elem = prop2(List.of(CSSProperty.marginTop, CSSProperty.marginRight,
+                CSSProperty.marginBottom, CSSProperty.marginLeft), elem, (e, margin) -> makePadding(e, margin, context));
+
+        return elem;
+    }
+
+    private Element makePadding(Element element, List<Length> lengths, DecorationContext context) {
+        return padding(element, new Insets(
+                lengths.get(0) == null ? 0 : context.length(lengths.get(0)), // top
+                lengths.get(1) == null ? 0 : context.length(lengths.get(1)), // right
+                lengths.get(2) == null ? 0 : context.length(lengths.get(2)), // bottom
+                lengths.get(3) == null ? 0 : context.length(lengths.get(3))  // left
+        ));
     }
 }

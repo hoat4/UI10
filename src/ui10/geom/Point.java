@@ -55,15 +55,19 @@ public record Point(int x, int y) {
     }
 
     public Point multiply(int i) {
-        return new Point(x*i, y*i);
+        return new Point(x * i, y * i);
     }
 
     public Point divide(int num) {
-        return new Point((x+num-1)/ num, (y+num-1) / num);
+        return new Point((x + num - 1) / num, (y + num - 1) / num);
     }
 
     public Point negate() {
         return new Point(-x, -y);
     }
 
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
 }

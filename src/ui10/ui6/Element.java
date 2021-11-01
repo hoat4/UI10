@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public interface Element {
 
-    void enumerateLogicalChildren(Consumer<Element> consumer); // this does not honor replacement
+    void enumerateStaticChildren(Consumer<Element> consumer); // this does not honor replacement
 
     Shape preferredShape(BoxConstraints constraints); // this honors replacement
 
@@ -29,14 +29,16 @@ public interface Element {
         private final List<Attribute> attributes = new ArrayList<>();
 
         @Override
-        public abstract void enumerateLogicalChildren(Consumer<Element> consumer);
+        public abstract void enumerateStaticChildren(Consumer<Element> consumer);
 
         @Override
         public Shape preferredShape(BoxConstraints constraints) {
             if (replacement == null || inReplacement) {
                 Shape preferredShape = preferredShapeImpl(constraints);
                 Objects.requireNonNull(preferredShape, ()->this+" returned null preferred shape");
-                return preferredShape.translate(preferredShape.bounds().topLeft().negate());
+                Shape s = preferredShape.translate(preferredShape.bounds().topLeft().negate());
+                Objects.requireNonNull(s);
+                return s;
             } else {
                 boolean r = inReplacement;
                 inReplacement = true;

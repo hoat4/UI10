@@ -34,13 +34,4 @@ public record RoundedRectangle(Rectangle rectangle, int radius /*Fraction?*/) im
         return new RoundedRectangle(rectangle.translate(point), radius);
     }
 
-    @Override
-    public Shape unionWith(Shape other) {
-        return null;
-    }
-
-    @Override
-    public Shape intersectionWith(Shape other) {
-        return null;
-    }
 }

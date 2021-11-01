@@ -11,6 +11,7 @@ import ui10.ui6.LayoutContext;
 import ui10.ui6.decoration.css.CSSClass;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class Layouts {
@@ -22,7 +23,7 @@ public class Layouts {
     private static class Empty extends Element.TransientElement {
 
         @Override
-        public void enumerateLogicalChildren(Consumer<Element> consumer) {
+        public void enumerateStaticChildren(Consumer<Element> consumer) {
         }
 
         @Override
@@ -137,7 +138,6 @@ public class Layouts {
 
         @Override
         protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            System.out.println("padding: "+containerShape);
             return insets.removeFrom(containerShape);
         }
     }
@@ -159,12 +159,13 @@ public class Layouts {
         protected Shape preferredShapeImpl(BoxConstraints constraints) {
             Rectangle rect = content.preferredShape(constraints.withMinimum(
                     Size.max(constraints.min(), new Size(radius * 2, radius * 2)))).bounds();
-            return new RoundedRectangle(rect, radius);
+            //return new RoundedRectangle(rect, radius);
+            return rect;
         }
 
         @Override
         protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            return containerShape;
+            return new RoundedRectangle(containerShape.bounds(), radius);
         }
     }
 
@@ -193,7 +194,7 @@ public class Layouts {
         }
 
         @Override
-        public void enumerateLogicalChildren(Consumer<Element> consumer) {
+        public void enumerateStaticChildren(Consumer<Element> consumer) {
             consumer.accept(content);
         }
 
@@ -222,13 +223,15 @@ public class Layouts {
         }
 
         @Override
-        public void enumerateLogicalChildren(Consumer<Element> consumer) {
+        public void enumerateStaticChildren(Consumer<Element> consumer) {
             nodes.forEach(consumer);
         }
 
         @Override
         protected Shape preferredShapeImpl(BoxConstraints constraints) {
-            return nodes.stream().map(n -> n.preferredShape(constraints)).reduce(Shape.NULL, Shape::unionWith);
+            return nodes.stream().map(n -> n.preferredShape(constraints)).
+                    peek(Objects::requireNonNull).
+                    reduce(Shape.NULL, Shape::unionWith);
         }
 
         @Override

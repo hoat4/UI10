@@ -5,6 +5,7 @@ import ui10.image.Colors;
 import ui10.image.RGBColor;
 import ui10.renderer.java2d.AWTTextStyle;
 import ui10.ui6.Element;
+import ui10.ui6.controls.Button;
 import ui10.ui6.decoration.*;
 import ui10.ui6.decoration.css.CSSParser;
 import ui10.ui6.decoration.css.CSSScanner;
@@ -15,8 +16,10 @@ import ui10.ui6.controls.TextField;
 import ui10.ui6.window.Window;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Objects;
 
 import static ui10.ui6.decoration.css.CSSClass.withClass;
 import static ui10.ui6.layout.Layouts.*;
@@ -24,28 +27,18 @@ import static ui10.ui6.layout.Layouts.*;
 public class Main6 {
 
     public static void main(String[] args) {
-        System.out.println(Colors.WHITE.derive(-.09));
+        // System.out.println(Colors.WHITE.derive(-.09));
 
         AWTDesktop desktop = new AWTDesktop();
         TextField tf = new TextField();
 
-        TextNode tn = new TextNode();
-        tn.text("Hello world!");
-        tn.textStyle(AWTTextStyle.of(24));
-        tn.fill(new ColorFill(RGBColor.ofRGB(0x333333)));
+        Button button = new Button();
+        button.onAction.subscribe(__->System.out.println("Hello world!"));
 
-        Element content = centered(tf);
+        Element content = withClass("root", centered(button));
 
         CSSParser css;
-        try (Reader r = new StringReader("""
-                .text-field {
-                    padding: 5px;
-                    border: 1px solid linear-gradient(to bottom, #CDCDCD, #B8B8B8);
-                    background: linear-gradient(from 0px 0px to 0px 5px, #E8E8E8, #fff);
-                    border-radius: 5px;
-                 }
-                .text { font-size: 16px; color: #323232; }
-                """)) {
+        try (Reader r = new InputStreamReader(Main6.class.getResourceAsStream("modena-imitation.css"))) {
             css = new CSSParser(new CSSScanner(r));
             css.parseCSS();
         } catch (IOException e) {

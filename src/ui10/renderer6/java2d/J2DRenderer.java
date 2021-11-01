@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class J2DRenderer {
 
-    private final EventLoop eventLoop;
+    public final EventLoop eventLoop;
 
     Item<?> root;
     Container c;
@@ -41,15 +41,15 @@ public class J2DRenderer {
         Rectangle rect = new Rectangle(
                 c.getWidth() - c.getInsets().left - c.getInsets().right,
                 c.getHeight() - c.getInsets().top - c.getInsets().bottom);
-        System.out.println(rect);
+        //System.out.println(rect);
         root.node.applyShape(J2DUtil.rect((java.awt.Rectangle) rect), (surface) -> {
         });
 
-        //root.width = rect.width;
-        //root.height = rect.height;
         root.draw(g);
-        System.err.println("done");
+        //System.err.println("done");
         g.dispose();
+
+        Toolkit.getDefaultToolkit().sync();
     }
 
     public void requestRepaint() {

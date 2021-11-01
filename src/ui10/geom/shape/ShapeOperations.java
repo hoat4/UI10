@@ -31,7 +31,20 @@ public class ShapeOperations {
     }
 
     public static Shape translate(Shape shape, Point point) {
-        return transform(shape, p -> p.add(point));
+        if (point.equals(Point.ORIGO))
+            return shape;
+
+        return new TransformedShape(shape) {
+            @Override
+            protected Point transform(Point p) {
+                return p.add(point);
+            }
+
+            @Override
+            public String toString() {
+                return shape+" translated by "+point;
+            }
+        };
     }
 
 
@@ -46,25 +59,55 @@ public class ShapeOperations {
                 b.add(p.transform(op));
             return b;
         };
+    }
 
+    private static abstract class TransformedShape implements Shape {
+        private final Shape original;
+
+        public TransformedShape(Shape original) {
+            this.original = original;
+        }
+
+        @Override
+        public List<Path> outlines() {
+            List<Path> a = original.outlines(), b = new ArrayList<>();
+            for (Path p : a)
+                b.add(p.transform(this::transform));
+            return b;
+        }
+
+        protected abstract Point transform(Point p);
     }
 
     public static Shape intoBounds(Shape shape, Rectangle b) {
         Rectangle a = shape.bounds();
-        Shape s = transform(shape, p -> {
-            // ceilDiv(40 * 39, 41) == 39
-            assert  ceilDiv((p.y() - a.top()) * (b.height()-1), a.height()-1) < b.height():
-                    ceilDiv((p.y() - a.top()) * (b.height()-1), a.height()-1)+", "+b.height()+", "+(p.y()-a.top())+", "+a;
-            return new Point(
-                    b.left() + ceilDiv((p.x() - a.left()) * (b.width()-1), a.width()-1),
-                    b.top() + ceilDiv((p.y() - a.top()) * (b.height()-1), a.height()-1));
-        });
-        System.out.println(s.bounds()+" vs "+b);
+        Shape s = new TransformedShape(shape) {
+            @Override
+            protected Point transform(Point p) {
+                // ceilDiv(40 * 39, 41) == 39
+                //assert ceilDiv((p.y() - a.top()) * (b.height() - 1), a.height() - 1) < b.height() :
+                // ceilDiv((p.y() - a.top()) * (b.height() - 1), a.height() - 1) + ", " + b.height() + ", " + (p.y() - a.top()) + ", " + a;
+                return new Point(
+                        b.left() + ceilDiv((p.x() - a.left()) * (b.width() - 1), a.width() - 1),
+                        b.top() + ceilDiv((p.y() - a.top()) * (b.height() - 1), a.height() - 1));
+            }
+
+            @Override
+            public Shape intoBounds(Rectangle bounds) {
+                return ShapeOperations.intoBounds(shape, bounds);
+            }
+
+            @Override
+            public String toString() {
+                return shape + " into " + b;
+            }
+        };
+        assert s.bounds().equals(b.bounds()) : s.bounds() + ", " + shape.bounds() + ", " + a.bounds();
         return s;
     }
 
     public static Shape union(Shape a, Shape b) {
-        throw new UnsupportedOperationException(a+", "+b);
+        throw new UnsupportedOperationException(a + ", " + b);
     }
 
     public static Shape intersection(Shape shape, Shape other) {

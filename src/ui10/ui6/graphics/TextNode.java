@@ -41,8 +41,10 @@ public class TextNode extends RenderableElement {
     }
 
     public TextNode fill(Element fill) {
-        this.fill = fill;
-        invalidateRendererData();
+        if (!Objects.equals(fill, this.fill)) {
+            this.fill = fill;
+           // invalidateRendererData();
+        }
         return this;
     }
 
@@ -51,13 +53,15 @@ public class TextNode extends RenderableElement {
     }
 
     public TextNode textStyle(TextStyle textStyle) {
-        this.textStyle = textStyle;
-        invalidateRendererData();
+        if (!Objects.equals(textStyle, this.textStyle)) {
+            this.textStyle = textStyle;
+            //invalidateRendererData();
+        }
         return this;
     }
 
     @Override
-    public void enumerateLogicalChildren(Consumer<Element> consumer) {
+    public void enumerateStaticChildren(Consumer<Element> consumer) {
         consumer.accept(fill);
     }
 

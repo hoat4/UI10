@@ -16,6 +16,16 @@ public class CSSClass extends Attribute {
         return "." + name;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return this == o || o instanceof CSSClass c && c.name.equals(name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
     public static <E extends Element> E withClass(String className, E elem) {
         return attr(elem, new CSSClass(className));
     }

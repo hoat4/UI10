@@ -4,9 +4,8 @@ import ui10.input.InputEvent;
 
 public abstract class Control extends Pane {
 
-    public boolean capture(InputEvent event) {
-        return false;
+    public void capture(InputEvent event, EventContext context) {
     }
 
-    public abstract boolean bubble(InputEvent event);
+    public abstract void bubble(InputEvent event, EventContext context);
 }

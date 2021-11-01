@@ -1,6 +1,7 @@
 package ui10.renderer6.java2d;
 
 import ui10.geom.Point;
+import ui10.nodes.EventLoop;
 import ui10.ui6.*;
 
 import java.awt.*;
@@ -27,6 +28,13 @@ public class AWTWindowImpl extends Frame implements RendererData {
         renderer.root = renderer.makeItem(RenderableElement.of(window.getContent()));
 
         enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
+
+        setTitle("Ablak");
+    }
+
+    @Override
+    public EventLoop eventLoop() {
+        return desktop.eventLoop;
     }
 
     @Override
@@ -52,12 +60,12 @@ public class AWTWindowImpl extends Frame implements RendererData {
         switch (e.getID()) {
             case java.awt.event.MouseEvent.MOUSE_PRESSED:
                 dispatchMouseEvent(new ui10.input.pointer.MouseEvent.MousePressEvent(
-                        new Point(e.getX()-getInsets().left, e.getY()-getInsets().top),
+                        new Point(e.getX() - getInsets().left, e.getY() - getInsets().top),
                         translateMouseButton(e.getButton())));
                 break;
             case java.awt.event.MouseEvent.MOUSE_RELEASED:
                 dispatchMouseEvent(new MouseEvent.MouseReleaseEvent(
-                        new Point(e.getX()-getInsets().left, e.getY()-getInsets().top),
+                        new Point(e.getX() - getInsets().left, e.getY() - getInsets().top),
                         translateMouseButton(e.getButton())));
                 break;
         }
@@ -65,11 +73,14 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
     private void dispatchMouseEvent(MouseEvent e) {
         List<Control> l = new ArrayList<>();
-        if (renderer.root.captureMouseEvent(e, l))
+        EventContext eventContext = new EventContext();
+        if (!renderer.root.captureMouseEvent(e, l, eventContext))
             return;
-        for (int i = l.size()-1; i>=0; i--) {
-            if (l.get(i).bubble(e))
-                return;
+        for (int i = l.size() - 1; i >= 0; i--) {
+            if (eventContext.stopPropagation)
+                break;
+
+            l.get(i).bubble(e, eventContext);
         }
     }
 

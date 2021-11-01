@@ -21,7 +21,7 @@ public class Border extends Element.TransientElement {
     }
 
     @Override
-    public void enumerateLogicalChildren(Consumer<Element> consumer) {
+    public void enumerateStaticChildren(Consumer<Element> consumer) {
         consumer.accept(content);
         consumer.accept(fill);
     }

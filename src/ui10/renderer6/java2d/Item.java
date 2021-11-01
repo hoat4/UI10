@@ -1,12 +1,9 @@
 package ui10.renderer6.java2d;
 
-import ui10.geom.IntTransformationMatrix;
-import ui10.geom.Transformation;
-import ui10.geom.shape.Path;
-import ui10.geom.shape.Shape;
-import ui10.geom.shape.StandardPathElement;
 import ui10.input.pointer.MouseEvent;
+import ui10.nodes.EventLoop;
 import ui10.ui6.Control;
+import ui10.ui6.EventContext;
 import ui10.ui6.RenderableElement;
 import ui10.ui6.RendererData;
 
@@ -15,7 +12,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.TexturePaint;
-import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,6 +31,11 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
         this.renderer = renderer;
         this.node = node;
         node.rendererData = this;
+    }
+
+    @Override
+    public EventLoop eventLoop() {
+        return renderer.eventLoop;
     }
 
     @Override
@@ -68,7 +69,7 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
 
     protected abstract void drawImpl(Graphics2D g);
 
-    public boolean captureMouseEvent(MouseEvent p, List<Control> l) {
+    public boolean captureMouseEvent(MouseEvent p, List<Control> l, EventContext eventContext) {
         return false;
     }
 
@@ -94,6 +95,5 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
 
         return new TexturePaint(bufferedImage, bounds);
     }
-
 
 }

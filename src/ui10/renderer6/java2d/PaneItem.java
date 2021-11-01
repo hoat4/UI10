@@ -2,6 +2,7 @@ package ui10.renderer6.java2d;
 
 import ui10.input.pointer.MouseEvent;
 import ui10.ui6.Control;
+import ui10.ui6.EventContext;
 import ui10.ui6.Pane;
 import ui10.ui6.RenderableElement;
 
@@ -37,21 +38,23 @@ public class PaneItem extends Item<Pane> {
     }
 
     @Override
-    public boolean captureMouseEvent(MouseEvent p, List<Control> l) {
-        // if (node.eventHandler != null) {
-        //    if (node.eventHandler.capture(p))
-        //        return true;
-        //
-        //    l.add(node.eventHandler);
-        // }
+    public boolean captureMouseEvent(MouseEvent p, List<Control> l, EventContext eventContext) {
+        if (node instanceof Control c) {
+            c.capture(p, eventContext);
+            if (eventContext.stopPropagation)
+                return true;
 
-        for (Item<?> item : children)  {
-            if (item.shape.contains(J2DUtil.point(p.point()))) {
-                return item.captureMouseEvent(p, l);
+            l.add(c);
+        }
+
+        for (Item<?> item : children) {
+            if (item.shape.contains(J2DUtil.point(p.point())) && item.captureMouseEvent(p, l, eventContext)) {
+                return true;
                 //return item.captureMouseEvent(p.subtract(new Point(item.x, item.y)), l);
             }
         }
-        return false;
+
+        return node instanceof Control;
     }
 
 }
