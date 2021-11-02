@@ -1,6 +1,8 @@
 package ui10.renderer6.java2d;
 
 import ui10.geom.Insets;
+import ui10.geom.Rectangle;
+import ui10.geom.Size;
 import ui10.image.Colors;
 import ui10.image.RGBColor;
 import ui10.renderer.java2d.AWTTextStyle;

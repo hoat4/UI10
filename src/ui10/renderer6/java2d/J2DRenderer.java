@@ -8,52 +8,79 @@ import ui10.ui6.graphics.LinearGradient;
 import ui10.ui6.graphics.TextNode;
 
 import java.awt.*;
+import java.awt.image.BufferStrategy;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 public class J2DRenderer {
 
     public final EventLoop eventLoop;
 
     Item<?> root;
-    Container c;
+    Window c;
+
+    private Rectangle prevSize;
 
     public J2DRenderer(EventLoop eventLoop) {
         this.eventLoop = eventLoop;
     }
 
     public void draw() {
-        Graphics2D g = (Graphics2D) c.getGraphics();
+        BufferStrategy bs = c.getBufferStrategy();
 
-        Map<?, ?> desktopHints = (Map<?, ?>) Toolkit.getDefaultToolkit().
-                getDesktopProperty("awt.font.desktophints");
+        do {
+            do {
+                Graphics2D g = (Graphics2D) bs.getDrawGraphics();
 
-        if (desktopHints != null) {
-            g.setRenderingHints(desktopHints);
-        } else {
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        }
+                Map<?, ?> desktopHints = (Map<?, ?>) Toolkit.getDefaultToolkit().
+                        getDesktopProperty("awt.font.desktophints");
+
+                if (desktopHints != null) {
+                    g.setRenderingHints(desktopHints);
+                } else {
+                    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                }
 //        System.out.println(desktopHints);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.translate(c.getInsets().left, c.getInsets().top);
+                g.translate(c.getInsets().left, c.getInsets().top);
 
 
-        Rectangle rect = new Rectangle(
-                c.getWidth() - c.getInsets().left - c.getInsets().right,
-                c.getHeight() - c.getInsets().top - c.getInsets().bottom);
-        //System.out.println(rect);
-        root.node.applyShape(J2DUtil.rect((java.awt.Rectangle) rect), (surface) -> {
-        });
+                Rectangle rect = new Rectangle(
+                        c.getWidth() - c.getInsets().left - c.getInsets().right,
+                        c.getHeight() - c.getInsets().top - c.getInsets().bottom);
+                //System.out.println(rect);
 
-        root.draw(g);
-        //System.err.println("done");
-        g.dispose();
+                long layoutBegin = System.nanoTime();
+                if (!Objects.equals(prevSize, rect)) {
+                    root.node.applyShape(J2DUtil.rect(rect), (surface) -> {
+                    });
+                    prevSize = rect;
+                }
+
+                long layoutEnd = System.nanoTime();
+
+                root.draw(g);
+
+                long drawEnd = System.nanoTime();
+                System.err.println("Layout " + (layoutEnd - layoutBegin) / 1000 + ", draw " + (drawEnd - layoutEnd) / 1000);
+
+                g.dispose();
+            } while (bs.contentsRestored());
+            bs.show();
+        } while (bs.contentsLost());
 
         Toolkit.getDefaultToolkit().sync();
     }
 
-    public void requestRepaint() {
-        eventLoop.runLater(this::draw);
+    public CompletableFuture<Void> requestRepaint() {
+        CompletableFuture<Void> cf = new CompletableFuture<>();
+        eventLoop.runLater(()->{
+            draw();
+            cf.complete(null);
+        });
+        return cf;
     }
 
 

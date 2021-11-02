@@ -12,6 +12,7 @@ import ui10.ui6.window.Window;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class AWTWindowImpl extends Frame implements RendererData {
 
@@ -28,8 +29,10 @@ public class AWTWindowImpl extends Frame implements RendererData {
         renderer.root = renderer.makeItem(RenderableElement.of(window.getContent()));
 
         enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
-
         setTitle("Ablak");
+
+        addNotify();
+        createBufferStrategy(2);
     }
 
     @Override
@@ -44,7 +47,13 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
     @Override
     public void paint(Graphics g1) {
-        renderer.requestRepaint();
+        try {
+            renderer.requestRepaint().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

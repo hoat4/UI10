@@ -159,8 +159,8 @@ public class Layouts {
         protected Shape preferredShapeImpl(BoxConstraints constraints) {
             Rectangle rect = content.preferredShape(constraints.withMinimum(
                     Size.max(constraints.min(), new Size(radius * 2, radius * 2)))).bounds();
-            //return new RoundedRectangle(rect, radius);
-            return rect;
+            return new RoundedRectangle(rect, radius);
+            //return rect;
         }
 
         @Override

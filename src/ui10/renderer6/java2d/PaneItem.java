@@ -22,7 +22,7 @@ public class PaneItem extends Item<Pane> {
     @Override
     protected void validateImpl() {
         children.clear();
-        for (RenderableElement n : node.children)
+        for (RenderableElement n : node.renderableElements())
             children.add(renderer.makeItem(n));
     }
 

@@ -1,9 +1,8 @@
 package ui10.renderer6.java2d;
 
 import ui10.geom.*;
-import ui10.geom.shape.Path;
+import ui10.geom.shape.BézierPath;
 import ui10.geom.shape.Shape;
-import ui10.geom.shape.StandardPathElement;
 import ui10.image.Color;
 import ui10.image.Fill;
 import ui10.image.LinearGradient;
@@ -71,44 +70,35 @@ public class J2DUtil {
 
 
     public static Path2D.Double shapeToPath2D(Shape shape) {
-        PathBuilder pb = new PathBuilder(IntTransformationMatrix.IDENTITY, null);
-        for (Path p : shape.outlines()) {
-            pb.reset();
+        PathBuilder pb = new PathBuilder();
+        for (BézierPath p : shape.outlines()) {
             p.iterate(pb);
         }
-        return pb.p;
+        return pb.path;
     }
 
-    private static class PathBuilder extends Path.PathConsumer {
+    private static class PathBuilder implements BézierPath.PathConsumer {
 
-        public final Path2D.Double p = new Path2D.Double(Path2D.WIND_EVEN_ODD);
-        private boolean first = true;
+        public final Path2D.Double path = new Path2D.Double(Path2D.WIND_EVEN_ODD);
 
-        public PathBuilder(Transformation transformation, Shape clip) {
-            super(transformation, clip);
-        }
-
-        protected void reset() {
-            super.reset();
-            first = true;
+        @Override
+        public void moveTo(Point p) {
+            path.moveTo(p.x(), p.y());
         }
 
         @Override
-        protected void addPointImpl(ui10.geom.Point point) {
-            if (first) {
-                p.moveTo(point.x(), point.y());
-                first = false;
-            } else
-                p.lineTo(point.x(), point.y());
+        public void lineTo(Point p) {
+            path.lineTo(p.x(), p.y());
         }
 
         @Override
-        public void addSubpath(Path path) {
-            if (path instanceof StandardPathElement.QuadCurveTo) {
-                StandardPathElement.QuadCurveTo q = (StandardPathElement.QuadCurveTo) path;
-                p.quadTo(q.control().x(), q.control().y(), q.p().x(), q.p().y());
-            } else
-                super.addSubpath(path);
+        public void quadCurveTo(Point p, Point control) {
+            path.quadTo(control.x(), control.y(), p.x(), p.y());
+        }
+
+        @Override
+        public void cubicCurveTo(Point p, Point control1, Point control2) {
+            path.curveTo(control1.x(), control1.y(),control2.x(), control2.y(), p.x(), p.y());
         }
     }
 }

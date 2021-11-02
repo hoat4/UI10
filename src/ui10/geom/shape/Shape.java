@@ -1,39 +1,48 @@
 package ui10.geom.shape;
 
-import ui10.geom.Insets;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 
 import java.util.List;
 
-public interface Shape {
+public abstract class Shape {
 
-    Shape NULL = Rectangle.of(Size.ZERO);
+    public static final Shape NULL = Rectangle.of(Size.ZERO);
 
-    List<Path> outlines();
+    public abstract List<BézierPath> outlines();
 
-    default Rectangle bounds() {
+    public Rectangle bounds() {
         return ShapeOperations.bounds(this);
     }
 
-    default Shape translate(Point point) {
+    public Shape translate(Point point) {
         return ShapeOperations.translate(this, point);
     }
 
-    default Shape intoBounds(Rectangle bounds) {
+    public Shape intoBounds(Rectangle bounds) {
         return ShapeOperations.intoBounds(this, bounds);
     }
 
-    default Shape unionWith(Shape other) {
+    public Shape unionWith(Shape other) {
         return ShapeOperations.union(this, other);
     }
 
-    default Shape intersectionWith(Shape other) {
+    public Shape intersectionWith(Shape other) {
         return ShapeOperations.intersection(this, other);
     }
 
-    default Shape subtract(Shape other) {
+    public Shape subtract(Shape other) {
         return ShapeOperations.subtract(this, other);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Shape s && outlines().equals(s.outlines());
+    }
+
+    @Override
+    public int hashCode() {
+        return outlines().hashCode();
     }
 }

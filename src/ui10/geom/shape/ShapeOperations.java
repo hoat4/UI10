@@ -1,32 +1,28 @@
 package ui10.geom.shape;
 
 import ui10.geom.*;
-import ui10.renderer6.java2d.J2DUtil;
 
-import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public class ShapeOperations {
 
     public static Rectangle bounds(Shape shape) {
-        class ComputeBounds extends Path.PathConsumer {
+        class ComputeBounds implements Consumer<Point> {
 
             private Point min, max;
 
             @Override
-            protected void addPointImpl(Point p) {
+            public void accept(Point p) {
                 min = Point.min(min, p);
                 max = Point.max(max, p);
             }
         }
 
         ComputeBounds cb = new ComputeBounds();
-        shape.outlines().forEach(p -> {
-            cb.reset();
-            p.iterate(cb);
-        });
+        shape.outlines().forEach(p -> p.iterate(BézierPath.PathConsumer.visitAllPoints(cb)));
         return Rectangle.of(cb.min, cb.max);
     }
 
@@ -42,7 +38,7 @@ public class ShapeOperations {
 
             @Override
             public String toString() {
-                return shape+" translated by "+point;
+                return shape + " translated by " + point;
             }
         };
     }
@@ -53,15 +49,18 @@ public class ShapeOperations {
     }
 
     public static Shape transform(Shape shape, UnaryOperator<Point> op) {
-        return () -> {
-            List<Path> a = shape.outlines(), b = new ArrayList<>();
-            for (Path p : a)
-                b.add(p.transform(op));
-            return b;
+        return new Shape() {
+            @Override
+            public List<BézierPath> outlines() {
+                List<BézierPath> a = shape.outlines(), b = new ArrayList<>();
+                for (BézierPath p : a)
+                    b.add(p.transform(op));
+                return b;
+            }
         };
     }
 
-    private static abstract class TransformedShape implements Shape {
+    private static abstract class TransformedShape extends Shape {
         private final Shape original;
 
         public TransformedShape(Shape original) {
@@ -69,9 +68,9 @@ public class ShapeOperations {
         }
 
         @Override
-        public List<Path> outlines() {
-            List<Path> a = original.outlines(), b = new ArrayList<>();
-            for (Path p : a)
+        public List<BézierPath> outlines() {
+            List<BézierPath> a = original.outlines(), b = new ArrayList<>();
+            for (BézierPath p : a)
                 b.add(p.transform(this::transform));
             return b;
         }
@@ -107,7 +106,8 @@ public class ShapeOperations {
     }
 
     public static Shape union(Shape a, Shape b) {
-        throw new UnsupportedOperationException(a + ", " + b);
+        System.out.println("unsupported union: " + a + ", " + b + ", fallbacking to bounds union");
+        return Rectangle.union(a.bounds(), b.bounds());
     }
 
     public static Shape intersection(Shape shape, Shape other) {
@@ -115,9 +115,14 @@ public class ShapeOperations {
     }
 
     public static Shape subtract(Shape a, Shape b) {
-        List<Path> o1 = a.outlines(), o2 = b.outlines();
+        List<BézierPath> o1 = a.outlines(), o2 = b.outlines();
         if (o1.size() == 1 && o2.size() == 1)
-            return () -> List.of(o2.get(0), o1.get(0));
+            return new Shape() {
+                @Override
+                public List<BézierPath> outlines() {
+                    return List.of(o2.get(0), o1.get(0));
+                }
+            };
         else
             throw new UnsupportedOperationException();
     }

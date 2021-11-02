@@ -13,7 +13,7 @@ import java.util.function.UnaryOperator;
 
 public abstract class Pane extends RenderableElement {
 
-    public final List<RenderableElement> children = new ArrayList<>();
+    private final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
 
     public BiConsumer<Element, Element> decorator;
@@ -30,6 +30,12 @@ public abstract class Pane extends RenderableElement {
         if (decorator != null)
             decorator.accept(this, content);
         return content;
+    }
+
+    public List<RenderableElement> renderableElements() {
+        if (!valid)
+            onShapeApplied(shape, null);
+        return children;
     }
 
     protected void validate() {

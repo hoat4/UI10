@@ -1,14 +1,29 @@
 package ui10.geom;
 
-import ui10.geom.shape.Path;
-import ui10.geom.shape.Polyline;
+import ui10.geom.shape.BézierPath;
 import ui10.geom.shape.Shape;
 
 import java.util.List;
 
 import static ui10.geom.Point.ORIGO;
 
-public record Rectangle(Point topLeft, Size size) implements Shape {
+public class Rectangle extends Shape {
+
+    private final Point topLeft;
+    private final Size size;
+
+    public Rectangle(Point topLeft, ui10.geom.Size size) {
+        this.topLeft = topLeft;
+        this.size = size;
+    }
+
+    public Point topLeft() {
+        return topLeft;
+    }
+
+    public Size size() {
+        return size;
+    }
 
     public Rectangle(int x, int y, int w, int h) {
         this(new Point(x, y), new Size(w, h));
@@ -36,7 +51,7 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
         return topLeft.add(0, size.height()).subtract(new Size(0, 1));
     }
 
-    public static Rectangle union(Rectangle a, Rectangle b) {
+    public static Rectangle union(Rectangle a, Rectangle b) { // ez valójában nem is unió
         if (a == null || a.isEmpty())
             return b;
         if (b == null || b.isEmpty())
@@ -135,13 +150,15 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
 
 
     @Override
-    public List<Path> outlines() {
-        return List.of(new Polyline(List.of(
-                rightTop().add(1, 0),
-                rightBottom().add(1, 1),
-                leftBottom().add(0, 1),
-                topLeft()
-        )));
+    public List<BézierPath> outlines() {
+        return List.of(
+                BézierPath.builder().
+                        moveTo(rightTop().add(1, 0)).
+                        lineTo(rightBottom().add(1, 1)).
+                        lineTo(leftBottom().add(0, 1)).
+                        lineTo(topLeft()).
+                        build()
+        );
     }
 
     @Override
@@ -150,7 +167,7 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
             return other;
 
         if (!(other instanceof Rectangle))
-            return Shape.super.unionWith(other);
+            return super.unionWith(other);
 
         return union(this, (Rectangle) other);
     }
@@ -186,6 +203,6 @@ public record Rectangle(Point topLeft, Size size) implements Shape {
 
     @Override
     public String toString() {
-        return "Rect {"+topLeft+" "+size+"}";
+        return "Rect {" + topLeft + " " + size + "}";
     }
 }

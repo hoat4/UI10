@@ -3,9 +3,7 @@ package ui10.ui6;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 public interface Element {
@@ -20,13 +18,13 @@ public interface Element {
 
     void replacement(Element e);
 
-    List<Attribute> attributes();
+    Set<Attribute> attributes();
 
     abstract class TransientElement implements Element {
 
         private Element replacement;
         private boolean inReplacement;
-        private final List<Attribute> attributes = new ArrayList<>();
+        private final Set<Attribute> attributes = new HashSet<>();
 
         @Override
         public abstract void enumerateStaticChildren(Consumer<Element> consumer);
@@ -80,7 +78,7 @@ public interface Element {
         }
 
         @Override
-        public List<Attribute> attributes() {
+        public Set<Attribute> attributes() {
             return attributes;
         }
     }

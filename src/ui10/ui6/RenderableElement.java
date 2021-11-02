@@ -1,13 +1,10 @@
 package ui10.ui6;
 
-import ui10.binding.PropertyEvent;
 import ui10.binding.PropertyHolder;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 public abstract class RenderableElement extends PropertyHolder implements Element {
@@ -21,10 +18,10 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
 
     // this should become a manual linked list, standard collections has large memory overhead
 
-    private final List<Attribute> attributeList = new ArrayList<>();
+    private final Set<Attribute> attributeList = new HashSet<>();
 
     @Override
-    public List<Attribute> attributes() {
+    public Set<Attribute> attributes() {
         return attributeList; // onChange
     }
 
@@ -74,7 +71,11 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
 
         context.accept(this);
 
+        boolean changed = !Objects.equals(this.shape, shape);
         this.shape = shape;
+        if (changed && rendererData != null)
+            rendererData.invalidateRendererData();
+
         onShapeApplied(shape, context);
     }
 
