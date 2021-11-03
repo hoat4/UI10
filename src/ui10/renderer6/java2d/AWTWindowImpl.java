@@ -88,16 +88,18 @@ public class AWTWindowImpl extends Frame implements RendererData {
     }
 
     private void dispatchMouseEvent(MouseEvent e) {
-        List<Control> l = new ArrayList<>();
-        EventContext eventContext = new EventContext();
-        if (!renderer.root.captureMouseEvent(e, l, eventContext))
-            return;
-        for (int i = l.size() - 1; i >= 0; i--) {
-            if (eventContext.stopPropagation)
-                break;
+        eventLoop().runLater(() -> {
+            List<Control> l = new ArrayList<>();
+            EventContext eventContext = new EventContext();
+            if (!renderer.root.captureMouseEvent(e, l, eventContext))
+                return;
+            for (int i = l.size() - 1; i >= 0; i--) {
+                if (eventContext.stopPropagation)
+                    break;
 
-            l.get(i).bubble(e, eventContext);
-        }
+                l.get(i).bubble(e, eventContext);
+            }
+        });
     }
 
     private ui10.input.pointer.MouseEvent.MouseButton translateMouseButton(int mouseButton) {

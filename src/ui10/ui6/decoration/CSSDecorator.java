@@ -93,8 +93,10 @@ public class CSSDecorator extends Element.TransientElement {
         for (Attribute a : attributes) {
             Rule r = css.rules.get(a);
             if (r != null) {
-                r.defaultsFrom(rule);
-                rule = r;
+                Rule r2 = new Rule();
+                r2.defaultsFrom(r);
+                r2.defaultsFrom(rule);
+                rule = r2;
             }
         }
         return rule;
