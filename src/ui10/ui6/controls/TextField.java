@@ -6,14 +6,13 @@ import ui10.geom.shape.Shape;
 import ui10.image.Colors;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
-import ui10.ui6.LayoutContext;
+import ui10.ui6.layout.LayoutContext2;
 import ui10.ui6.Pane;
 import ui10.ui6.decoration.css.CSSClass;
 import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.TextNode;
-import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.LayoutContext1;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import static ui10.ui6.decoration.css.CSSClass.withClass;
@@ -40,18 +39,17 @@ public class TextField extends Pane {
             }
 
             @Override
-            protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
-                LayoutResult lr = textNode.preferredShape(constraints);
-                return new LayoutResult(lr.shape(), this, lr);
+            protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
+                return textNode.preferredShape(constraints, context);
             }
 
             @Override
-            protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
-                textNode.performLayout(TextField.this.shape, context, lr);
+            protected void applyShapeImpl(Shape shape, LayoutContext2 context) {
+                textNode.performLayout(TextField.this.shape, context);
 
                 Rectangle caretShape = new Rectangle(caretPosition.get(), 0, 1, shape.bounds().size().height()).
                         translate(shape.bounds().topLeft());
-                caret.performLayout(caretShape, context, List.of());
+                caret.performLayout(caretShape, context);
             }
 
         };

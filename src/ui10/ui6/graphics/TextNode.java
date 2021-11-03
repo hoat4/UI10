@@ -5,11 +5,10 @@ import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
-import ui10.ui6.LayoutContext;
+import ui10.ui6.layout.LayoutContext2;
 import ui10.ui6.RenderableElement;
-import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.LayoutContext1;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -68,18 +67,12 @@ public class TextNode extends RenderableElement {
     }
 
     @Override
-    protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
-        Rectangle rect = Rectangle.of(textStyle.textSize(text).size().divide(1000));
-        return new LayoutResult(rect, this, new RH(constraints, rect));
+    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+        return Rectangle.of(textStyle.textSize(text).size().divide(1000));
     }
 
     @Override
-    protected void onShapeApplied(Shape shape, LayoutContext context, List<LayoutResult> dependencies) {
-        fill.performLayout(shape, r -> {
-        }, List.of());
-    }
-
-    private record RH(BoxConstraints c, Shape s) {
-
+    protected void onShapeApplied(Shape shape, LayoutContext2 context) {
+        fill.performLayout(shape,LayoutContext2.ignoring());
     }
 }

@@ -5,9 +5,9 @@ import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.LayoutContext;
+import ui10.ui6.layout.LayoutContext2;
 import ui10.ui6.RenderableElement;
-import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.LayoutContext1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +38,8 @@ public class LinearGradient extends RenderableElement {
     }
 
     @Override
-    protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
-        return new LayoutResult(Rectangle.of(constraints.min()), this, List.of());
+    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+        return Rectangle.of(constraints.min());
     }
 
     public record Stop(Color color, int pos) {
@@ -48,7 +48,7 @@ public class LinearGradient extends RenderableElement {
     public static LinearGradient vertical(Color from, Color to) {
         return new LinearGradient() {
             @Override
-            protected void onShapeApplied(Shape shape, LayoutContext context, List<LayoutResult> dependencies) {
+            protected void onShapeApplied(Shape shape, LayoutContext2 context) {
                 stops.clear();
                 stops.add(new Stop(from, 0));
                 stops.add(new Stop(to, shape.bounds().size().height() - 1));

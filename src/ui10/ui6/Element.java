@@ -2,18 +2,21 @@ package ui10.ui6;
 
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.LayoutContext1;
+import ui10.ui6.layout.LayoutContext2;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public interface Element {
 
     // LAYOUT
 
-    LayoutResult preferredShape(BoxConstraints constraints); // this honors replacement
+    Shape preferredShape(BoxConstraints constraints, LayoutContext1 context); // this honors replacement
 
-    void performLayout(Shape shape, LayoutContext context, List<LayoutResult> lr); // this also honors replacement
+    void performLayout(Shape shape, LayoutContext2 context); // this also honors replacement
 
     // DECORATION
 
@@ -47,44 +50,41 @@ public interface Element {
         public abstract void enumerateStaticChildren(Consumer<Element> consumer);
 
         @Override
-        public LayoutResult preferredShape(BoxConstraints constraints) {
+        public Shape preferredShape(BoxConstraints constraints, LayoutContext1 context) {
             if (replacement == null || inReplacement) {
-                LayoutResult preferredShape = preferredShapeImpl(constraints);
+                Shape preferredShape = preferredShapeImpl(constraints, context);
+                preferredShape = preferredShape.translate(preferredShape.bounds().topLeft().negate());
                 Objects.requireNonNull(preferredShape, () -> this + " returned null preferred layout");
-                assert preferredShape.elementClass() == getClass();
                 return preferredShape;
             } else {
                 boolean r = inReplacement;
                 inReplacement = true;
                 try {
-                    return replacement.preferredShape(constraints);
+                    return replacement.preferredShape(constraints, context);
                 } finally {
                     inReplacement = r;
                 }
             }
         }
 
-        protected abstract LayoutResult preferredShapeImpl(BoxConstraints constraints);
+        protected abstract Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context);
 
         @Override
-        public void performLayout(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+        public void performLayout(Shape shape, LayoutContext2 context) {
             if (replacement == null || inReplacement) {
-                for (LayoutResult l : lr)
-                    assert l.elementClass() == getClass() : this + ", " + l;
-
-                applyShapeImpl(shape, context, lr);
+                applyShapeImpl(shape, context);
             } else {
                 boolean r = inReplacement;
                 inReplacement = true;
                 try {
-                    replacement.performLayout(shape, context, lr);
+                    replacement.performLayout(shape, context);
                 } finally {
                     inReplacement = r;
                 }
             }
         }
 
-        protected abstract void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr);
+        protected abstract void applyShapeImpl(Shape shape, LayoutContext2 context);
 
         @Override
         public Element replacement() {

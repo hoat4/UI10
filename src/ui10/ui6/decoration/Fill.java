@@ -5,14 +5,13 @@ import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
-import ui10.ui6.LayoutContext;
+import ui10.ui6.layout.LayoutContext2;
 import ui10.ui6.decoration.css.Length;
 import ui10.ui6.graphics.LinearGradient;
-import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.LayoutContext1;
 import ui10.ui6.layout.Layouts;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public interface Fill {
 
@@ -37,14 +36,14 @@ public interface Fill {
             return new Layouts.SingleNodeLayout(g) {
 
                 @Override
-                protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
-                    LayoutResult lr = g.preferredShape(constraints);
-                    return new LayoutResult(lr.shape(), this, lr);
+                protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
+                    return g.preferredShape(constraints, context);
                 }
 
                 @Override
-                protected void applyShapeImpl(Shape shape, LayoutContext layoutContext, List<LayoutResult> lr) {
-                    context.parentSize = shape.bounds().size();
+                protected Shape computeContentShape(Shape containerShape, LayoutContext2 layoutContext) {
+                    context.parentSize = containerShape.bounds().size();
+
                     try {
                         int length = Point.distance(from.makePoint(context), to.makePoint(context));
 
@@ -57,7 +56,7 @@ public interface Fill {
                         context.parentSize = null;
                     }
 
-                    g.performLayout(shape, layoutContext, unwrap(lr));
+                    return containerShape;
                 }
 
             };

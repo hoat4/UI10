@@ -4,12 +4,10 @@ import ui10.geom.Insets;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
-import ui10.ui6.LayoutContext;
-import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.LayoutContext2;
+import ui10.ui6.layout.LayoutContext1;
 
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class Border extends Element.TransientElement {
 
@@ -30,21 +28,15 @@ public class Border extends Element.TransientElement {
     }
 
     @Override
-    protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
-        LayoutResult contentLR = content.preferredShape(constraints.subtract(insets.all()));
-        return new LayoutResult(
-                insets.addTo(contentLR.shape()),
-                this,
-                contentLR
-        );
+    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return insets.addTo(content.preferredShape(constraints.subtract(insets.all()), context));
     }
 
     @Override
-    protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+    protected void applyShapeImpl(Shape shape, LayoutContext2 context) {
         Shape contentShape = insets.removeFrom(shape);
 
-        fill.performLayout(shape.subtract(contentShape), context, List.of());
-        content.performLayout(contentShape, context, lr.stream().
-                map(l -> (LayoutResult) l.obj()).collect(Collectors.toList()));
+        fill.performLayout(shape.subtract(contentShape), context);
+        content.performLayout(contentShape, context);
     }
 }

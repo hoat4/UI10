@@ -1,12 +1,12 @@
 package ui10.renderer6.java2d;
 
 import ui10.nodes.EventLoop;
+import ui10.ui6.layout.LayoutContext2;
 import ui10.ui6.Pane;
 import ui10.ui6.RenderableElement;
 import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.LinearGradient;
 import ui10.ui6.graphics.TextNode;
-import ui10.ui6.layout.LayoutResult;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -55,8 +55,11 @@ public class J2DRenderer {
 
                 long layoutBegin = System.nanoTime();
                 if (!Objects.equals(prevSize, rect)) {
-                    root.node.performLayout(J2DUtil.rect(rect), (surface) -> {
-                    }, java.util.List.of());
+                    root.node.performLayout(J2DUtil.rect(rect), new LayoutContext2.AbstractLayoutContext2() {
+                        @Override
+                        public void accept(RenderableElement element) {
+                        }
+                    });
                     prevSize = rect;
                 }
 

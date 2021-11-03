@@ -3,7 +3,8 @@ package ui10.ui6;
 import ui10.binding.PropertyEvent;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.LayoutContext1;
+import ui10.ui6.layout.LayoutContext2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,13 @@ public abstract class Pane extends RenderableElement {
 
     public List<RenderableElement> renderableElements() {
         if (!valid)
-            onShapeApplied(shape, null, layoutDependencies);
+            onShapeApplied(shape, new LayoutContext2.AbstractLayoutContext2() {
+
+                @Override
+                public void accept(RenderableElement element) {
+                    throw new UnsupportedOperationException();
+                }
+            });
         return children;
     }
 
@@ -52,14 +59,18 @@ public abstract class Pane extends RenderableElement {
                 return;
             valid2 = true;
 
-            for (LayoutResult lr : layoutDependencies)
-                if (!preferredShape(((PaneLR)lr.obj()).inputConstraints).shape().equals(lr.shape())) {
+            final LayoutContext1 consumer = (pane, dep) -> {
+                // these known shapes could be used later to avoid computing preferred shapes redundantly
+            };
+
+            for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
+                if (!preferredShape(dep.inputConstraints(), consumer).equals(dep.shape())) {
                     rendererData.invalidateLayout();
                     break;
                 }
+            }
 
             this.invalidatePane();
-
         });
     }
 
@@ -74,21 +85,31 @@ public abstract class Pane extends RenderableElement {
     }
 
     @Override
-    protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
-        LayoutResult lr = getContent().preferredShape(constraints);
-        return new LayoutResult(lr.shape(), this, new PaneLR(constraints, lr));
+    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return getContent().preferredShape(constraints, context);
     }
 
     @Override
-    protected void onShapeApplied(Shape lr, LayoutContext context, List<LayoutResult> dependencies) {
-        List<LayoutResult> contentLayoutDeps = dependencies.stream().map(l -> ((PaneLR) l.obj()).contentLR).toList();
-
+    protected void onShapeApplied(Shape shape, LayoutContext2 context) {
         children.clear();
-        getContent().performLayout(lr, e -> {
-            children.add(e);
-            if (e instanceof Pane p)
-                p.focusContext = focusContext;
-        }, contentLayoutDeps);
+        getContent().performLayout(shape, new LayoutContext2() {
+            @Override
+            public void accept(RenderableElement e) {
+                children.add(e);
+                if (e instanceof Pane p)
+                    p.focusContext = focusContext;
+            }
+
+            @Override
+            public List<LayoutDependency> getDependencies(RenderableElement element) {
+                return context.getDependencies(element);
+            }
+
+            @Override
+            public void addLayoutDependency(RenderableElement element, LayoutDependency d) {
+                context.addLayoutDependency(element, d);
+            }
+        });
     }
 
     public static Pane of(Element node) {
@@ -101,8 +122,5 @@ public abstract class Pane extends RenderableElement {
                     return node;
                 }
             };
-    }
-
-    private record PaneLR(BoxConstraints inputConstraints, LayoutResult contentLR) {
     }
 }

@@ -6,7 +6,8 @@ import ui10.ui6.*;
 import ui10.ui6.decoration.css.CSSParser;
 import ui10.ui6.decoration.css.CSSPseudoClass;
 import ui10.ui6.decoration.css.Rule;
-import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.LayoutContext1;
+import ui10.ui6.layout.LayoutContext2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +31,13 @@ public class CSSDecorator extends Element.TransientElement {
     }
 
     @Override
-    protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
-        LayoutResult lr = content.preferredShape(constraints);
-        return new LayoutResult(lr.shape(), this, lr);
+    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return content.preferredShape(constraints, context);
     }
 
     @Override
-    protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
-        content.performLayout(shape, context, lr.stream().map(l -> (LayoutResult) l.obj()).toList());
+    protected void applyShapeImpl(Shape shape, LayoutContext2 context) {
+        content.performLayout(shape, context);
     }
 
     private void applyOnRegularElement(Element element) {
