@@ -6,6 +6,7 @@ import ui10.ui6.RenderableElement;
 import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.LinearGradient;
 import ui10.ui6.graphics.TextNode;
+import ui10.ui6.layout.LayoutResult;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -54,8 +55,8 @@ public class J2DRenderer {
 
                 long layoutBegin = System.nanoTime();
                 if (!Objects.equals(prevSize, rect)) {
-                    root.node.applyShape(J2DUtil.rect(rect), (surface) -> {
-                    });
+                    root.node.performLayout(J2DUtil.rect(rect), (surface) -> {
+                    }, java.util.List.of());
                     prevSize = rect;
                 }
 
@@ -96,5 +97,9 @@ public class J2DRenderer {
             return (Item<N>) new LinearGradientImpl(this, l);
         else
             throw new UnsupportedOperationException(n.toString());
+    }
+
+    public void invalidateLayout() {
+        prevSize = null;
     }
 }

@@ -17,3 +17,4 @@
 }
 .button-text { font-size: 20px; color: #000; }
 :active { background: linear-gradient(to bottom, #E2E2E2, #CDCDCD); }
+:focus {border: 5px solid #f00;}

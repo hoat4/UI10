@@ -7,7 +7,9 @@ import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
 import ui10.ui6.LayoutContext;
 import ui10.ui6.RenderableElement;
+import ui10.ui6.layout.LayoutResult;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -43,7 +45,7 @@ public class TextNode extends RenderableElement {
     public TextNode fill(Element fill) {
         if (!Objects.equals(fill, this.fill)) {
             this.fill = fill;
-           // invalidateRendererData();
+            // invalidateRendererData();
         }
         return this;
     }
@@ -66,12 +68,18 @@ public class TextNode extends RenderableElement {
     }
 
     @Override
-    protected Shape preferredShapeImpl(BoxConstraints constraints) {
-        return Rectangle.of(textStyle.textSize(text).size().divide(1000));
+    protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+        Rectangle rect = Rectangle.of(textStyle.textSize(text).size().divide(1000));
+        return new LayoutResult(rect, this, new RH(constraints, rect));
     }
 
     @Override
-    protected void onShapeApplied(Shape shape, LayoutContext context) {
-        fill.applyShape(shape, r->{});
+    protected void onShapeApplied(Shape shape, LayoutContext context, List<LayoutResult> dependencies) {
+        fill.performLayout(shape, r -> {
+        }, List.of());
+    }
+
+    private record RH(BoxConstraints c, Shape s) {
+
     }
 }

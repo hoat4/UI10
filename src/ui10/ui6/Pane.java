@@ -3,24 +3,27 @@ package ui10.ui6;
 import ui10.binding.PropertyEvent;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
+import ui10.ui6.layout.LayoutResult;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 public abstract class Pane extends RenderableElement {
 
     private final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
 
-    public BiConsumer<Element, Element> decorator;
+    public BiConsumer<Pane, Element> decorator;
+    public FocusContext focusContext;
+
+    protected void validate() {
+    }
 
     protected abstract Element content();
 
-    public final Element getContent() {
+    private Element getContent() {
         if (!valid) {
             validate();
             valid = true;
@@ -34,39 +37,58 @@ public abstract class Pane extends RenderableElement {
 
     public List<RenderableElement> renderableElements() {
         if (!valid)
-            onShapeApplied(shape, null);
+            onShapeApplied(shape, null, layoutDependencies);
         return children;
     }
 
-    protected void validate() {
-    }
+    private boolean valid2;
 
     @Override
     public <T extends PropertyEvent> void onChange(T changeEvent) {
         super.onChange(changeEvent);
-        this.invalidatePane();
+        valid2 = false;
+        rendererData.eventLoop().runLater(()->{
+            if (valid2)
+                return;
+            valid2 = true;
+
+            for (LayoutResult lr : layoutDependencies)
+                if (!preferredShape(((PaneLR)lr.obj()).inputConstraints).shape().equals(lr.shape())) {
+                    rendererData.invalidateLayout();
+                    break;
+                }
+
+            this.invalidatePane();
+
+        });
     }
 
+    /**
+     * Invalidates layout and content.
+     */
     protected void invalidatePane() {
         valid = false;
         if (rendererData != null) {
-            rendererData.invalidateRendererData();
+            rendererData.invalidateRendererData(); // miért?
         }
     }
 
     @Override
-    public void enumerateStaticChildren(Consumer<Element> consumer) {
+    protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+        LayoutResult lr = getContent().preferredShape(constraints);
+        return new LayoutResult(lr.shape(), this, new PaneLR(constraints, lr));
     }
 
     @Override
-    protected Shape preferredShapeImpl(BoxConstraints constraints) {
-        return getContent().preferredShape(constraints);
-    }
+    protected void onShapeApplied(Shape lr, LayoutContext context, List<LayoutResult> dependencies) {
+        List<LayoutResult> contentLayoutDeps = dependencies.stream().map(l -> ((PaneLR) l.obj()).contentLR).toList();
 
-    @Override
-    protected void onShapeApplied(Shape shape, LayoutContext context) {
         children.clear();
-        getContent().applyShape(shape, children::add);
+        getContent().performLayout(lr, e -> {
+            children.add(e);
+            if (e instanceof Pane p)
+                p.focusContext = focusContext;
+        }, contentLayoutDeps);
     }
 
     public static Pane of(Element node) {
@@ -79,5 +101,8 @@ public abstract class Pane extends RenderableElement {
                     return node;
                 }
             };
+    }
+
+    private record PaneLR(BoxConstraints inputConstraints, LayoutResult contentLR) {
     }
 }

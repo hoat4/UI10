@@ -7,8 +7,9 @@ import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
 import ui10.ui6.LayoutContext;
 import ui10.ui6.decoration.css.Length;
-import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.LinearGradient;
+import ui10.ui6.layout.LayoutResult;
+import ui10.ui6.layout.Layouts;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,19 +34,16 @@ public interface Fill {
         public Element makeElement(DecorationContext context) {
             LinearGradient g = new LinearGradient();
 
-            return new Element.TransientElement() {
+            return new Layouts.SingleNodeLayout(g) {
+
                 @Override
-                public void enumerateStaticChildren(Consumer<Element> consumer) {
-                    consumer.accept(g);
+                protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+                    LayoutResult lr = g.preferredShape(constraints);
+                    return new LayoutResult(lr.shape(), this, lr);
                 }
 
                 @Override
-                protected Shape preferredShapeImpl(BoxConstraints constraints) {
-                    return g.preferredShape(constraints);
-                }
-
-                @Override
-                protected void applyShapeImpl(Shape shape, LayoutContext layoutContext) {
+                protected void applyShapeImpl(Shape shape, LayoutContext layoutContext, List<LayoutResult> lr) {
                     context.parentSize = shape.bounds().size();
                     try {
                         int length = Point.distance(from.makePoint(context), to.makePoint(context));
@@ -59,8 +57,9 @@ public interface Fill {
                         context.parentSize = null;
                     }
 
-                    g.applyShape(shape, layoutContext);
+                    g.performLayout(shape, layoutContext, unwrap(lr));
                 }
+
             };
         }
 

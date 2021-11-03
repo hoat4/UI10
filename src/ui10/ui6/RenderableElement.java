@@ -3,6 +3,7 @@ package ui10.ui6;
 import ui10.binding.PropertyHolder;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
+import ui10.ui6.layout.LayoutResult;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -12,6 +13,7 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
     public RendererData rendererData;
 
     protected Shape shape;
+    protected List<LayoutResult> layoutDependencies;
 
     private Element replacement;
     private boolean inReplacement;
@@ -31,16 +33,15 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
     }
 
     @Override
-    public final Shape preferredShape(BoxConstraints constraints) {
+    public final LayoutResult preferredShape(BoxConstraints constraints) {
         Objects.requireNonNull(constraints);
 
         if (replacement == null || inReplacement) {
-            Shape s = preferredShapeImpl(constraints);
+            LayoutResult s = preferredShapeImpl(constraints);
             Objects.requireNonNull(s, this::toString);
-            s = s.translate(s.bounds().topLeft().negate());
-            Objects.requireNonNull(s);
+            assert s.elementClass() == getClass() : this + ", " + s;
             return s;
-        }else {
+        } else {
             boolean r = inReplacement;
             inReplacement = true;
             try {
@@ -51,10 +52,10 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
         }
     }
 
-    protected abstract Shape preferredShapeImpl(BoxConstraints constraints);
+    protected abstract LayoutResult preferredShapeImpl(BoxConstraints constraints);
 
     @Override
-    public final void applyShape(Shape shape, LayoutContext context) {
+    public final void performLayout(Shape shape, LayoutContext context, List<LayoutResult> lr) {
         Objects.requireNonNull(shape);
         Objects.requireNonNull(context);
 
@@ -62,24 +63,28 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
             boolean r = inReplacement;
             inReplacement = true;
             try {
-                replacement.applyShape(shape, context);
+                replacement.performLayout(shape, context, lr);
             } finally {
                 inReplacement = r;
             }
             return;
         }
 
+        for (LayoutResult lh : lr)
+            assert lh.elementClass() == getClass();
+
         context.accept(this);
 
         boolean changed = !Objects.equals(this.shape, shape);
         this.shape = shape;
+        this.layoutDependencies = lr;
         if (changed && rendererData != null)
             rendererData.invalidateRendererData();
 
-        onShapeApplied(shape, context);
+        onShapeApplied(shape, context, lr);
     }
 
-    protected void onShapeApplied(Shape shape, LayoutContext context) {
+    protected void onShapeApplied(Shape shape, LayoutContext context, List<LayoutResult> dependencies) {
     }
 
     @Override

@@ -32,6 +32,11 @@ public class Button extends Control {
     {
         withClass("button", this);
         textNode.text("Gomb");
+
+        pressed().subscribe(e->{
+            if (!e.newValue())
+                onAction.postEvent(null);
+        });
     }
 
     @Override
@@ -40,10 +45,7 @@ public class Button extends Control {
     }
 
     public ScalarProperty<Boolean> pressed() {
-        return property((Button b) -> b._pressed, (b, v) -> {
-            b._pressed = v;
-            onAction.postEvent(null);
-        });
+        return property((Button b) -> b._pressed, (b, v) -> b._pressed = v);
     }
 
     @Override
@@ -54,6 +56,8 @@ public class Button extends Control {
     @Override
     public void bubble(InputEvent event, EventContext eventContext) {
         if (event instanceof MouseEvent.MousePressEvent) {
+            focusContext.focusedControl.set(this);
+
             pressed().set(true);
             attributes().add(new CSSPseudoClass("active"));
         }

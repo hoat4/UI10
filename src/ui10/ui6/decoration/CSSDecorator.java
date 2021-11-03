@@ -2,24 +2,22 @@ package ui10.ui6.decoration;
 
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.Attribute;
-import ui10.ui6.Element;
-import ui10.ui6.LayoutContext;
-import ui10.ui6.Pane;
+import ui10.ui6.*;
 import ui10.ui6.decoration.css.CSSParser;
 import ui10.ui6.decoration.css.CSSPseudoClass;
 import ui10.ui6.decoration.css.Rule;
+import ui10.ui6.layout.LayoutResult;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Decorated extends Element.TransientElement {
+public class CSSDecorator extends Element.TransientElement {
 
     private final Element content;
     final CSSParser css;
 
-    public Decorated(Element content, CSSParser css) {
+    public CSSDecorator(Element content, CSSParser css) {
         this.content = content;
         this.css = css;
 
@@ -32,40 +30,44 @@ public class Decorated extends Element.TransientElement {
     }
 
     @Override
-    protected Shape preferredShapeImpl(BoxConstraints constraints) {
-        return content.preferredShape(constraints);
+    protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+        LayoutResult lr = content.preferredShape(constraints);
+        return new LayoutResult(lr.shape(), this, lr);
     }
 
     @Override
-    protected void applyShapeImpl(Shape shape, LayoutContext context) {
-        content.applyShape(shape, context);
+    protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+        content.performLayout(shape, context, lr.stream().map(l -> (LayoutResult) l.obj()).toList());
     }
 
     private void applyOnRegularElement(Element element) {
         applySelf(element);
 
         if (element instanceof Pane p) {
-            p.decorator = (c, e) -> applyOnPaneContent(p, e);
+            p.decorator = this::applyOnPaneContent;
         } else {
             element.enumerateStaticChildren(this::applyOnRegularElement);
             applyReplacements(element, element);
         }
     }
 
-    private void applyOnPaneContent(Pane pane, Element element) {
+    private void applyOnPaneContent(Pane pane, Element paneContent) {
         applySelf(pane);
-        applySelf(element);
+        applySelf(paneContent);
 
-        element.enumerateStaticChildren(this::applyOnRegularElement);
+        paneContent.enumerateStaticChildren(this::applyOnRegularElement);
 
         DecorationContext context = new DecorationContext();
-        Element e = element;
+        Element e = paneContent;
 
-        e = ruleOf(element).apply2(e, context);
+        if (paneContent instanceof Pane p)
+            p.decorator = this::applyOnPaneContent;
+        else
+            e = ruleOf(paneContent).apply2(e, context);
         e = ruleOf(pane).apply2(e, context);
 
-        if (e != element)
-            element.replacement(e);
+        if (e != paneContent)
+            paneContent.replacement(e);
     }
 
     private void applySelf(Element element) {
@@ -81,9 +83,11 @@ public class Decorated extends Element.TransientElement {
 
     private Rule ruleOf(Element e) {
         List<Attribute> attributes = new ArrayList<>();
+        attributes.addAll(e.attributes());
         if (e == this.content)
             attributes.add(new CSSPseudoClass("root"));
-        attributes.addAll(e.attributes());
+        if (e instanceof Control c && c.focusContext != null && c.focusContext.focusedControl.get() == c)
+            attributes.add(new CSSPseudoClass("focus"));
 
         Rule rule = new Rule();
         for (Attribute a : attributes) {

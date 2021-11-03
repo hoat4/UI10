@@ -11,7 +11,9 @@ import ui10.ui6.Pane;
 import ui10.ui6.decoration.css.CSSClass;
 import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.TextNode;
+import ui10.ui6.layout.LayoutResult;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import static ui10.ui6.decoration.css.CSSClass.withClass;
@@ -38,16 +40,20 @@ public class TextField extends Pane {
             }
 
             @Override
-            protected Shape preferredShapeImpl(BoxConstraints constraints) {
-                return textNode.preferredShape(constraints);
+            protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+                LayoutResult lr = textNode.preferredShape(constraints);
+                return new LayoutResult(lr.shape(), this, lr);
             }
 
             @Override
-            protected void applyShapeImpl(Shape shape, LayoutContext context) {
-                context.placeElement(textNode, shape);
-                context.placeElement(caret, new Rectangle(caretPosition.get(), 0, 1, shape.bounds().size().height()).
-                        translate(shape.bounds().topLeft()));
+            protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+                textNode.performLayout(TextField.this.shape, context, lr);
+
+                Rectangle caretShape = new Rectangle(caretPosition.get(), 0, 1, shape.bounds().size().height()).
+                        translate(shape.bounds().topLeft());
+                caret.performLayout(caretShape, context, List.of());
             }
+
         };
     }
 }

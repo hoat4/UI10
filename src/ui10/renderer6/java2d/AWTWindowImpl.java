@@ -26,7 +26,9 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
         renderer = new J2DRenderer(desktop.eventLoop);
         renderer.c = this;
-        renderer.root = renderer.makeItem(RenderableElement.of(window.getContent()));
+
+        window.focusContext = new FocusContext();
+        renderer.root = renderer.makeItem(window);
 
         enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
         setTitle("Ablak");
@@ -43,6 +45,11 @@ public class AWTWindowImpl extends Frame implements RendererData {
     @Override
     public void invalidateRendererData() {
         renderer.requestRepaint();
+    }
+
+    @Override
+    public void invalidateLayout() {
+        renderer.invalidateLayout();
     }
 
     @Override

@@ -8,4 +8,12 @@ public abstract class Control extends Pane {
     }
 
     public abstract void bubble(InputEvent event, EventContext context);
+
+    public void onFocusGain() {
+        invalidatePane();
+    }
+
+    public void onFocusLost() {
+        invalidatePane();
+    }
 }

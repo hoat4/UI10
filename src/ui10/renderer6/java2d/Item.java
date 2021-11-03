@@ -47,6 +47,11 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
         }
     }
 
+    @Override
+    public void invalidateLayout() {
+        renderer.invalidateLayout();
+    }
+
     private void validate() {
         this.shape = J2DUtil.shapeToPath2D(node.shape());
 

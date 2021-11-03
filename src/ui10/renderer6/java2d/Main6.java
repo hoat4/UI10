@@ -1,18 +1,13 @@
 package ui10.renderer6.java2d;
 
 import ui10.geom.Insets;
-import ui10.geom.Rectangle;
-import ui10.geom.Size;
 import ui10.image.Colors;
-import ui10.image.RGBColor;
-import ui10.renderer.java2d.AWTTextStyle;
 import ui10.ui6.Element;
 import ui10.ui6.controls.Button;
 import ui10.ui6.decoration.*;
 import ui10.ui6.decoration.css.CSSParser;
 import ui10.ui6.decoration.css.CSSScanner;
 import ui10.ui6.graphics.ColorFill;
-import ui10.ui6.graphics.TextNode;
 import ui10.ui6.layout.Layouts;
 import ui10.ui6.controls.TextField;
 import ui10.ui6.window.Window;
@@ -21,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Objects;
 
 import static ui10.ui6.decoration.css.CSSClass.withClass;
 import static ui10.ui6.layout.Layouts.*;
@@ -48,7 +42,7 @@ public class Main6 {
             return;
         }
 
-        content = new Decorated(content, css);
+        content = new CSSDecorator(content, css);
 
         Window window = Window.of(content);
         desktop.windows.add(window);
@@ -88,7 +82,7 @@ public class Main6 {
             return null;
         }
 
-        return new Decorated(content, css);
+        return new CSSDecorator(content, css);
     }
 
 }

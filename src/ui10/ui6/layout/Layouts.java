@@ -10,8 +10,8 @@ import ui10.ui6.Element;
 import ui10.ui6.LayoutContext;
 import ui10.ui6.decoration.css.CSSClass;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class Layouts {
@@ -27,12 +27,12 @@ public class Layouts {
         }
 
         @Override
-        protected Shape preferredShapeImpl(BoxConstraints constraints) {
-            return Rectangle.of(constraints.min());
+        protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+            return new LayoutResult(Rectangle.of(constraints.min()), this, List.of());
         }
 
         @Override
-        protected void applyShapeImpl(Shape shape, LayoutContext context) {
+        protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
         }
     }
 
@@ -47,13 +47,13 @@ public class Layouts {
         }
 
         @Override
-        protected Shape preferredShapeImpl(BoxConstraints constraints) {
+        protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
             return content.preferredShape(constraints);
         }
 
         @Override
-        protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            return containerShape;
+        protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+            content.performLayout(shape, context, unwrap(lr));
         }
     }
 
@@ -73,16 +73,24 @@ public class Layouts {
         }
 
         @Override
-        protected Shape preferredShapeImpl(BoxConstraints constraints) {
-            return constraints.clamp(content.preferredShape(constraints.withMinimum(Size.ZERO)));
+        protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+            LayoutResult contentLR = content.preferredShape(constraints.withMinimum(Size.ZERO));
+            return new LayoutResult(constraints.clamp(contentLR.shape()), this, contentLR);
         }
 
         @Override
-        protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            Shape contentShape = content.preferredShape(new BoxConstraints(Size.ZERO, containerShape.bounds().size()));
-            return contentShape.
+        protected void applyShapeImpl(Shape containerShape, LayoutContext context, List<LayoutResult> lr) {
+            LayoutResult contentLR = content.preferredShape(new BoxConstraints(Size.ZERO, containerShape.bounds().size()));
+
+            Shape contentShape = contentLR.shape();
+            contentShape = contentShape.
                     translate(contentShape.bounds().topLeft().negate()).
                     translate(containerShape.bounds().centered(contentShape.bounds().size()).topLeft());
+
+            List<LayoutResult> deps = new ArrayList<>(unwrap(lr));
+            deps.add(contentLR);
+
+            content.performLayout(contentShape, context, deps);
         }
     }
 
@@ -90,7 +98,7 @@ public class Layouts {
         return new MinSize(content, minSize);
     }
 
-    private static class MinSize extends SingleNodeLayout{
+    private static class MinSize extends SingleNodeLayout {
 
         private final Size minSize;
 
@@ -100,14 +108,15 @@ public class Layouts {
         }
 
         @Override
-        protected Shape preferredShapeImpl(BoxConstraints constraints) {
+        protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
             return content.preferredShape(constraints.withMinimum(Size.max(constraints.min(), minSize)));
         }
 
         @Override
-        protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            return containerShape;
+        protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+            content.performLayout(shape, context, unwrap(lr));
         }
+
     }
 
     public static Element padding(Element content, Insets insets) {
@@ -123,22 +132,23 @@ public class Layouts {
         }
 
         @Override
-        protected Shape preferredShapeImpl(BoxConstraints constraints) {
+        protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
             Size all = insets.all();
-            BoxConstraints c = new BoxConstraints(
-                    constraints.min().subtractOrClamp(all),
-                    constraints.max().subtract(all));
 
-            Shape cs = content.preferredShape(c);
-            //System.out.println("cs:"+cs.bounds());
-            final Shape shape = insets.addTo(cs);
-            //System.out.println(insets+" s:"+shape.bounds());
-            return shape;
+            LayoutResult contentLR = content.preferredShape(new BoxConstraints(
+                    constraints.min().subtractOrClamp(all),
+                    constraints.max().subtract(all)));
+
+            return new LayoutResult(
+                    insets.addTo(contentLR.shape()),
+                    this,
+                    contentLR
+            );
         }
 
         @Override
-        protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            return insets.removeFrom(containerShape);
+        protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+            content.performLayout(insets.removeFrom(shape), context, unwrap(lr));
         }
     }
 
@@ -156,16 +166,19 @@ public class Layouts {
         }
 
         @Override
-        protected Shape preferredShapeImpl(BoxConstraints constraints) {
-            Rectangle rect = content.preferredShape(constraints.withMinimum(
-                    Size.max(constraints.min(), new Size(radius * 2, radius * 2)))).bounds();
-            return new RoundedRectangle(rect, radius);
-            //return rect;
+        protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+            Size minSize = Size.max(constraints.min(), new Size(radius * 2, radius * 2));
+            LayoutResult contentLR = content.preferredShape(constraints.withMinimum(minSize));
+            return new LayoutResult(
+                    new RoundedRectangle(contentLR.shape().bounds(), radius),
+                    this,
+                    contentLR
+            );
         }
 
         @Override
-        protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-            return new RoundedRectangle(containerShape.bounds(), radius);
+        protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+            content.performLayout(new RoundedRectangle(shape.bounds(), radius), context, unwrap(lr));
         }
     }
 
@@ -173,19 +186,26 @@ public class Layouts {
         return new SingleNodeLayout(content) {
 
             @Override
-            protected Shape preferredShapeImpl(BoxConstraints constraints) {
-                return content.preferredShape(constraints).bounds();
+            protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+                LayoutResult lr = content.preferredShape(constraints);
+                return new LayoutResult(
+                        lr.shape().bounds(),
+                        this,
+                        lr
+                );
             }
 
             @Override
-            protected Shape computeContentShape(Shape containerShape, LayoutContext context) {
-                return content.preferredShape(BoxConstraints.fixed(containerShape.bounds().size())).
-                        translate(containerShape.bounds().topLeft());
+            protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+                LayoutResult contentLR = content.preferredShape(BoxConstraints.fixed(shape.bounds().size()));
+                List<LayoutResult> l = unwrap(lr);
+                l.add(contentLR);
+                content.performLayout(contentLR.shape().translate(shape.bounds().topLeft()), context, l);
             }
         };
     }
 
-    private static abstract class SingleNodeLayout extends Element.TransientElement {
+    public static abstract class SingleNodeLayout extends Element.TransientElement {
 
         protected final Element content;
 
@@ -198,11 +218,15 @@ public class Layouts {
             consumer.accept(content);
         }
 
-        protected abstract Shape computeContentShape(Shape containerShape, LayoutContext context);
+        protected static List<LayoutResult> unwrap(List<LayoutResult> lr) {
+            return switch (lr.size()) {
+                case 0 -> List.of();
+                case 1 -> List.of((LayoutResult) lr.get(0).obj());
+                case 2 -> List.of((LayoutResult) lr.get(0).obj(), (LayoutResult) lr.get(1).obj());
+                case 3 -> List.of((LayoutResult) lr.get(0).obj(), (LayoutResult) lr.get(1).obj(), (LayoutResult) lr.get(2).obj());
+                default -> lr.stream().map(l -> (LayoutResult) l.obj()).toList();
+            };
 
-        @Override
-        protected void applyShapeImpl(Shape shape, LayoutContext context) {
-            content.applyShape(computeContentShape(shape, context), context);
         }
     }
 
@@ -212,31 +236,42 @@ public class Layouts {
 
     private static class StackLayout extends Element.TransientElement {
 
-        private final List<Element> nodes;
+        private final List<Element> elements;
 
-        public StackLayout(Element... nodes) {
-            this.nodes = List.of(nodes);
-        }
-
-        public StackLayout(List<Element> nodes) {
-            this.nodes = nodes;
+        public StackLayout(Element... elements) {
+            this.elements = List.of(elements);
         }
 
         @Override
         public void enumerateStaticChildren(Consumer<Element> consumer) {
-            nodes.forEach(consumer);
+            elements.forEach(consumer);
         }
 
         @Override
-        protected Shape preferredShapeImpl(BoxConstraints constraints) {
-            return nodes.stream().map(n -> n.preferredShape(constraints)).
-                    peek(Objects::requireNonNull).
-                    reduce(Shape.NULL, Shape::unionWith);
+        protected LayoutResult preferredShapeImpl(BoxConstraints constraints) {
+            Shape shape = Shape.NULL;
+            LayoutResult[] l = new LayoutResult[elements.size()];
+            int i = 0;
+
+            for (Element e : elements) {
+                LayoutResult lr = e.preferredShape(constraints);
+                shape = shape.unionWith(lr.shape());
+                l[i++] = lr;
+            }
+            return new LayoutResult(shape, this, l);
         }
 
         @Override
-        protected void applyShapeImpl(Shape shape, LayoutContext context) {
-            nodes.forEach(n -> context.placeElement(n, shape));
+        protected void applyShapeImpl(Shape shape, LayoutContext context, List<LayoutResult> lr) {
+            int i = 0;
+            for (Element e : elements) {
+                List<LayoutResult> l = new ArrayList<>();
+                for (LayoutResult a : lr) {
+                    l.add(((LayoutResult[]) a.obj())[i]);
+                }
+                e.performLayout(shape, context, l);
+                i++;
+            }
         }
     }
 }
