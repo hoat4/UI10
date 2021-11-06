@@ -7,6 +7,7 @@ import ui10.ui6.*;
 import java.awt.*;
 
 import ui10.input.pointer.MouseEvent;
+import ui10.ui6.layout.LayoutContext2;
 import ui10.ui6.window.Window;
 
 import java.awt.event.WindowEvent;
@@ -24,22 +25,37 @@ public class AWTWindowImpl extends Frame implements RendererData {
         this.window = window;
         this.desktop = desktop;
 
-        renderer = new J2DRenderer(desktop.eventLoop);
+        renderer = new J2DRenderer();
         renderer.c = this;
 
-        window.focusContext = new FocusContext();
         renderer.root = renderer.makeItem(window);
+        window.focusContext = new FocusContext();
 
         enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
         setTitle("Ablak");
 
         addNotify();
         createBufferStrategy(2);
+
+        applySize();
+    }
+
+    private void applySize() {
+        renderer.uiContext.requestLayout(new UIContext.LayoutTask(window, ()->{
+            Rectangle rect = new Rectangle(
+                    getWidth() - getInsets().left - getInsets().right,
+                    getHeight() - getInsets().top - getInsets().bottom);
+            window.performLayout(J2DUtil.rect(rect), new LayoutContext2.AbstractLayoutContext2() {
+                @Override
+                public void accept(RenderableElement element) {
+                }
+            });
+        }));
     }
 
     @Override
     public EventLoop eventLoop() {
-        return desktop.eventLoop;
+        return renderer.uiContext.eventLoop();
     }
 
     @Override
@@ -48,8 +64,8 @@ public class AWTWindowImpl extends Frame implements RendererData {
     }
 
     @Override
-    public void invalidateLayout() {
-        renderer.invalidateLayout();
+    public UIContext uiContext() {
+        return renderer.uiContext;
     }
 
     @Override

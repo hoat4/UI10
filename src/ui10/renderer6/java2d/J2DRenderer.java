@@ -16,18 +16,19 @@ import java.util.concurrent.CompletableFuture;
 
 public class J2DRenderer {
 
-    public final EventLoop eventLoop;
+    public final UIContextImpl uiContext = new UIContextImpl(this);
 
     Item<?> root;
     Window c;
 
-    private Rectangle prevSize;
-
-    public J2DRenderer(EventLoop eventLoop) {
-        this.eventLoop = eventLoop;
-    }
 
     public void draw() {
+        long layoutBegin = System.nanoTime();
+
+        uiContext.performLayouts();
+
+        long layoutEnd = System.nanoTime();
+
         BufferStrategy bs = c.getBufferStrategy();
 
         do {
@@ -48,22 +49,8 @@ public class J2DRenderer {
                 g.translate(c.getInsets().left, c.getInsets().top);
 
 
-                Rectangle rect = new Rectangle(
-                        c.getWidth() - c.getInsets().left - c.getInsets().right,
-                        c.getHeight() - c.getInsets().top - c.getInsets().bottom);
                 //System.out.println(rect);
 
-                long layoutBegin = System.nanoTime();
-                if (!Objects.equals(prevSize, rect)) {
-                    root.node.performLayout(J2DUtil.rect(rect), new LayoutContext2.AbstractLayoutContext2() {
-                        @Override
-                        public void accept(RenderableElement element) {
-                        }
-                    });
-                    prevSize = rect;
-                }
-
-                long layoutEnd = System.nanoTime();
 
                 root.draw(g);
 
@@ -80,7 +67,7 @@ public class J2DRenderer {
 
     public CompletableFuture<Void> requestRepaint() {
         CompletableFuture<Void> cf = new CompletableFuture<>();
-        eventLoop.runLater(()->{
+        uiContext.eventLoop().runLater(()->{
             draw();
             cf.complete(null);
         });
@@ -100,9 +87,5 @@ public class J2DRenderer {
             return (Item<N>) new LinearGradientImpl(this, l);
         else
             throw new UnsupportedOperationException(n.toString());
-    }
-
-    public void invalidateLayout() {
-        prevSize = null;
     }
 }

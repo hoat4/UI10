@@ -4,9 +4,10 @@ import ui10.nodes.EventLoop;
 
 public interface RendererData {
 
-    void invalidateRendererData(); //  // name clash with java.awt.Component::invalidate
+    void invalidateRendererData(); // name clash with java.awt.Component::invalidate
+
 
     EventLoop eventLoop();
 
-    void invalidateLayout();
+    UIContext uiContext();
 }

@@ -7,8 +7,6 @@ import ui10.ui6.window.Window;
 
 public class AWTDesktop extends Desktop {
 
-    public final EventLoop eventLoop = new EventLoop();
-
     {
         windows.subscribe(ObservableList.simpleListSubscriber(this::showWindow, this::hideWindow));
     }

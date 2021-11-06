@@ -48,30 +48,11 @@ public abstract class Pane extends RenderableElement {
         return children;
     }
 
-    private boolean valid2;
-
     @Override
     public <T extends PropertyEvent> void onChange(T changeEvent) {
         super.onChange(changeEvent);
-        valid2 = false;
-        rendererData.eventLoop().runLater(()->{
-            if (valid2)
-                return;
-            valid2 = true;
 
-            final LayoutContext1 consumer = (pane, dep) -> {
-                // these known shapes could be used later to avoid computing preferred shapes redundantly
-            };
-
-            for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
-                if (!preferredShape(dep.inputConstraints(), consumer).equals(dep.shape())) {
-                    rendererData.invalidateLayout();
-                    break;
-                }
-            }
-
-            this.invalidatePane();
-        });
+        requestLayout();
     }
 
     /**
@@ -79,9 +60,7 @@ public abstract class Pane extends RenderableElement {
      */
     protected void invalidatePane() {
         valid = false;
-        if (rendererData != null) {
-            rendererData.invalidateRendererData(); // miért?
-        }
+        requestLayout();
     }
 
     @Override
@@ -91,11 +70,15 @@ public abstract class Pane extends RenderableElement {
 
     @Override
     protected void onShapeApplied(Shape shape, LayoutContext2 context) {
+        for (RenderableElement child : children)
+            child.parent = null;
         children.clear();
+
         getContent().performLayout(shape, new LayoutContext2() {
             @Override
             public void accept(RenderableElement e) {
                 children.add(e);
+                e.parent = Pane.this;
                 if (e instanceof Pane p)
                     p.focusContext = focusContext;
             }

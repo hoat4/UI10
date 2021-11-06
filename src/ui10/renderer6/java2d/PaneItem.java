@@ -30,6 +30,7 @@ public class PaneItem extends Item<Pane> {
     protected void drawImpl(Graphics2D g) {
         AffineTransform t = g.getTransform();
         for (Item<?> item : children) {
+            assert item != this;
             // g.setClip
             //g.translate(item., item.y);
             item.draw(g);

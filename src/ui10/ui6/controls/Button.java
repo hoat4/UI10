@@ -40,11 +40,6 @@ public class Button extends Control {
         });
     }
 
-    @Override
-    public void validate() {
-        super.validate();
-    }
-
     public ScalarProperty<Boolean> pressed() {
         return property((Button b) -> b._pressed, (b, v) -> b._pressed = v);
     }

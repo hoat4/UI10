@@ -2,10 +2,7 @@ package ui10.renderer6.java2d;
 
 import ui10.input.pointer.MouseEvent;
 import ui10.nodes.EventLoop;
-import ui10.ui6.Control;
-import ui10.ui6.EventContext;
-import ui10.ui6.RenderableElement;
-import ui10.ui6.RendererData;
+import ui10.ui6.*;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -35,21 +32,21 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
 
     @Override
     public EventLoop eventLoop() {
-        return renderer.eventLoop;
+        return uiContext().eventLoop();
     }
 
     @Override
     public void invalidateRendererData() {
-        if (valid) {
+        //if (valid) {
             valid = false;
             //bufferedImage = null;
-            renderer.requestRepaint();
-        }
+            //renderer.requestRepaint();
+        //}
     }
 
     @Override
-    public void invalidateLayout() {
-        renderer.invalidateLayout();
+    public UIContext uiContext() {
+        return renderer.uiContext;
     }
 
     private void validate() {

@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 public abstract class RenderableElement extends PropertyHolder implements Element {
 
     public RendererData rendererData;
+    public RenderableElement parent;
 
     protected Shape shape;
     protected List<LayoutContext1.LayoutDependency> layoutDependencies;
@@ -106,9 +107,39 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
 
     protected void invalidateRendererData() {
         if (rendererData != null)
-            rendererData.invalidateRendererData();
+            requestLayout();
     }
 
+    void requestLayout() {
+        rendererData.invalidateRendererData();
+        rendererData.uiContext().requestLayout(new UIContext.LayoutTask(this, ()->{
+            final LayoutContext1 consumer = (pane, dep) -> {
+                // these known shapes could be used later to avoid computing preferred shapes redundantly
+            };
+
+            for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
+                if (!preferredShape(dep.inputConstraints(), consumer).equals(dep.shape())) {
+                    Objects.requireNonNull(parent, ()->toString());
+                    parent.requestLayout();
+                    return;
+                }
+            }
+
+            performLayout(shape, new LayoutContext2.AbstractLayoutContext2() {
+                @Override
+                public void accept(RenderableElement element) {
+                }
+
+                @Override
+                public List<LayoutDependency> getDependencies(RenderableElement element) {
+                    if (element == RenderableElement.this)
+                        return layoutDependencies;
+                    else
+                        return super.getDependencies(element);
+                }
+            });
+        }));
+    }
     public static RenderableElement of(Element node) {
         return node instanceof RenderableElement r ? r : Pane.of(node);
     }
