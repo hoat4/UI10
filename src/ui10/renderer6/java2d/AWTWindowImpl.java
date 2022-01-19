@@ -36,16 +36,14 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
         addNotify();
         createBufferStrategy(2);
-
-        applySize();
     }
 
-    private void applySize() {
+    public void applySize() {
         renderer.uiContext.requestLayout(new UIContext.LayoutTask(window, ()->{
             Rectangle rect = new Rectangle(
                     getWidth() - getInsets().left - getInsets().right,
                     getHeight() - getInsets().top - getInsets().bottom);
-            window.performLayout(J2DUtil.rect(rect), new LayoutContext2.AbstractLayoutContext2() {
+            window.performLayout(J2DUtil.rect(rect), new LayoutContext2.AbstractLayoutContext2(null) {
                 @Override
                 public void accept(RenderableElement element) {
                 }

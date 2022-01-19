@@ -10,6 +10,11 @@ import java.util.Objects;
 
 public record BoxConstraints(Size min, Size max) {
 
+    public BoxConstraints {
+        if (max.width() < min.width() || max.height() < min.height())
+            throw new IllegalArgumentException(min + ", " + max);
+    }
+
     public static BoxConstraints fixed(Size size) {
         return new BoxConstraints(size, size);
     }
@@ -17,7 +22,7 @@ public record BoxConstraints(Size min, Size max) {
     public BoxConstraints subtract(Point point) {
         Objects.requireNonNull(point);
         if (point.x() > max.width() || point.y() > max.height())
-            throw new IllegalArgumentException("couldn't subtract "+point+" from "+this);
+            throw new IllegalArgumentException("couldn't subtract " + point + " from " + this);
         return new BoxConstraints(min.subtractOrClamp(point), max.subtract(point));
     }
 
@@ -48,6 +53,7 @@ public record BoxConstraints(Size min, Size max) {
     public BoxConstraints withWidth(int min, int max) {
         return new BoxConstraints(new Size(min, this.min.height()), new Size(max, this.max.height()));
     }
+
     public BoxConstraints withHeight(int min, int max) {
         return new BoxConstraints(new Size(this.min.width(), min), new Size(this.max.width(), max));
     }

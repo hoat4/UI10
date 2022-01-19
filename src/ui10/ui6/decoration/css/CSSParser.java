@@ -8,6 +8,7 @@ import ui10.ui6.decoration.BorderSpec;
 import ui10.ui6.decoration.Fill;
 import ui10.ui6.decoration.PointSpec;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -225,6 +226,29 @@ public class CSSParser {
         } while (scanner.next != ';');
 
         return lengths;
+    }
+
+    public List<TransitionSpec<?>> parseTransitionList() {
+        List<TransitionSpec<?>> transitions = new ArrayList<>();
+        scanner.skipWhitespaces();
+        do {
+            String propName = scanner.readIdentifier();
+            scanner.skipWhitespaces();
+            Duration duration = parseDuration();
+            transitions.add(new TransitionSpec<>(CSSProperty.ofName(propName), duration));
+            scanner.skipWhitespaces();
+        } while (scanner.next == ',');
+        return transitions;
+    }
+
+    private Duration parseDuration() {
+        String s = scanner.readIdentifier();
+        if (s.endsWith("ms"))
+            return Duration.ofMillis(Integer.parseInt(s.substring(0, s.length() - "ms".length())));
+        else if (s.endsWith("s"))
+            return Duration.ofSeconds(Integer.parseInt(s.substring(0, s.length() - "s".length())));
+        else
+            throw new CSSScanner.CSSParseException("unknown duration unit: " + s);
     }
 
     public record NumberWithUnit(double n, Unit unit) {

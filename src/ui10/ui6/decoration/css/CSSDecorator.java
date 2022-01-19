@@ -1,11 +1,12 @@
-package ui10.ui6.decoration;
+package ui10.ui6.decoration.css;
 
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.*;
-import ui10.ui6.decoration.css.CSSParser;
-import ui10.ui6.decoration.css.CSSPseudoClass;
-import ui10.ui6.decoration.css.Rule;
+import ui10.ui6.Attribute;
+import ui10.ui6.Control;
+import ui10.ui6.Element;
+import ui10.ui6.Pane;
+import ui10.ui6.decoration.DecorationContext;
 import ui10.ui6.layout.LayoutContext1;
 import ui10.ui6.layout.LayoutContext2;
 
@@ -41,23 +42,25 @@ public class CSSDecorator extends Element.TransientElement {
     }
 
     private void applyOnRegularElement(Element element) {
-        applySelf(element);
+        DecorationContext context = new DecorationContext();
+        applySelf(element, context);
 
         if (element instanceof Pane p) {
             p.decorator = this::applyOnPaneContent;
         } else {
             element.enumerateStaticChildren(this::applyOnRegularElement);
-            applyReplacements(element, element);
+            applyReplacements(element, element, context);
         }
     }
 
     private void applyOnPaneContent(Pane pane, Element paneContent) {
-        applySelf(pane);
-        applySelf(paneContent);
+        DecorationContext context = new DecorationContext();
+
+        applySelf(pane, context);
+        applySelf(paneContent, context);
 
         paneContent.enumerateStaticChildren(this::applyOnRegularElement);
 
-        DecorationContext context = new DecorationContext();
         Element e = paneContent;
 
         if (paneContent instanceof Pane p)
@@ -70,12 +73,12 @@ public class CSSDecorator extends Element.TransientElement {
             paneContent.replacement(e);
     }
 
-    private void applySelf(Element element) {
-        ruleOf(element).apply1(element, new DecorationContext());
+    private void applySelf(Element element, DecorationContext context) {
+        ruleOf(element).apply1(element, context);
     }
 
-    private void applyReplacements(Element selectorElement, Element element) {
-        Element e = ruleOf(selectorElement).apply2(element, new DecorationContext());
+    private void applyReplacements(Element selectorElement, Element element, DecorationContext context) {
+        Element e = ruleOf(selectorElement).apply2(element, context);
 
         if (e != element)
             element.replacement(e);
@@ -90,6 +93,7 @@ public class CSSDecorator extends Element.TransientElement {
             attributes.add(new CSSPseudoClass("focus"));
 
         Rule rule = new Rule();
+
         for (Attribute a : attributes) {
             Rule r = css.rules.get(a);
             if (r != null) {
@@ -99,6 +103,9 @@ public class CSSDecorator extends Element.TransientElement {
                 rule = r2;
             }
         }
+
+        rule.applyTransitionsOf(e);
+
         return rule;
     }
 }

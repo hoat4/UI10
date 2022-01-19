@@ -110,22 +110,30 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
             requestLayout();
     }
 
-    void requestLayout() {
+    public void requestLayout() {
         rendererData.invalidateRendererData();
         rendererData.uiContext().requestLayout(new UIContext.LayoutTask(this, ()->{
-            final LayoutContext1 consumer = (pane, dep) -> {
-                // these known shapes could be used later to avoid computing preferred shapes redundantly
+            LayoutContext1 consumer = new LayoutContext1() {
+                @Override
+                public RenderableElement lowestRenderableElement() {
+                    return null;
+                }
+
+                @Override
+                public void addLayoutDependency(RenderableElement element, LayoutDependency d) {
+                    // these known shapes should be used later to avoid computing preferred shapes redundantly
+                }
             };
 
             for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
                 if (!preferredShape(dep.inputConstraints(), consumer).equals(dep.shape())) {
-                    Objects.requireNonNull(parent, ()->toString());
+                    Objects.requireNonNull(parent, this::toString);
                     parent.requestLayout();
                     return;
                 }
             }
 
-            performLayout(shape, new LayoutContext2.AbstractLayoutContext2() {
+            performLayout(shape, new LayoutContext2.AbstractLayoutContext2(null) {
                 @Override
                 public void accept(RenderableElement element) {
                 }

@@ -4,7 +4,7 @@ public record HSBColor(double hue, double saturation, double brightness) impleme
 
     // alpha?
 
-    public RGBColor toRGB() {
+    public RGBColor toRGBColor() {
         // normalize the hue
         double normalizedHue = ((hue % 360) + 360) % 360;
         double hue = normalizedHue/360;

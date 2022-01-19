@@ -33,6 +33,11 @@ public record RGBColor(double red, double green, double blue, double alpha) impl
                 (int) (blue * 255 + 0.5) << 8 | (int) (alpha * 255 + 0.5);
     }
 
+    @Override
+    public RGBColor toRGBColor() {
+        return this;
+    }
+
     public RGBColor derive(double brightnessFactor) {
         // ez nem pontos, text field border (#ececec, 26.4%, -15%) nálunk 205, náluk 207
         // valójában nem tudom, hogy mit kéne jelentenie a brightness factornak, homályos a dokumentáció:
@@ -46,7 +51,7 @@ public record RGBColor(double red, double green, double blue, double alpha) impl
         else if (brightnessFactor > 0)
             b = b + (1-b)*brightnessFactor;
 
-        return new HSBColor(hsb.hue(), hsb.saturation(), b).toRGB();
+        return new HSBColor(hsb.hue(), hsb.saturation(), b).toRGBColor();
     }
 
     @Override

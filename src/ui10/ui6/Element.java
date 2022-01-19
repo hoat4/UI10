@@ -22,7 +22,7 @@ public interface Element {
 
     /**
      * This can be used by decorators to walk the elementClass tree. When encountering a Pane, the decorator should
-     * set the Pane.decorator field because Panes usually recreates its children every time, so decorating them once
+     * set the Pane.decorator field because Panes usually recreate its children every time, so decorating them only once
      * is useless.
      */
     void enumerateStaticChildren(Consumer<Element> consumer); // this does not honor replacement

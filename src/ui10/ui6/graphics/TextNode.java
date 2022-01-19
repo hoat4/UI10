@@ -73,6 +73,6 @@ public class TextNode extends RenderableElement {
 
     @Override
     protected void onShapeApplied(Shape shape, LayoutContext2 context) {
-        fill.performLayout(shape,LayoutContext2.ignoring());
+        fill.performLayout(shape,LayoutContext2.ignoring(this));
     }
 }

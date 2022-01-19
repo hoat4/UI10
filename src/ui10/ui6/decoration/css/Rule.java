@@ -3,15 +3,16 @@ package ui10.ui6.decoration.css;
 import ui10.geom.Insets;
 import ui10.geom.Size;
 import ui10.renderer.java2d.AWTTextStyle;
+import ui10.ui6.Attribute;
 import ui10.ui6.Element;
+import ui10.ui6.Pane;
+import ui10.ui6.RenderableElement;
 import ui10.ui6.decoration.Border;
 import ui10.ui6.decoration.DecorationContext;
 import ui10.ui6.graphics.TextNode;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -22,12 +23,18 @@ public class Rule {
 
     private final Map<CSSProperty<?>, Object> map = new HashMap<>();
 
+    private final List<Transition<?>> transitions = new ArrayList<>();
+
     private <T> void put(CSSProperty<T> prop, T value) {
         map.put(prop, value);
     }
 
     @SuppressWarnings("unchecked")
     private <T> T get(CSSProperty<T> prop) {
+        for (Transition<?> t : transitions)
+            if (t.spec.property().equals(prop))
+                return ((Transition<T>) t).value();
+
         return (T) map.get(prop);
     }
 
@@ -44,6 +51,7 @@ public class Rule {
             case "min-height" -> put(CSSProperty.minHeight, parser.parseLength());
             case "border" -> put(CSSProperty.border, parser.parseBorder());
             case "font-size" -> put(CSSProperty.fontSize, parser.parseLength());
+            case "transition" -> put(CSSProperty.transition, parser.parseTransitionList());
             default -> throw new UnsupportedOperationException("unknown CSS property: " + name);
         }
     }
@@ -95,7 +103,6 @@ public class Rule {
             return e;
     }
 
-
     public Element apply2(Element elem, DecorationContext context) {
         elem = prop2(List.of(CSSProperty.paddingTop, CSSProperty.paddingRight,
                 CSSProperty.paddingBottom, CSSProperty.paddingLeft), elem, (e, padding) -> makePadding(e, padding, context));
@@ -124,5 +131,49 @@ public class Rule {
                 lengths.get(2) == null ? 0 : context.length(lengths.get(2)), // bottom
                 lengths.get(3) == null ? 0 : context.length(lengths.get(3))  // left
         ));
+    }
+
+    public void applyTransitionsOf(Element e) {
+        List<TransitionSpec<?>> l = get(CSSProperty.transition);
+        if (l == null) // ilyenkor törölni kéne
+            return;
+
+        if (!(e instanceof RenderableElement))
+            throw new IllegalArgumentException("transition on transient element: " + e);
+
+        for (TransitionSpec<?> t : l)
+            handleTransitionSpec(e, t);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void handleTransitionSpec(Element e, TransitionSpec<T> transitionSpec) {
+        Transition<T> transition = null;
+        for (Attribute a : e.attributes()) {
+            if (a instanceof Transition && ((Transition<?>) a).spec.equals(transitionSpec)) {
+                transition = (Transition<T>) a;
+            }
+        }
+
+        T currentValue = (T) map.get(transitionSpec.property());
+
+        if (transition == null) {
+            transition = new Transition<>((Pane) e, transitionSpec, currentValue);
+            e.attributes().add(transition);
+        }
+
+        boolean start = transition.setEnd(currentValue);
+        transitions.add(transition);
+
+        if (start) {
+            Transition<T> t = transition;
+            if (t.activeAnimation != null)
+                t.activeAnimation.cancel(false);
+
+            RenderableElement r = (RenderableElement) e;
+            transition.activeAnimation = r.rendererData.eventLoop().beginAnimation(transition.spec.duration(), f -> {
+                t.progress(f);
+                r.requestLayout();
+            });
+        }
     }
 }

@@ -4,7 +4,7 @@ import ui10.geom.Insets;
 import ui10.image.Colors;
 import ui10.ui6.Element;
 import ui10.ui6.controls.Button;
-import ui10.ui6.decoration.*;
+import ui10.ui6.decoration.css.CSSDecorator;
 import ui10.ui6.decoration.css.CSSParser;
 import ui10.ui6.decoration.css.CSSScanner;
 import ui10.ui6.graphics.ColorFill;

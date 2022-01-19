@@ -22,6 +22,7 @@ public class AWTDesktop extends Desktop {
         frame.setSize(frame.getInsets().left + 640 + frame.getInsets().right,
                 frame.getInsets().top + 480 + frame.getInsets().bottom);
         frame.setLocationRelativeTo(null);
+        frame.applySize();
         frame.setVisible(true);
     }
 

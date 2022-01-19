@@ -38,8 +38,7 @@ public abstract class Pane extends RenderableElement {
 
     public List<RenderableElement> renderableElements() {
         if (!valid)
-            onShapeApplied(shape, new LayoutContext2.AbstractLayoutContext2() {
-
+            onShapeApplied(shape, new LayoutContext2.AbstractLayoutContext2(null) {
                 @Override
                 public void accept(RenderableElement element) {
                     throw new UnsupportedOperationException();
@@ -81,6 +80,11 @@ public abstract class Pane extends RenderableElement {
                 e.parent = Pane.this;
                 if (e instanceof Pane p)
                     p.focusContext = focusContext;
+            }
+
+            @Override
+            public RenderableElement lowestRenderableElement() {
+                return Pane.this;
             }
 
             @Override

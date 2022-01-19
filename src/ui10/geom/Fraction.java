@@ -1,6 +1,9 @@
 package ui10.geom;
 
 public record Fraction(int numerator, int denominator) {
+
+    public static final Fraction ZERO = new Fraction(0, 1);
+    public static final Fraction HALF = new Fraction(1, 2);
     public static final Fraction WHOLE = new Fraction(1, 1);
 
     public boolean isNegative() {

@@ -55,7 +55,7 @@ public class UIContextImpl implements UIContext {
             t.task().run();
         }
         inLayout = -1;
-        System.out.println(layoutTasks);
+        //System.out.println(layoutTasks);
         layoutTasks.clear();
     }
 

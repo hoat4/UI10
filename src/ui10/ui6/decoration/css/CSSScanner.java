@@ -7,16 +7,13 @@ import java.util.stream.Collectors;
 public class CSSScanner {
 
     private final Reader reader;
-    int next;
+    int next, next1;
 
     public CSSScanner(Reader reader) {
         this.reader = reader;
 
-        try {
-            next = reader.read();
-        } catch (IOException e) {
-            throw new CSSParseException(e);
-        }
+        take();
+        take();
     }
 
     public int take() {
@@ -24,12 +21,26 @@ public class CSSScanner {
         if (c == -1)
             throw new CSSParseException("EOF");
 
+        readImpl();
+        while (next == '/' && next1 == '*') {
+            readImpl();
+            readImpl();
+            while(next != '*' || next1 != '/')
+                readImpl();
+            readImpl();
+            readImpl();
+        }
+
+        return c;
+    }
+
+    private void readImpl() {
+        next = next1;
         try {
-            next = reader.read();
+            next1 = reader.read();
         } catch (IOException e) {
             throw new CSSParseException(e);
         }
-        return c;
     }
 
     public void expectAndSkipWhitespaces() {

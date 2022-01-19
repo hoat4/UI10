@@ -1,7 +1,6 @@
 package ui10.nodes;
 
 import ui10.geom.Fraction;
-import ui10.ui6.RenderableElement;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -27,10 +26,11 @@ public class EventLoop {
         });
     }
 
-    public void beginAnimation(Duration duration, Consumer<Fraction> f) {
+    public ScheduledFuture<?> beginAnimation(Duration duration, Consumer<Fraction> f) {
         Animation animation = new Animation(duration, f);
         animation.scheduledFuture = executorService.scheduleAtFixedRate(animation,
                 0, 16, TimeUnit.MILLISECONDS);
+        return animation.scheduledFuture;
     }
 
     private static class Animation implements Runnable {
