@@ -1,5 +1,6 @@
 package ui10.ui6.decoration;
 
+import ui10.geom.Fraction;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
@@ -12,6 +13,8 @@ import ui10.ui6.layout.LayoutContext1;
 import ui10.ui6.layout.Layouts;
 
 import java.util.List;
+
+import static ui10.ui6.layout.Layouts.withOpacity;
 
 public interface Fill {
 
@@ -64,4 +67,21 @@ public interface Fill {
 
     }
 
+    class InterpolatedFill implements Fill {
+
+        private final Fill a;
+        private final Fill b;
+        private final Fraction t;
+
+        public InterpolatedFill(Fill a, Fill b, Fraction t) {
+            this.a = a;
+            this.b = b;
+            this.t = t;
+        }
+
+        @Override
+        public Element makeElement(DecorationContext context) {
+            return Layouts.stack(withOpacity(a.makeElement(context), t.oneMinus()), withOpacity(b.makeElement(context), t));
+        }
+    }
 }

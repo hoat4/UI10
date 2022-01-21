@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
+// if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
 public abstract class RenderableElement extends PropertyHolder implements Element {
 
     public RendererData rendererData;
@@ -101,7 +102,9 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
         // TODO onChange
     }
 
-    public Shape shape() {
+    public Shape shapeOrFail() {
+        if (shape == null)
+            throw new IllegalStateException("no shape for " + this);
         return shape;
     }
 
@@ -112,7 +115,7 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
 
     public void requestLayout() {
         rendererData.invalidateRendererData();
-        rendererData.uiContext().requestLayout(new UIContext.LayoutTask(this, ()->{
+        rendererData.uiContext().requestLayout(new UIContext.LayoutTask(this, () -> {
             LayoutContext1 consumer = new LayoutContext1() {
                 @Override
                 public RenderableElement lowestRenderableElement() {
@@ -148,6 +151,7 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
             });
         }));
     }
+
     public static RenderableElement of(Element node) {
         return node instanceof RenderableElement r ? r : Pane.of(node);
     }

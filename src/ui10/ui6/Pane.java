@@ -108,6 +108,11 @@ public abstract class Pane extends RenderableElement {
                 public Element content() {
                     return node;
                 }
+
+                @Override
+                public String toString() {
+                    return "Pane[" + node + "]";
+                }
             };
     }
 }

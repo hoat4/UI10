@@ -1,6 +1,7 @@
 package ui10.renderer6.java2d;
 
 import ui10.nodes.EventLoop;
+import ui10.ui6.graphics.Opacity;
 import ui10.ui6.layout.LayoutContext2;
 import ui10.ui6.Pane;
 import ui10.ui6.RenderableElement;
@@ -85,6 +86,8 @@ public class J2DRenderer {
             return (Item<N>) new TextItem(this, t);
         else if (n instanceof LinearGradient l)
             return (Item<N>) new LinearGradientImpl(this, l);
+        else if (n instanceof Opacity o)
+            return (Item<N>) new OpacityItem(this, o);
         else
             throw new UnsupportedOperationException(n.toString());
     }

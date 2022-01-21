@@ -27,6 +27,6 @@ public class Interpolators {
         if (a instanceof Fill.ColorFill ac && b instanceof Fill.ColorFill bc)
             return new Fill.ColorFill(COLOR.interpolate(ac.color(), bc.color(), t));
         else
-            throw new UnsupportedOperationException(a + ", " + b + ", " + t);
+            return new Fill.InterpolatedFill(a, b, t);
     };
 }

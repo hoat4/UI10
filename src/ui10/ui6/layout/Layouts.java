@@ -1,5 +1,6 @@
 package ui10.ui6.layout;
 
+import ui10.geom.Fraction;
 import ui10.geom.Insets;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
@@ -8,6 +9,7 @@ import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
 import ui10.ui6.decoration.css.CSSClass;
+import ui10.ui6.graphics.Opacity;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -233,6 +235,34 @@ public class Layouts {
         protected void applyShapeImpl(Shape shape, LayoutContext2 context) {
             for (Element e : elements)
                 e.performLayout(shape, context);
+        }
+    }
+
+    public static Element withOpacity(Element e, Fraction opacity) {
+        return new Opacity(e, opacity);
+    }
+
+    public static Element withSize(Element e, Size size) { // paramétersorrend ne fordítva legyen?
+        return new WithSize(e, size);
+    }
+
+    private static class WithSize extends SingleNodeLayout {
+
+        private final Size size;
+
+        public WithSize(Element content, Size size) {
+            super(content);
+            this.size = size;
+        }
+
+        @Override
+        protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
+            return Rectangle.of(constraints.clamp(size));
+        }
+
+        @Override
+        protected Shape computeContentShape(Shape containerShape, LayoutContext2 context) {
+            return containerShape;
         }
     }
 }

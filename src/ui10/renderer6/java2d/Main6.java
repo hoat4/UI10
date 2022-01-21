@@ -1,6 +1,8 @@
 package ui10.renderer6.java2d;
 
+import ui10.geom.Fraction;
 import ui10.geom.Insets;
+import ui10.geom.Size;
 import ui10.image.Colors;
 import ui10.ui6.Element;
 import ui10.ui6.controls.Button;
@@ -8,6 +10,7 @@ import ui10.ui6.decoration.css.CSSDecorator;
 import ui10.ui6.decoration.css.CSSParser;
 import ui10.ui6.decoration.css.CSSScanner;
 import ui10.ui6.graphics.ColorFill;
+import ui10.ui6.graphics.Opacity;
 import ui10.ui6.layout.Layouts;
 import ui10.ui6.controls.TextField;
 import ui10.ui6.window.Window;
@@ -44,6 +47,10 @@ public class Main6 {
 
         content = new CSSDecorator(content, css);
 
+        /*Window window = Window.of(centered(withSize(
+                new Opacity(new ColorFill(Colors.RED), Fraction.of(.1, 100)),
+                new Size(100, 100)
+        )));*/
         Window window = Window.of(content);
         desktop.windows.add(window);
     }

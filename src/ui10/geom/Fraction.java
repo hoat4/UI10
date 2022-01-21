@@ -27,7 +27,18 @@ public record Fraction(int numerator, int denominator) {
         return new Fraction((int) (d * denominator), denominator);
     }
 
+    public float toFloat() {
+        return (float) numerator / denominator;
+    }
+
     public double toDouble() {
         return (double) numerator / denominator;
+    }
+
+    /**
+     * @return {@link #WHOLE} - {@code this}
+     */
+    public Fraction oneMinus() {
+        return new Fraction(denominator - numerator, denominator);
     }
 }
