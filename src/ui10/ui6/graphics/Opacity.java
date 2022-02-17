@@ -1,6 +1,7 @@
 package ui10.ui6.graphics;
 
 import ui10.geom.Fraction;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
@@ -30,8 +31,8 @@ public class Opacity extends RenderableElement {
     }
 
     @Override
-    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-        return content.preferredShape(constraints, context1);
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+        return content.preferredSize(constraints, context1);
     }
 
     @Override

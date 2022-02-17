@@ -3,6 +3,7 @@ package ui10.ui6.controls;
 import ui10.binding.EventBus;
 import ui10.binding.ScalarProperty;
 import ui10.binding.StandaloneEventBus;
+import ui10.binding.impl.SelfContainedScalarProperty;
 import ui10.geom.Insets;
 import ui10.image.Colors;
 import ui10.image.RGBColor;
@@ -29,11 +30,14 @@ public class Button extends Control {
 
     public final EventBus<Void> onAction = new StandaloneEventBus<>();
 
+    private final ScalarProperty<Boolean> pressed = new SelfContainedScalarProperty<>("pressed");
+
     {
         withClass("button", this);
         textNode.text("Gomb");
 
         pressed().subscribe(e->{
+            requestLayout();
             System.out.println(e.newValue());
             if (!e.newValue())
                 onAction.postEvent(null);
@@ -41,7 +45,7 @@ public class Button extends Control {
     }
 
     public ScalarProperty<Boolean> pressed() {
-        return property((Button b) -> b._pressed, (b, v) -> b._pressed = v);
+        return pressed;
     }
 
     @Override

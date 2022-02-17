@@ -6,8 +6,12 @@ public record Size(int width, int height) {
 
     public static final Size ZERO = new Size(0, 0);
 
+    // konkrét értéknek nincs gyakorlati jelentősége, de legyen kisebb mint Integer.MAX_VALUE,
+    // mert BoxConstraints-ben azt használjuk végtelennek
+    public static final int MAX = Integer.MAX_VALUE / 2 - 2;
+
     public Size {
-        if (width < 0 || height < 0)
+        if (width < 0 || height < 0 || width > MAX || height > MAX)
             throw new IllegalArgumentException(width + " × " + height);
     }
 

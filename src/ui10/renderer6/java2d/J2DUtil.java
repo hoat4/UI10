@@ -71,6 +71,8 @@ public class J2DUtil {
 
     public static Path2D.Double shapeToPath2D(Shape shape) {
         PathBuilder pb = new PathBuilder();
+        if (shape.bounds().isEmpty())
+            return pb.path;
         for (BézierPath p : shape.outlines()) {
             p.iterate(pb);
         }

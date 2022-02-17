@@ -1,6 +1,7 @@
 package ui10.ui6;
 
 import ui10.binding.PropertyHolder;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.layout.LayoutContext1;
@@ -13,7 +14,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
-public abstract class RenderableElement extends PropertyHolder implements Element {
+public abstract class RenderableElement extends Element {
 
     public RendererData rendererData;
     public RenderableElement parent;
@@ -21,62 +22,13 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
     protected Shape shape;
     protected List<LayoutContext1.LayoutDependency> layoutDependencies;
 
-    private Element replacement;
-    private boolean inReplacement;
-
-    // this should become a manual linked list, standard collections has large memory overhead
-
-    private final Set<Attribute> attributeList = new HashSet<>();
-
-    @Override
-    public Set<Attribute> attributes() {
-        return attributeList; // onChange
-    }
-
     @Override
     public void enumerateStaticChildren(Consumer<Element> consumer) {
         // most subclasses have no children
     }
 
     @Override
-    public final Shape preferredShape(BoxConstraints constraints, LayoutContext1 context) {
-        Objects.requireNonNull(constraints);
-
-        if (replacement == null || inReplacement) {
-            Shape s = preferredShapeImpl(constraints, context);
-            s = s.translate(s.bounds().topLeft().negate());
-            Objects.requireNonNull(s, this::toString);
-            context.addLayoutDependency(this, new LayoutContext1.LayoutDependency(constraints, shape));
-            return s;
-        } else {
-            boolean r = inReplacement;
-            inReplacement = true;
-            try {
-                return replacement.preferredShape(constraints, context);
-            } finally {
-                inReplacement = r;
-            }
-        }
-    }
-
-    protected abstract Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context1);
-
-    @Override
-    public final void performLayout(Shape shape, LayoutContext2 context) {
-        Objects.requireNonNull(shape);
-        Objects.requireNonNull(context);
-
-        if (replacement != null && !inReplacement) {
-            boolean r = inReplacement;
-            inReplacement = true;
-            try {
-                replacement.performLayout(shape, context);
-            } finally {
-                inReplacement = r;
-            }
-            return;
-        }
-
+    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
         context.accept(this);
 
         boolean changed = !Objects.equals(this.shape, shape);
@@ -89,17 +41,6 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
     }
 
     protected void onShapeApplied(Shape shape, LayoutContext2 context) {
-    }
-
-    @Override
-    public Element replacement() {
-        return replacement;
-    }
-
-    @Override
-    public void replacement(Element e) {
-        replacement = e;
-        // TODO onChange
     }
 
     public Shape shapeOrFail() {
@@ -129,7 +70,7 @@ public abstract class RenderableElement extends PropertyHolder implements Elemen
             };
 
             for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
-                if (!preferredShape(dep.inputConstraints(), consumer).equals(dep.shape())) {
+                if (!preferredSize(dep.inputConstraints(), consumer).equals(dep.shape())) {
                     Objects.requireNonNull(parent, this::toString);
                     parent.requestLayout();
                     return;

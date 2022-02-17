@@ -1,6 +1,7 @@
 package ui10.ui6.decoration;
 
 import ui10.geom.Insets;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
@@ -9,7 +10,7 @@ import ui10.ui6.layout.LayoutContext1;
 
 import java.util.function.Consumer;
 
-public class Border extends Element.TransientElement {
+public class Border extends Element {
 
     public final Insets insets;
     public final Element fill;
@@ -28,12 +29,12 @@ public class Border extends Element.TransientElement {
     }
 
     @Override
-    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return insets.addTo(content.preferredShape(constraints.subtract(insets.all()), context));
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return content.preferredSize(constraints.subtract(insets.all()), context).add(insets.all());
     }
 
     @Override
-    protected void applyShapeImpl(Shape shape, LayoutContext2 context) {
+    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
         Shape contentShape = insets.removeFrom(shape);
 
         fill.performLayout(shape.subtract(contentShape), context);

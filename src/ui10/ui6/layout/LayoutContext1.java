@@ -8,8 +8,11 @@ public interface LayoutContext1 {
 
     RenderableElement lowestRenderableElement(); // ez meg mi a fene?
 
+    // TODO "performing layout" helyett írjuk ki értelmesen, hogy elhelyezi az elementeket
     /**
      * Records that the current element must be layouted again if the size of the specified element is changed.
+     * This is invoked automatically by RenderableElement when computing preferred size and by Pane when performing
+     * layout.
      */
     void addLayoutDependency(RenderableElement element, LayoutDependency d);
 

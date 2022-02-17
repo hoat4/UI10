@@ -2,6 +2,7 @@ package ui10.ui6.controls;
 
 import ui10.binding.ScalarProperty;
 import ui10.geom.Rectangle;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.image.Colors;
 import ui10.layout.BoxConstraints;
@@ -31,7 +32,7 @@ public class TextField extends Pane {
 
     @Override
     public Element content() {
-        return new Element.TransientElement() {
+        return new Element() {
             @Override
             public void enumerateStaticChildren(Consumer<Element> consumer) {
                 consumer.accept(textNode);
@@ -39,13 +40,13 @@ public class TextField extends Pane {
             }
 
             @Override
-            protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
-                return textNode.preferredShape(constraints, context);
+            protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+                return textNode.preferredSize(constraints, context);
             }
 
             @Override
-            protected void applyShapeImpl(Shape shape, LayoutContext2 context) {
-                textNode.performLayout(TextField.this.shape, context);
+            protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
+                textNode.performLayout(shape, context);
 
                 Rectangle caretShape = new Rectangle(caretPosition.get(), 0, 1, shape.bounds().size().height()).
                         translate(shape.bounds().topLeft());

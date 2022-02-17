@@ -28,6 +28,7 @@ public abstract class Shape {
         return ShapeOperations.union(this, other);
     }
 
+    // nullable
     public Shape intersectionWith(Shape other) {
         return ShapeOperations.intersection(this, other);
     }

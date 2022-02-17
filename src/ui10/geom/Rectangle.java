@@ -4,6 +4,7 @@ import ui10.geom.shape.BézierPath;
 import ui10.geom.shape.Shape;
 
 import java.util.List;
+import java.util.Objects;
 
 import static ui10.geom.Point.ORIGO;
 
@@ -174,8 +175,11 @@ public class Rectangle extends Shape {
 
     @Override
     public Shape intersectionWith(Shape other) {
+        if (size.isZero())
+            return this;
+
         if (!(other instanceof Rectangle))
-            throw new UnsupportedOperationException(); // ???
+            return super.intersectionWith(other);
 
         return intersection(this, (Rectangle) other);
     }
@@ -200,6 +204,18 @@ public class Rectangle extends Shape {
         return size.height();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rectangle rectangle = (Rectangle) o;
+        return topLeft.equals(rectangle.topLeft) && size.equals(rectangle.size);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(topLeft, size);
+    }
 
     @Override
     public String toString() {

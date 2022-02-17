@@ -101,7 +101,7 @@ public class ShapeOperations {
                 return shape + " into " + b;
             }
         };
-        assert s.bounds().equals(b.bounds()) : s.bounds() + ", " + shape.bounds() + ", " + a.bounds();
+        assert s.bounds().equals(b.bounds()) : s.bounds() +", "+ b+", " + shape.bounds() + ", " + a.bounds();
         return s;
     }
 
@@ -111,7 +111,7 @@ public class ShapeOperations {
     }
 
     public static Shape intersection(Shape shape, Shape other) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(shape+", "+other);
     }
 
     public static Shape subtract(Shape a, Shape b) {

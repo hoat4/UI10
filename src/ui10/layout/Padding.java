@@ -77,9 +77,7 @@ public class Padding extends Pane {
 
             @Override
             protected Size determineSize(BoxConstraints constraints) {
-                BoxConstraints c = new BoxConstraints(
-                        constraints.min().subtractOrClamp(all.get()),
-                        constraints.max().subtract(all.get()));
+                BoxConstraints c = constraints.subtract(all.get());
 
                 return content.get().determineSize(c).add(all.get());
             }

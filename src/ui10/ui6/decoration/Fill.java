@@ -2,6 +2,7 @@ package ui10.ui6.decoration;
 
 import ui10.geom.Fraction;
 import ui10.geom.Point;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
@@ -39,8 +40,8 @@ public interface Fill {
             return new Layouts.SingleNodeLayout(g) {
 
                 @Override
-                protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
-                    return g.preferredShape(constraints, context);
+                protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+                    return g.preferredSize(constraints, context);
                 }
 
                 @Override

@@ -1,5 +1,6 @@
 package ui10.ui6.decoration.css;
 
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Attribute;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class CSSDecorator extends Element.TransientElement {
+public class CSSDecorator extends Element {
 
     private final Element content;
     final CSSParser css;
@@ -32,12 +33,12 @@ public class CSSDecorator extends Element.TransientElement {
     }
 
     @Override
-    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return content.preferredShape(constraints, context);
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return content.preferredSize(constraints, context);
     }
 
     @Override
-    protected void applyShapeImpl(Shape shape, LayoutContext2 context) {
+    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
         content.performLayout(shape, context);
     }
 

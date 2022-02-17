@@ -1,6 +1,7 @@
 package ui10.ui6;
 
 import ui10.binding.PropertyEvent;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.layout.LayoutContext1;
@@ -47,13 +48,6 @@ public abstract class Pane extends RenderableElement {
         return children;
     }
 
-    @Override
-    public <T extends PropertyEvent> void onChange(T changeEvent) {
-        super.onChange(changeEvent);
-
-        requestLayout();
-    }
-
     /**
      * Invalidates layout and content.
      */
@@ -63,8 +57,8 @@ public abstract class Pane extends RenderableElement {
     }
 
     @Override
-    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return getContent().preferredShape(constraints, context);
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return getContent().preferredSize(constraints, context);
     }
 
     @Override

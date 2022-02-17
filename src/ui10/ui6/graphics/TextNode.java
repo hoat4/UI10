@@ -2,6 +2,7 @@ package ui10.ui6.graphics;
 
 import ui10.font.TextStyle;
 import ui10.geom.Rectangle;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
@@ -67,8 +68,8 @@ public class TextNode extends RenderableElement {
     }
 
     @Override
-    protected Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-        return Rectangle.of(textStyle.textSize(text).size().divide(1000));
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+        return textStyle.textSize(text).size().divide(1000);
     }
 
     @Override

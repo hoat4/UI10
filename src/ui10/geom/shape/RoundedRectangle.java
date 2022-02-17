@@ -50,4 +50,11 @@ public class RoundedRectangle extends Shape {
         return new RoundedRectangle(rectangle.translate(point), radius);
     }
 
+    @Override
+    public String toString() {
+        return "RoundedRectangle{" +
+                "rectangle=" + rectangle +
+                ", radius=" + radius +
+                '}';
+    }
 }

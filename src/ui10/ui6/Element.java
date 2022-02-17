@@ -1,5 +1,6 @@
 package ui10.ui6;
 
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.layout.LayoutContext1;
@@ -10,13 +11,60 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public interface Element {
+public abstract class Element {
+
+    protected Element replacement;
+    protected boolean inReplacement;
+
+    // this should become a manual linked list, standard collections has large memory overhead
+    private final Set<Attribute> attributes = new HashSet<>();
 
     // LAYOUT
 
-    Shape preferredShape(BoxConstraints constraints, LayoutContext1 context); // this honors replacement
+    // the returned shape will have bounds with topLeft at origo
+    // this honors replacement
+    public final Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
+        Objects.requireNonNull(constraints);
 
-    void performLayout(Shape shape, LayoutContext2 context); // this also honors replacement
+        if (replacement == null || inReplacement) {
+            Size s = preferredSizeImpl(constraints, context);
+            Objects.requireNonNull(s, this::toString);
+            if (this instanceof RenderableElement)
+                context.addLayoutDependency((RenderableElement) this,
+                        new LayoutContext1.LayoutDependency(constraints, ((RenderableElement)this).shape));
+            return s;
+        } else {
+            boolean r = inReplacement;
+            inReplacement = true;
+            try {
+                return replacement.preferredSize(constraints, context);
+            } finally {
+                inReplacement = r;
+            }
+        }
+    }
+
+    protected abstract Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1);
+
+    // this also honors replacement
+    public final void performLayout(Shape shape, LayoutContext2 context) {
+        Objects.requireNonNull(shape);
+        Objects.requireNonNull(context);
+
+        if (replacement != null && !inReplacement) {
+            boolean r = inReplacement;
+            inReplacement = true;
+            try {
+                replacement.performLayout(shape, context);
+            } finally {
+                inReplacement = r;
+            }
+        } else
+            performLayoutImpl(shape, context);
+    }
+
+    protected abstract void performLayoutImpl(Shape shape, LayoutContext2 context);
+
 
     // DECORATION
 
@@ -25,80 +73,26 @@ public interface Element {
      * set the Pane.decorator field because Panes usually recreate its children every time, so decorating them only once
      * is useless.
      */
-    void enumerateStaticChildren(Consumer<Element> consumer); // this does not honor replacement
+    public abstract void enumerateStaticChildren(Consumer<Element> consumer); // this does not honor replacement
 
-    Element replacement();
+    public final Element replacement() {
+        return replacement;
+    }
 
     /**
      * This can be used by decorators to provide a replacement elementClass.
      *
      * @param e
      */
-    void replacement(Element e);
+    public final void replacement(Element e) {
+        this.replacement = e;
+        // TODO onChange
+    }
 
     // MISC
 
-    Set<Attribute> attributes();
-
-    abstract class TransientElement implements Element {
-
-        private Element replacement;
-        private boolean inReplacement;
-        private final Set<Attribute> attributes = new HashSet<>();
-
-        @Override
-        public abstract void enumerateStaticChildren(Consumer<Element> consumer);
-
-        @Override
-        public Shape preferredShape(BoxConstraints constraints, LayoutContext1 context) {
-            if (replacement == null || inReplacement) {
-                Shape preferredShape = preferredShapeImpl(constraints, context);
-                preferredShape = preferredShape.translate(preferredShape.bounds().topLeft().negate());
-                Objects.requireNonNull(preferredShape, () -> this + " returned null preferred layout");
-                return preferredShape;
-            } else {
-                boolean r = inReplacement;
-                inReplacement = true;
-                try {
-                    return replacement.preferredShape(constraints, context);
-                } finally {
-                    inReplacement = r;
-                }
-            }
-        }
-
-        protected abstract Shape preferredShapeImpl(BoxConstraints constraints, LayoutContext1 context);
-
-        @Override
-        public void performLayout(Shape shape, LayoutContext2 context) {
-            if (replacement == null || inReplacement) {
-                applyShapeImpl(shape, context);
-            } else {
-                boolean r = inReplacement;
-                inReplacement = true;
-                try {
-                    replacement.performLayout(shape, context);
-                } finally {
-                    inReplacement = r;
-                }
-            }
-        }
-
-        protected abstract void applyShapeImpl(Shape shape, LayoutContext2 context);
-
-        @Override
-        public Element replacement() {
-            return replacement;
-        }
-
-        @Override
-        public void replacement(Element e) {
-            this.replacement = e;
-        }
-
-        @Override
-        public Set<Attribute> attributes() {
-            return attributes;
-        }
+    public Set<Attribute> attributes() {
+        // onChange
+        return attributes;
     }
 }

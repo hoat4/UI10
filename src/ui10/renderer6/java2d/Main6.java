@@ -4,6 +4,8 @@ import ui10.geom.Fraction;
 import ui10.geom.Insets;
 import ui10.geom.Size;
 import ui10.image.Colors;
+import ui10.image.RGBColor;
+import ui10.layout.FixedSize;
 import ui10.ui6.Element;
 import ui10.ui6.controls.Button;
 import ui10.ui6.decoration.css.CSSDecorator;
@@ -32,9 +34,14 @@ public class Main6 {
         TextField tf = new TextField();
 
         Button button = new Button();
-        button.onAction.subscribe(__->System.out.println("Hello world!"));
+        button.onAction.subscribe(__ -> System.out.println("Hello world!"));
 
-        Element content = withClass("root", centered(button));
+        Element content = withClass("root",
+                centered(vertically(button, tf))
+                //centered(roundRectangle(10, stack(
+               //         Layouts.padding(new ColorFill(Colors.RED), new Insets(25)), new ColorFill(Colors.GREEN)
+                //)))
+        );
 
         CSSParser css;
         try (Reader r = new InputStreamReader(Main6.class.getResourceAsStream("modena-imitation.css"))) {
@@ -61,9 +68,7 @@ public class Main6 {
                 Layouts.stack(
                         new ColorFill(Colors.YELLOW),
                         Layouts.padding(
-                                Layouts.shaped(
-                                        Layouts.roundRectangle(20, new ColorFill(Colors.GREEN))
-                                ),
+                                Layouts.roundRectangle(20, new ColorFill(Colors.GREEN)),
                                 new Insets(50)
                         )
                 ),
