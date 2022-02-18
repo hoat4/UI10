@@ -1,8 +1,6 @@
 package ui10.renderer6.java2d;
 
-import ui10.nodes.EventLoop;
 import ui10.ui6.graphics.Opacity;
-import ui10.ui6.layout.LayoutContext2;
 import ui10.ui6.Pane;
 import ui10.ui6.RenderableElement;
 import ui10.ui6.graphics.ColorFill;
@@ -12,7 +10,6 @@ import ui10.ui6.graphics.TextNode;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class J2DRenderer {

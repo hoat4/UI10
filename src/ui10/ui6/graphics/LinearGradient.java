@@ -1,14 +1,13 @@
 package ui10.ui6.graphics;
 
 import ui10.geom.Point;
-import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.layout.LayoutContext2;
+import ui10.ui6.LayoutContext2;
 import ui10.ui6.RenderableElement;
-import ui10.ui6.layout.LayoutContext1;
+import ui10.ui6.LayoutContext1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ public class LinearGradient extends RenderableElement {
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
         return constraints.min();
     }
 

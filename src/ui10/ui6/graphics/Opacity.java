@@ -6,8 +6,8 @@ import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
 import ui10.ui6.RenderableElement;
-import ui10.ui6.layout.LayoutContext1;
-import ui10.ui6.layout.LayoutContext2;
+import ui10.ui6.LayoutContext1;
+import ui10.ui6.LayoutContext2;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -31,12 +31,12 @@ public class Opacity extends RenderableElement {
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-        return content.preferredSize(constraints, context1);
+    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+        return context1.preferredSize(content, constraints);
     }
 
     @Override
     protected void onShapeApplied(Shape shape, LayoutContext2 context) {
-        content.performLayout(shape, LayoutContext2.ignoring(this));
+        LayoutContext2.ignoring().placeElement(content, shape);
     }
 }

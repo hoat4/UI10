@@ -8,8 +8,8 @@ import ui10.ui6.Control;
 import ui10.ui6.Element;
 import ui10.ui6.Pane;
 import ui10.ui6.decoration.DecorationContext;
-import ui10.ui6.layout.LayoutContext1;
-import ui10.ui6.layout.LayoutContext2;
+import ui10.ui6.LayoutContext1;
+import ui10.ui6.LayoutContext2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +33,13 @@ public class CSSDecorator extends Element {
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return content.preferredSize(constraints, context);
+    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return context.preferredSize(content, constraints);
     }
 
     @Override
     protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-        content.performLayout(shape, context);
+        context.placeElement(content, shape);
     }
 
     private void applyOnRegularElement(Element element) {

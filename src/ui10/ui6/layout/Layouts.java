@@ -5,11 +5,12 @@ import ui10.geom.shape.RoundedRectangle;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
+import ui10.ui6.LayoutContext1;
+import ui10.ui6.LayoutContext2;
 import ui10.ui6.decoration.css.CSSClass;
 import ui10.ui6.graphics.Opacity;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Layouts {
@@ -25,7 +26,7 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
             return constraints.min();
         }
 
@@ -45,8 +46,8 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-            return content.preferredSize(constraints, context);
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+            return context.preferredSize(content, constraints);
         }
 
         @Override
@@ -71,14 +72,14 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-            return constraints.clamp(content.preferredSize(constraints.withMinimum(Size.ZERO), context));
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+            return constraints.clamp(context.preferredSize(content, constraints.withMinimum(Size.ZERO)));
         }
 
 
         @Override
         protected Shape computeContentShape(Shape containerShape, LayoutContext2 context) {
-            Size contentSize = content.preferredSize(new BoxConstraints(Size.ZERO, containerShape.bounds().size()), context);
+            Size contentSize = context.preferredSize(content, new BoxConstraints(Size.ZERO, containerShape.bounds().size()));
             return containerShape.bounds().centered(contentSize).intersectionWith(containerShape);
         }
 
@@ -98,8 +99,8 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-            return content.preferredSize(constraints.withMinimum(Size.max(constraints.min(), minSize)), context);
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+            return context.preferredSize(content, constraints.withMinimum(Size.max(constraints.min(), minSize)));
         }
 
         @Override
@@ -121,9 +122,9 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
             Size insetsSize = insets.all();
-            Size contentSize = content.preferredSize(constraints.subtract(insetsSize), context);
+            Size contentSize = context.preferredSize(content, constraints.subtract(insetsSize));
             return contentSize.add(insetsSize);
         }
 
@@ -146,9 +147,9 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
             Size insetsSize = insets.all();
-            Size contentSize = content.preferredSize(constraints.subtract(insetsSize), context);
+            Size contentSize = context.preferredSize(content, constraints.subtract(insetsSize));
             return contentSize.add(insetsSize);
         }
 
@@ -172,9 +173,9 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
             Size minSize = Size.max(constraints.min(), new Size(radius * 2, radius * 2));
-            return content.preferredSize(constraints.withMinimum(minSize), context);
+            return context.preferredSize(content, constraints.withMinimum(minSize));
         }
 
         @Override
@@ -198,7 +199,7 @@ public class Layouts {
 
         @Override
         protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-            content.performLayout(computeContentShape(shape, context), context);
+            context.placeElement(content, computeContentShape(shape, context));
         }
 
         protected abstract Shape computeContentShape(Shape containerShape, LayoutContext2 context);
@@ -222,17 +223,17 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
             Size size = Size.ZERO;
             for (Element e : elements)
-                size = Size.max(size, e.preferredSize(constraints, context));
+                size = Size.max(size, context.preferredSize(e, constraints));
             return size;
         }
 
         @Override
         protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
             for (Element e : elements)
-                e.performLayout(shape, context);
+                context.placeElement(e, shape);
         }
     }
 
@@ -254,7 +255,7 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
             return constraints.clamp(size);
         }
 
@@ -273,7 +274,7 @@ public class Layouts {
         return new VerticalLayout(List.of(elements));
     }
 
-    private static class VerticalLayout extends RectangularLayout {
+    private static class VerticalLayout extends Element {
 
         private final List<? extends Element> elements;
 
@@ -287,52 +288,31 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
             BoxConstraints elementConstraints = constraints.withUnboundedHeight();
 
             int w = 0;
             for (Element e : elements)
-                w = Math.max(w, e.preferredSize(elementConstraints, context).width());
+                w = Math.max(w, context.preferredSize(e, elementConstraints).width());
 
             elementConstraints = BoxConstraints.fixed(new Size(w, 0)).withUnboundedHeight();
             int h = 0;
             for (Element e : elements)
-                h += e.preferredSize(elementConstraints, context).height();
+                h += context.preferredSize(e, elementConstraints).height();
             return new Size(w, h);
         }
 
         @Override
-        protected void doPerformLayout(Size size, LayoutContext1 context, BiConsumer<Element, Rectangle> consumer) {
+        protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
             BoxConstraints elementConstraints =
-                    BoxConstraints.fixed(new Size(size.width(), 0)).withUnboundedHeight();
+                    BoxConstraints.fixed(new Size(shape.bounds().width(), 0)).withUnboundedHeight();
 
             int y = 0;
             for (Element e : elements) {
-                Size elemSize = e.preferredSize(elementConstraints, context);
-                consumer.accept(e, new Rectangle(new Point(0, y), elemSize));
+                Size elemSize = context.preferredSize(e, elementConstraints);
+                context.placeElement(e, new Rectangle(new Point(0, y), elemSize).translate(shape.bounds().topLeft()));
                 y += elemSize.height();
             }
         }
     }
-
-
-    public static abstract class RectangularLayout extends Element {
-
-        @Override
-        protected abstract Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1);
-
-        @Override
-        protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-            doPerformLayout(shape.bounds().size(), context, (e, rect) -> {
-                rect = rect.translate(shape.bounds().topLeft());
-                Shape intersection = rect.intersectionWith(shape);
-                if (intersection == null)
-                    throw new RuntimeException("no intersection for "+e+": "+rect+", "+shape.bounds());
-                e.performLayout(intersection, context);
-            });
-        }
-
-        protected abstract void doPerformLayout(Size size, LayoutContext1 context, BiConsumer<Element, Rectangle> consumer);
-    }
-
 }

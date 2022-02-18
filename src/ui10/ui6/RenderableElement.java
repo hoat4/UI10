@@ -1,16 +1,10 @@
 package ui10.ui6;
 
-import ui10.binding.PropertyHolder;
-import ui10.geom.Size;
+import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
-import ui10.layout.BoxConstraints;
-import ui10.ui6.layout.LayoutContext1;
-import ui10.ui6.layout.LayoutContext2;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
@@ -29,8 +23,6 @@ public abstract class RenderableElement extends Element {
 
     @Override
     protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-        context.accept(this);
-
         boolean changed = !Objects.equals(this.shape, shape);
         this.shape = shape;
         this.layoutDependencies = context.getDependencies(this);
@@ -43,9 +35,9 @@ public abstract class RenderableElement extends Element {
     protected void onShapeApplied(Shape shape, LayoutContext2 context) {
     }
 
-    public Shape shapeOrFail() {
+    public Shape getShapeOrFail() {
         if (shape == null)
-            throw new IllegalStateException("no shape for " + this);
+            throw new IllegalStateException("no clip for " + this);
         return shape;
     }
 
@@ -57,39 +49,29 @@ public abstract class RenderableElement extends Element {
     public void requestLayout() {
         rendererData.invalidateRendererData();
         rendererData.uiContext().requestLayout(new UIContext.LayoutTask(this, () -> {
-            LayoutContext1 consumer = new LayoutContext1() {
-                @Override
-                public RenderableElement lowestRenderableElement() {
-                    return null;
-                }
-
-                @Override
-                public void addLayoutDependency(RenderableElement element, LayoutDependency d) {
-                    // these known shapes should be used later to avoid computing preferred shapes redundantly
-                }
-            };
+            LayoutContext1 ctx = new LayoutContext1();
 
             for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
-                if (!preferredSize(dep.inputConstraints(), consumer).equals(dep.shape())) {
+                if (!ctx.preferredSize(this, dep.inputConstraints()).equals(dep.size())) {
                     Objects.requireNonNull(parent, this::toString);
                     parent.requestLayout();
                     return;
                 }
             }
 
-            performLayout(shape, new LayoutContext2.AbstractLayoutContext2(null) {
-                @Override
-                public void accept(RenderableElement element) {
-                }
+            new LayoutContext2() {
+                    @Override
+                    public void accept(RenderableElement element) {
+                    }
 
-                @Override
-                public List<LayoutDependency> getDependencies(RenderableElement element) {
-                    if (element == RenderableElement.this)
-                        return layoutDependencies;
-                    else
-                        return super.getDependencies(element);
-                }
-            });
+                    @Override
+                    public List<LayoutDependency> getDependencies(RenderableElement element) {
+                        if (element == RenderableElement.this)
+                            return layoutDependencies;
+                        else
+                            return super.getDependencies(element);
+                    }
+                }.placeElement(this, shape);
         }));
     }
 

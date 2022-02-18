@@ -7,12 +7,12 @@ import ui10.geom.shape.Shape;
 import ui10.image.Colors;
 import ui10.layout.BoxConstraints;
 import ui10.ui6.Element;
-import ui10.ui6.layout.LayoutContext2;
+import ui10.ui6.LayoutContext2;
 import ui10.ui6.Pane;
 import ui10.ui6.decoration.css.CSSClass;
 import ui10.ui6.graphics.ColorFill;
 import ui10.ui6.graphics.TextNode;
-import ui10.ui6.layout.LayoutContext1;
+import ui10.ui6.LayoutContext1;
 
 import java.util.function.Consumer;
 
@@ -40,17 +40,17 @@ public class TextField extends Pane {
             }
 
             @Override
-            protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-                return textNode.preferredSize(constraints, context);
+            public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+                return context.preferredSize(textNode, constraints);
             }
 
             @Override
             protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-                textNode.performLayout(shape, context);
+                context.placeElement(textNode, shape);
 
                 Rectangle caretShape = new Rectangle(caretPosition.get(), 0, 1, shape.bounds().size().height()).
                         translate(shape.bounds().topLeft());
-                caret.performLayout(caretShape, context);
+                context.placeElement(caret, caretShape);
             }
 
         };

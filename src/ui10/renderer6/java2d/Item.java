@@ -50,7 +50,7 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
     }
 
     private void validate() {
-        this.shape = J2DUtil.shapeToPath2D(node.shapeOrFail());
+        this.shape = J2DUtil.shapeToPath2D(node.getShapeOrFail());
 
         validateImpl();
     }

@@ -3,7 +3,6 @@ package ui10.renderer6.java2d;
 import ui10.nodes.EventLoop;
 import ui10.ui6.RenderableElement;
 import ui10.ui6.UIContext;
-import ui10.ui6.layout.LayoutContext2;
 
 import java.util.ArrayList;
 import java.util.BitSet;

@@ -1,11 +1,8 @@
 package ui10.ui6;
 
-import ui10.binding.PropertyEvent;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.layout.LayoutContext1;
-import ui10.ui6.layout.LayoutContext2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +36,7 @@ public abstract class Pane extends RenderableElement {
 
     public List<RenderableElement> renderableElements() {
         if (!valid)
-            onShapeApplied(shape, new LayoutContext2.AbstractLayoutContext2(null) {
+            onShapeApplied(shape, new LayoutContext2() {
                 @Override
                 public void accept(RenderableElement element) {
                     throw new UnsupportedOperationException();
@@ -57,8 +54,8 @@ public abstract class Pane extends RenderableElement {
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return getContent().preferredSize(constraints, context);
+    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return context.preferredSize(getContent(), constraints);
     }
 
     @Override
@@ -67,18 +64,13 @@ public abstract class Pane extends RenderableElement {
             child.parent = null;
         children.clear();
 
-        getContent().performLayout(shape, new LayoutContext2() {
+        new LayoutContext2() {
             @Override
             public void accept(RenderableElement e) {
                 children.add(e);
                 e.parent = Pane.this;
                 if (e instanceof Pane p)
                     p.focusContext = focusContext;
-            }
-
-            @Override
-            public RenderableElement lowestRenderableElement() {
-                return Pane.this;
             }
 
             @Override
@@ -90,7 +82,7 @@ public abstract class Pane extends RenderableElement {
             public void addLayoutDependency(RenderableElement element, LayoutDependency d) {
                 context.addLayoutDependency(element, d);
             }
-        });
+        }.placeElement(getContent(), shape);
     }
 
     public static Pane of(Element node) {

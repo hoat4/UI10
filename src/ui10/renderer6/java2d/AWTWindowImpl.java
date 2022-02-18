@@ -7,7 +7,7 @@ import ui10.ui6.*;
 import java.awt.*;
 
 import ui10.input.pointer.MouseEvent;
-import ui10.ui6.layout.LayoutContext2;
+import ui10.ui6.LayoutContext2;
 import ui10.ui6.window.Window;
 
 import java.awt.event.WindowEvent;
@@ -43,11 +43,11 @@ public class AWTWindowImpl extends Frame implements RendererData {
             Rectangle rect = new Rectangle(
                     getWidth() - getInsets().left - getInsets().right,
                     getHeight() - getInsets().top - getInsets().bottom);
-            window.performLayout(J2DUtil.rect(rect), new LayoutContext2.AbstractLayoutContext2(null) {
+            new LayoutContext2() {
                 @Override
                 public void accept(RenderableElement element) {
                 }
-            });
+            }.placeElement(window, J2DUtil.rect(rect));
         }));
     }
 
