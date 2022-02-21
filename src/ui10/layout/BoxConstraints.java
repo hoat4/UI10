@@ -7,17 +7,13 @@ import ui10.geom.shape.Shape;
 
 import java.util.Objects;
 
-public record BoxConstraints(Size min, int maxWidth, int maxHeight) {
+import static ui10.geom.Size.INFINITY;
 
-    public static final int INFINITY = Integer.MAX_VALUE;
+public record BoxConstraints(Size min, Size max) {
 
     public BoxConstraints {
-        if (maxWidth < min.width() || maxHeight < min.height())
-            throw new IllegalArgumentException(min + ", " + maxWidth + "×" + maxHeight);
-    }
-
-    public BoxConstraints(Size min, Size max) {
-        this(min, max.width(), max.height());
+        if (max.width() < min.width() || max.height() < min.height())
+            throw new IllegalArgumentException(min + ", " + max);
     }
 
     public static BoxConstraints fixed(Size size) {
@@ -26,62 +22,47 @@ public record BoxConstraints(Size min, int maxWidth, int maxHeight) {
 
     public BoxConstraints subtract(Point point) {
         Objects.requireNonNull(point);
-        if (point.x() > maxWidth || point.y() > maxHeight)
+        if (point.x() > max.width() || point.y() > max.height())
             throw new IllegalArgumentException("couldn't subtract " + point + " from " + this);
         return new BoxConstraints(
                 min.subtractOrClamp(point),
-                subtract(maxWidth, point.x()), subtract(maxHeight, point.y())
+                max.subtract(point)
         );
     }
 
     public BoxConstraints subtract(Size size) {
         Objects.requireNonNull(size);
-        if (size.width() > maxWidth || size.height() > maxHeight)
+        if (size.width() > max.width() || size.height() > max.height())
             throw new IllegalArgumentException("couldn't subtract " + size + " from " + this);
         return new BoxConstraints(
                 min.subtractOrClamp(size),
-                subtract(maxWidth, size.width()), subtract(maxHeight, size.height())
+                max.subtract(size)
         );
     }
 
     public BoxConstraints withMinimum(Size min) {
-        return new BoxConstraints(min, maxWidth, maxHeight);
+        return new BoxConstraints(min, max);
     }
 
     public Size clamp(Size size) {
         return new Size(
-                Math.max(min.width(), Math.min(maxWidth, size.width())),
-                Math.max(min.height(), Math.min(maxHeight, size.height()))
+                Math.max(min.width(), Math.min(max.width(), size.width())),
+                Math.max(min.height(), Math.min(max.height(), size.height()))
         );
     }
 
-    public Size maxSizeOrFail() {
-        return new Size(maxWidth, maxHeight); // ez a konstruktor exceptiont dob, ha túl nagy valamelyik érték
-    }
-
     public BoxConstraints withUnboundedWidth() {
-        return new BoxConstraints(min, INFINITY, maxHeight);
+        return new BoxConstraints(min, new Size(INFINITY, max.height()));
     }
 
     public BoxConstraints withUnboundedHeight() {
-        return new BoxConstraints(min, maxWidth, INFINITY);
+        return new BoxConstraints(min, new Size(max.width(), INFINITY));
     }
 
     public Shape clamp(Shape shape) {
         shape = shape.unionWith(Rectangle.of(min));
 
-        Size maxSize;
-        if (maxWidth == INFINITY)
-            if (maxHeight == INFINITY)
-                return shape;
-            else
-                maxSize = new Size(shape.bounds().width(), maxHeight);
-        else if (maxHeight == INFINITY)
-            maxSize = new Size(maxWidth, shape.bounds().height());
-        else
-            maxSize = maxSizeOrFail();
-
-        return shape.intersectionWith(Rectangle.of(maxSize));
+        return shape.intersectionWith(Rectangle.of(max));
     }
 
     public boolean contains(Size size) {
@@ -89,26 +70,18 @@ public record BoxConstraints(Size min, int maxWidth, int maxHeight) {
     }
 
     public BoxConstraints withWidth(int min, int max) {
-        return new BoxConstraints(new Size(min, this.min.height()), max, maxHeight);
+        return new BoxConstraints(this.min.withWidth(min), this.max.withWidth(max));
     }
 
     public BoxConstraints withHeight(int min, int max) {
-        return new BoxConstraints(new Size(this.min.width(), min), maxWidth, max);
+        return new BoxConstraints(this.min.withHeight(min), this.max.withHeight(max));
     }
 
     public boolean containsWidth(int w) {
-        return w >= min.width() && w <= maxWidth;
+        return w >= min.width() && w <= max.width();
     }
 
     public boolean isFixed() {
-        return min.width() == maxWidth && min.height() == maxHeight;
-    }
-
-    public static int subtract(int a, int b) {
-        if (a == INFINITY)
-            return Integer.MAX_VALUE;
-        if (b == INFINITY)
-            throw new IllegalArgumentException("can't subtract infinity from " + a);
-        return a - b;
+        return min.width() == max.width() && min.height() == max.height();
     }
 }

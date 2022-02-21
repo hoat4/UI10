@@ -6,12 +6,14 @@ public record Size(int width, int height) {
 
     public static final Size ZERO = new Size(0, 0);
 
-    // konkrét értéknek nincs gyakorlati jelentősége, de legyen kisebb mint Integer.MAX_VALUE,
-    // mert BoxConstraints-ben azt használjuk végtelennek
+    // konkrét értéknek nincs gyakorlati jelentősége, de legyen kisebb mint INFINITY
     public static final int MAX = Integer.MAX_VALUE / 2 - 2;
+    public static final int INFINITY = Integer.MAX_VALUE;
 
     public Size {
-        if (width < 0 || height < 0 || width > MAX || height > MAX)
+        if (width < 0 || height < 0
+                || width > MAX && width != INFINITY
+                || height > MAX && height != INFINITY)
             throw new IllegalArgumentException(width + " × " + height);
     }
 
@@ -23,6 +25,41 @@ public record Size(int width, int height) {
         return new Size(end.x(), end.y());
     }
 
+    public static Size of(Axis firstAxis, int a, int b) {
+        switch (firstAxis) {
+            case HORIZONTAL:
+                return new Size(a, b);
+            case VERTICAL:
+                return new Size(b, a);
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    public int value(Axis axis) {
+        switch (axis) {
+            case HORIZONTAL:
+                return width;
+            case VERTICAL:
+                return height;
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+
+    public Size with(Axis axis, int value) {
+        return of(axis, value, value(axis.other()));
+    }
+
+    public Size withWidth(int width) {
+        return new Size(width, height);
+    }
+
+    public Size withHeight(int height) {
+        return new Size(width, height);
+    }
+
     public Size add(Size s) {
         return new Size(width + s.width(), height + s.height());
     }
@@ -32,23 +69,23 @@ public record Size(int width, int height) {
     }
 
     public Size subtract(Point point) {
-        return new Size(width - point.x(), height - point.y());
+        return subtract(Size.of(point));
     }
 
     public Size subtract(Size s) {
         try {
-            return new Size(width - s.width, height - s.height);
+            return new Size(subtract(width, s.width), subtract(height, s.height));
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("couldn't subtract " + s + " from " + this);
         }
     }
 
     public Size subtractOrClamp(Point p) {
-        return new Size(Math.max(0, width - p.x()), Math.max(0, height - p.y()));
+        return new Size(Math.max(0, subtract(width, p.x())), Math.max(0, subtract(height, p.y())));
     }
 
     public Size subtractOrClamp(Size s) {
-        return new Size(Math.max(0, width - s.width()), Math.max(0, height - s.height()));
+        return new Size(Math.max(0, subtract(width, s.width())), Math.max(0, subtract(height, s.height())));
     }
 
     public Size divide(int divisor) {
@@ -78,5 +115,17 @@ public record Size(int width, int height) {
     @Override
     public String toString() {
         return "(" + width + " × " + height + ")";
+    }
+
+    public static int subtract(int a, int b) {
+        if (a == INFINITY)
+            return Integer.MAX_VALUE;
+        if (b == INFINITY)
+            throw new IllegalArgumentException("can't subtract infinity from " + a);
+        return a - b;
+    }
+
+    public boolean isInfinite() {
+        return width == INFINITY || height == INFINITY;
     }
 }

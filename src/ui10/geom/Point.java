@@ -30,6 +30,28 @@ public record Point(int x, int y) {
         return (int) Math.ceil(Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)));
     }
 
+    public static Point of(Axis firstAxis, int a, int b) {
+        switch (firstAxis) {
+            case HORIZONTAL:
+                return new Point(a, b);
+            case VERTICAL:
+                return new Point(b, a);
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    public int value(Axis axis) {
+        switch (axis) {
+            case HORIZONTAL:
+                return x;
+            case VERTICAL:
+                return y;
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
     public Point add(Size s) {
         return new Point(x + s.width(), y + s.height());
     }

@@ -18,6 +18,8 @@ public class LayoutContext1 {
 
         if (e.replacement() == null || inReplacement.contains(e)) {
             Size s = e.preferredSizeImpl(constraints, this);
+            if (s.isInfinite())
+                throw new IllegalStateException("preferred size must be finite: " + s); // milyen exceptionnek kéne ennek lennie?
             Objects.requireNonNull(s, this::toString);
             if (e instanceof RenderableElement)
                 addLayoutDependency((RenderableElement) e,
@@ -35,6 +37,7 @@ public class LayoutContext1 {
 
 
     // TODO "performing layout" helyett írjuk ki értelmesen, hogy elhelyezi az elementeket
+
     /**
      * Records that the current element must be layouted again if the size of the specified element is changed.
      * This is invoked automatically by RenderableElement when computing preferred size and by Pane when performing
