@@ -4,7 +4,6 @@ import ui10.geom.*;
 import ui10.geom.shape.RoundedRectangle;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.layout4.GrowFactor;
 import ui10.ui6.Element;
 import ui10.ui6.LayoutContext1;
 import ui10.ui6.LayoutContext2;
@@ -14,7 +13,6 @@ import ui10.ui6.graphics.Opacity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Layouts {
@@ -188,27 +186,6 @@ public class Layouts {
         }
     }
 
-    public static abstract class SingleNodeLayout extends Element {
-
-        protected final Element content;
-
-        public SingleNodeLayout(Element content) {
-            this.content = content;
-        }
-
-        @Override
-        public void enumerateStaticChildren(Consumer<Element> consumer) {
-            consumer.accept(content);
-        }
-
-        @Override
-        protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-            context.placeElement(content, computeContentShape(shape, context));
-        }
-
-        protected abstract Shape computeContentShape(Shape containerShape, LayoutContext2 context);
-    }
-
     public static Element stack(Element... nodes) {
         return new StackLayout(nodes);
     }
@@ -269,79 +246,12 @@ public class Layouts {
         }
     }
 
-    static abstract class RectangularLayout extends Element {
-        @Override
-        protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-            Rectangle shapeBounds = shape.bounds();
-            Size size = shapeBounds.size();
-            doPerformLayout(size, (elem, rect) -> {
-                context.placeElement(elem, rect.translate(shapeBounds.topLeft()).intersectionWith(shape));
-            }, context);
-        }
-
-        protected abstract void doPerformLayout(Size size, BiConsumer<Element, Rectangle> placer, LayoutContext1 context);
-    }
-
     public static Element vertically(List<? extends Element> elements) {
         return new LinearLayout(Axis.VERTICAL, List.copyOf(elements));
     }
 
     public static Element vertically(Element... elements) {
         return new LinearLayout(Axis.VERTICAL, List.of(elements));
-    }
-
-    static class LinearLayout extends RectangularLayout {
-
-        private final Axis primaryAxis;
-        private final List<? extends Element> children;
-
-        public LinearLayout(Axis primaryAxis, List<? extends Element> children) {
-            this.primaryAxis = primaryAxis;
-            this.children = children;
-        }
-
-        private Axis secondaryAxis() {
-            return primaryAxis.other();
-        }
-
-        @Override
-        public void enumerateStaticChildren(Consumer<Element> consumer) {
-            children.forEach(consumer);
-        }
-
-        @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-            return computeLayout(constraints, context1).containerSize;
-        }
-
-        @Override
-        protected void doPerformLayout(Size size, BiConsumer<Element, Rectangle> placer, LayoutContext1 context) {
-            FlexLayout l = computeLayout(BoxConstraints.fixed(size), context);
-            int x = 0;
-            for (int i = 0; i < children.size(); i++) {
-                Size s = l.childrenSizes.get(i);
-                placer.accept(children.get(i), new Rectangle(Point.of(primaryAxis, x, 0), s));
-                x += s.value(primaryAxis);
-            }
-        }
-
-        private FlexLayout computeLayout(BoxConstraints constraints, LayoutContext1 context) {
-            FlexLayout l = new FlexLayout(primaryAxis, constraints,
-                    children.stream().map(e -> new FlexLayout.FlexElement() {
-                        @Override
-                        public Size preferredSize(BoxConstraints constraints) {
-                            return context.preferredSize(e, constraints);
-                        }
-
-                        @Override
-                        public Fraction growFactor() {
-                            return GrowFactor.growFactor(e);
-                        }
-                    }).toList());
-
-            l.layout();
-            return l;
-        }
     }
 
     public static Element grid(int cols, Element... elements) {

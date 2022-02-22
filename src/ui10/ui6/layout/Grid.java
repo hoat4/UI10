@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-class Grid extends Layouts.RectangularLayout {
+class Grid extends RectangularLayout {
 
     public final List<? extends List<? extends Element>> rows;
 

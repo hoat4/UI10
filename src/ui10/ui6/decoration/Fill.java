@@ -12,6 +12,7 @@ import ui10.ui6.decoration.css.Length;
 import ui10.ui6.graphics.LinearGradient;
 import ui10.ui6.LayoutContext1;
 import ui10.ui6.layout.Layouts;
+import ui10.ui6.layout.SingleNodeLayout;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ public interface Fill {
         public Element makeElement(DecorationContext context) {
             LinearGradient g = new LinearGradient();
 
-            return new Layouts.SingleNodeLayout(g) {
+            return new SingleNodeLayout(g) {
 
                 @Override
                 public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {

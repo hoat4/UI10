@@ -11,7 +11,7 @@ import java.util.List;
 import static ui10.geom.Fraction.subtract;
 
 /**
- * Common code for {@linkplain ui10.ui6.layout.Layouts.LinearLayout} and {@linkplain Grid}
+ * Common code for {@linkplain LinearLayout} and {@linkplain Grid}
  */
 class FlexLayout {
 
