@@ -6,6 +6,7 @@ import ui10.geom.Size;
 import ui10.image.Colors;
 import ui10.image.RGBColor;
 import ui10.layout.FixedSize;
+import ui10.layout4.GrowFactor;
 import ui10.ui6.Element;
 import ui10.ui6.controls.Button;
 import ui10.ui6.decoration.css.CSSDecorator;
@@ -36,10 +37,18 @@ public class Main6 {
         Button button = new Button();
         button.onAction.subscribe(__ -> System.out.println("Hello world!"));
 
+        tf.attributes().add(new GrowFactor(Fraction.of(2, 1)));
+
         Element content = withClass("root",
-                centered(vertically(button, tf))
+                //vertically(button, tf)
+
+                grid(3,
+                        new Button(), new Button(), new Button(),
+                        new Button(), new Button(), new Button()
+                )
+
                 //centered(roundRectangle(10, stack(
-               //         Layouts.padding(new ColorFill(Colors.RED), new Insets(25)), new ColorFill(Colors.GREEN)
+                //         Layouts.padding(new ColorFill(Colors.RED), new Insets(25)), new ColorFill(Colors.GREEN)
                 //)))
         );
 

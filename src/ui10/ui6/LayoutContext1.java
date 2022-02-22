@@ -18,8 +18,13 @@ public class LayoutContext1 {
 
         if (e.replacement() == null || inReplacement.contains(e)) {
             Size s = e.preferredSizeImpl(constraints, this);
+
             if (s.isInfinite())
-                throw new IllegalStateException("preferred size must be finite: " + s); // milyen exceptionnek kéne ennek lennie?
+                throw new IllegalStateException("preferred size must be finite: " + s + " (by " + e + ")"); // milyen exceptionnek kéne ennek lennie?
+            if (!constraints.contains(s))
+                throw new IllegalStateException("invalid size returned by preferredSizeImpl for " +
+                        constraints + ": " + s + " (by " + e + ")");
+
             Objects.requireNonNull(s, this::toString);
             if (e instanceof RenderableElement)
                 addLayoutDependency((RenderableElement) e,

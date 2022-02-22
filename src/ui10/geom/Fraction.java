@@ -22,6 +22,52 @@ public record Fraction(int numerator, int denominator) {
         return (a * (denominator - numerator) + b * numerator) / denominator;
     }
 
+    public Fraction multiply(int multiplier) {
+        return new Fraction(numerator * multiplier, denominator);
+    }
+
+    public Fraction divide(Fraction divisor) {
+        return new Fraction(numerator * divisor.denominator, denominator * divisor.numerator);
+    }
+
+    public Fraction add(int i) {
+        return new Fraction(numerator + i * denominator, denominator);
+    }
+
+    public int floor() {
+        // TODO negatív esetek kezelése?
+        return numerator / denominator;
+    }
+
+    public int ceil() {
+        // TODO negatív esetek kezelése?
+        return (numerator + denominator - 1) / denominator;
+    }
+
+    public int round() {
+        return (numerator + denominator / 2) / denominator;
+    }
+
+    public static Fraction add(Fraction a, Fraction b) {
+        if (a.denominator == b.denominator)
+            return new Fraction(a.numerator + b.numerator, a.denominator);
+
+        if (a.denominator % b.denominator == 0)
+            // ilyeneket lehet hogy csak akkor kéne csinálni ha már túl nagy a nevező, mert az osztás lassú művelet
+            return new Fraction(a.numerator + b.numerator * a.denominator / b.denominator, a.denominator);
+
+        return new Fraction(a.numerator * b.denominator + b.numerator * a.denominator,
+                a.denominator * b.denominator);
+    }
+
+    public static Fraction subtract(Fraction a, Fraction b) {
+        return add(a, negate(b));
+    }
+
+    public static Fraction negate(Fraction f) {
+        return new Fraction(-f.numerator, f.denominator);
+    }
+
     public static Fraction of(double d, int denominator) {
         // round?
         return new Fraction((int) (d * denominator), denominator);

@@ -4,7 +4,7 @@ import ui10.geom.*;
 import ui10.geom.shape.RoundedRectangle;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.layout4.Weight;
+import ui10.layout4.GrowFactor;
 import ui10.ui6.Element;
 import ui10.ui6.LayoutContext1;
 import ui10.ui6.LayoutContext2;
@@ -12,6 +12,7 @@ import ui10.ui6.decoration.css.CSSClass;
 import ui10.ui6.graphics.Opacity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -268,12 +269,12 @@ public class Layouts {
         }
     }
 
-    private static abstract class RectangularLayout extends Element {
+    static abstract class RectangularLayout extends Element {
         @Override
         protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
             Rectangle shapeBounds = shape.bounds();
             Size size = shapeBounds.size();
-            doPerformLayout(size, (elem, rect)->{
+            doPerformLayout(size, (elem, rect) -> {
                 context.placeElement(elem, rect.translate(shapeBounds.topLeft()).intersectionWith(shape));
             }, context);
         }
@@ -289,7 +290,7 @@ public class Layouts {
         return new LinearLayout(Axis.VERTICAL, List.of(elements));
     }
 
-    private static class LinearLayout extends RectangularLayout {
+    static class LinearLayout extends RectangularLayout {
 
         private final Axis primaryAxis;
         private final List<? extends Element> children;
@@ -310,12 +311,12 @@ public class Layouts {
 
         @Override
         protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-            return computeLayout(constraints, context1).size;
+            return computeLayout(constraints, context1).containerSize;
         }
 
         @Override
         protected void doPerformLayout(Size size, BiConsumer<Element, Rectangle> placer, LayoutContext1 context) {
-            ComputedLayout l = computeLayout(BoxConstraints.fixed(size), context);
+            FlexLayout l = computeLayout(BoxConstraints.fixed(size), context);
             int x = 0;
             for (int i = 0; i < children.size(); i++) {
                 Size s = l.childrenSizes.get(i);
@@ -324,64 +325,30 @@ public class Layouts {
             }
         }
 
-        private ComputedLayout computeLayout(BoxConstraints constraints, LayoutContext1 context) {
-            Axis secondaryAxis = primaryAxis.other();
-
-            // ebben a függvényben width alatt primaryAxis-beli méretet értjük, height alatt pedig secondaryAxis-beli méretet
-
-            BoxConstraints c1 = new BoxConstraints(
-                    constraints.min().with(primaryAxis, 0),
-                    constraints.max().with(primaryAxis, Size.INFINITY));
-            int height = children.stream().mapToInt(n -> context.preferredSize(n, c1).value(secondaryAxis)).max().orElse(0);
-            List<Size> childrenSizes = new ArrayList<>();
-            var w = constraints.max().value(primaryAxis);
-            for (Element e : children) {
-                var l = context.preferredSize(e, new BoxConstraints(
-                        Size.of(primaryAxis, 0, height),
-                        Size.of(primaryAxis, w, height)
-                ));
-                if (w != Size.INFINITY)
-                    w -= l.value(primaryAxis);
-                childrenSizes.add(l);
-            }
-            var width = childrenSizes.stream().mapToInt(l -> l.value(primaryAxis)).sum();
-
-            int remaining = constraints.min().value(primaryAxis) - width;
-            if (remaining >= 0) {
-                double weightSum = children.stream().mapToDouble(Weight::weight).sum();
-                int lastWithWeight = -1;
-                for (int i = children.size() - 1; i >= 0; i--) {
-                    if (Weight.weight(children.get(i)) != 0) {
-                        lastWithWeight = i;
-                        break;
-                    }
-                }
-
-                if (lastWithWeight != -1) {
-                    for (int i = 0; i < children.size() && weightSum != 0; i++) {
-                        Element e = children.get(i);
-                        double weight = Weight.weight(e);
-                        if (weight != 0) {
-                            Size currentSize = childrenSizes.get(i);
-                            double w2 = currentSize.value(primaryAxis) + remaining * weight / weightSum;
-                            assert Double.isFinite(w2);
-                            BoxConstraints c3 = new BoxConstraints(
-                                    Size.of(primaryAxis, i == lastWithWeight ? (int) Math.ceil(w2) : (int) Math.floor(w2), height),
-                                    Size.of(primaryAxis, (int) Math.ceil(w2), height));
-                            Size s = context.preferredSize(e, c3);
-                            childrenSizes.set(i, s);
-                            remaining -= s.value(primaryAxis) - currentSize.value(primaryAxis);
-                            weightSum -= weight;
+        private FlexLayout computeLayout(BoxConstraints constraints, LayoutContext1 context) {
+            FlexLayout l = new FlexLayout(primaryAxis, constraints,
+                    children.stream().map(e -> new FlexLayout.FlexElement() {
+                        @Override
+                        public Size preferredSize(BoxConstraints constraints) {
+                            return context.preferredSize(e, constraints);
                         }
-                    }
-                    width = constraints.min().value(primaryAxis);
-                }
-            }
 
-            return new ComputedLayout(childrenSizes, Size.of(primaryAxis, width, height));
-        }
+                        @Override
+                        public Fraction growFactor() {
+                            return GrowFactor.growFactor(e);
+                        }
+                    }).toList());
 
-        private record ComputedLayout(List<Size> childrenSizes, Size size) {
+            l.layout();
+            return l;
         }
     }
+
+    public static Element grid(int cols, Element... elements) {
+        List<List<Element>> rows = new ArrayList<>();
+        for (int i = 0; i < elements.length; i += cols)
+            rows.add(List.of(Arrays.copyOfRange(elements, i, i + cols)));
+        return new Grid(rows);
+    }
+
 }
