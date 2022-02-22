@@ -1,27 +1,42 @@
-package ui10.renderer.java2d;
+package ui10.renderer6.java2d;
 
-import ui10.geom.Rectangle;
+import ui10.renderer.java2d.AWTTextStyle;
+import ui10.base.Element;
+import ui10.base.RenderableElement;
+import ui10.graphics.TextNode;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
+import java.awt.Graphics2D;
+import java.util.Objects;
 
-public class TextItem extends RenderItem {
+public class TextItem extends Item<TextNode> {
 
-    String text;
-    AWTTextStyle font;
-    Paint color;
+    private Element prevFill;
+    private Item<?> fill;
 
-    @Override
-    Rectangle2D computeBounds(AffineTransform transform) {
-        final Rectangle r = Rectangle.of(font.textSize(text).size());
-        return transform.createTransformedShape(J2DUtil.rect(r)).getBounds2D();
+    public TextItem(J2DRenderer renderer, TextNode node) {
+        super(renderer, node);
     }
 
     @Override
-    public void draw(Graphics2D g) {
-        g.setPaint(color);
-        g.setFont(font.font);
-        g.drawString(text, 0, J2DUtil.i2px(font.textSize(text).ascent()));
+    protected void validateImpl() {
+        Objects.requireNonNull(node.fill());
+        Objects.requireNonNull(node.text());
+        Objects.requireNonNull(node.textStyle());
+
+        if (!Objects.equals(prevFill, node.fill())) {
+            prevFill = node.fill();
+            fill = renderer.makeItem(RenderableElement.of(node.fill()));
+        }
+
+        // TODO cache textlayout vagy glyphvector vagy amit kell
     }
+
+    @Override
+    protected void drawImpl(Graphics2D g) {
+        AWTTextStyle textStyle = (AWTTextStyle) node.textStyle();
+        g.setFont(textStyle.font);
+        g.setPaint(fill.asPaint());
+        g.drawString(node.text(), shape.getBounds().x, shape.getBounds().y+textStyle.fontMetrics.getAscent());
+    }
+
 }

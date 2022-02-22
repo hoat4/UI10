@@ -1,21 +1,16 @@
-package ui10.window;
+package ui10.ui6.window;
 
-import ui10.binding.ObservableScalar;
-import ui10.binding.ScalarProperty;
-import ui10.nodes.Node;
-import ui10.nodes.WrapperPane;
+import ui10.ui6.Element;
+import ui10.ui6.Pane;
 
-public class Window extends WrapperPane {
-    public final ScalarProperty<Boolean> shown = ScalarProperty.create();
+public abstract class Window extends Pane {
 
-    public Window() {
-    }
-
-    public Window(Node content) {
-        super(content);
-    }
-
-    public Window(ObservableScalar<Node> content) {
-        super(content);
+    public static Window of(Element node) {
+        return new Window() {
+            @Override
+            public Element content() {
+                return node;
+            }
+        };
     }
 }

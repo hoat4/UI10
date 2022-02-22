@@ -1,39 +1,53 @@
-package ui10.decoration.css;
+package ui10.ui6.decoration.css;
 
-import ui10.decoration.css.CSS.I;
-import ui10.geom.Point;
+
 import ui10.image.Color;
-import ui10.image.Fill;
-import ui10.image.LinearGradient;
 import ui10.image.RGBColor;
-import ui10.nodes.Border;
+import ui10.ui6.Attribute;
+import ui10.ui6.decoration.BorderSpec;
+import ui10.ui6.decoration.Fill;
+import ui10.ui6.decoration.PointSpec;
 
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.Map;
 
-import static ui10.decoration.css.CSSScanner.chToString;
+import static ui10.ui6.decoration.css.CSSScanner.chToString;
+import static ui10.ui6.decoration.css.Length.percent;
+import static ui10.ui6.decoration.css.Length.zero;
 
 public class CSSParser {
 
     private final CSSScanner scanner;
-    private final Visitor ruleVisitor;
+    public final Map<Attribute, Rule> rules = new HashMap<>();
 
-    public CSSParser(CSSScanner scanner, Visitor ruleVisitor) {
+    public CSSParser(CSSScanner scanner) {
         this.scanner = scanner;
-        this.ruleVisitor = ruleVisitor;
     }
-
 
     public void parseCSS() {
         scanner.skipWhitespaces();
 
         while (scanner.next != -1) {
-            scanner.expect(".");
-            String className = scanner.readIdentifier();
+            //if (scanner.next == '-') {
+            //    scanner.expect('-');
+            //    String varName = "--"+scanner.readIdentifier();
+            //    vars.put(varName, )
+            //}
+
+            int c = scanner.expectAnyOf(".:");
+            Attribute a = switch (c) {
+                case '.' -> new CSSClass(scanner.readIdentifier());
+                case ':' -> new CSSPseudoClass(scanner.readIdentifier());
+                default -> throw new RuntimeException(Integer.toString(c));
+            };
             scanner.skipWhitespaces();
             scanner.expect("{");
-            ruleVisitor.beginRule(className);
+
+            Rule rule = new Rule();
+            rules.put(a, rule);
 
             scanner.skipWhitespaces();
             while (scanner.next != '}') {
@@ -42,41 +56,33 @@ public class CSSParser {
                 scanner.expect(":");
                 scanner.skipWhitespaces();
 
-                ruleVisitor.property(propName, this);
+                rule.parseProperty(propName, this);
 
                 scanner.skipWhitespaces();
                 if (scanner.next != ';' && scanner.next != '}')
                     throw new CSSScanner.CSSParseException("expected ';' or '}', but got " + chToString(scanner.next));
 
                 scanner.expect(";");
+                scanner.skipWhitespaces();
             }
-            ruleVisitor.endRule();
-
+            scanner.expect('}');
             scanner.skipWhitespaces();
         }
     }
 
-    public interface Visitor {
-
-        void beginRule(String className);
-
-        void property(String name, CSSParser p);
-
-        void endRule();
-    }
-
-    public I<Border.BorderStyle> parseBorder() {
-        I<Integer> len = parseLength(null);
+    public BorderSpec parseBorder() {
+        Length len = parseLength();
         scanner.skipWhitespaces();
         scanner.expectIdentifier("solid");
         scanner.skipWhitespaces();
-        I<Fill> fill = parseFill();
-        return uv -> new Border.BorderStyle(len.value(uv), fill.value(uv), 0);
+        Fill fill = parseFill();
+        return new BorderSpec(len, fill);
     }
 
-    public I<Fill> parseFill() {
+
+    public Fill parseFill() {
         if (scanner.next == '#') {
-            return u -> parseColor();
+            return new Fill.ColorFill(parseColor());
         }
 
         String id = scanner.readIdentifier();
@@ -87,21 +93,22 @@ public class CSSParser {
     }
 
     public Color parseColor() {
+        scanner.skipWhitespaces();
         scanner.expect('#');
         String s = scanner.readIdentifier();
         return switch (s.length()) {
             case 3 -> RGBColor.ofRGBShort(Integer.parseInt(s, 16));
             case 6 -> RGBColor.ofRGB(Integer.parseInt(s, 16));
-            case 8 -> RGBColor.ofIntRGBA(Integer.parseInt(s, 16));
+            case 8 -> RGBColor.ofIntRGBA(Integer.parseUnsignedInt(s, 16));
             default -> throw new CSSScanner.CSSParseException("unknown fill: #" + s);
         };
     }
 
-    public I<Fill> parseLinearGradient() {
+    public Fill.LinearGradientFill parseLinearGradient() {
         scanner.skipWhitespaces();
         scanner.expect("(");
 
-        I<Point> from, to;
+        PointSpec from, to;
 
         String s = scanner.skipWhitespaceAndReadIdentifier();
         switch (s) {
@@ -138,74 +145,61 @@ public class CSSParser {
             default -> throw new CSSScanner.CSSParseException("expected 'from' or 'to', but got '" + s + "'");
         }
 
-        List<I<LinearGradient.Stop>> stops = new ArrayList<>();
+        List<Fill.LinearGradientFill.Stop> stops = new ArrayList<>();
 
         scanner.skipWhitespaces();
         while (scanner.next == ',') {
-            stops.add(readGradientStop(stops.isEmpty(), uv -> Point.distance(from.value(uv), to.value(uv))));
+            scanner.expect(',');
+            stops.add(readGradientStop(stops.isEmpty()));
             scanner.skipWhitespaces();
         }
         scanner.expect(')');
 
-        return uv -> new LinearGradient(from.value(uv), to.value(uv),
-                stops.stream().map(u -> u.value(uv)).toList());
+        return new Fill.LinearGradientFill(from, to, stops);
     }
 
-    public I<LinearGradient.Stop> readGradientStop(boolean first, I<Integer> lineLength) {
+    public Fill.LinearGradientFill.Stop readGradientStop(boolean first) {
         Color color = parseColor();
         scanner.skipWhitespaces();
 
         if (scanner.next == ')')
-            return uv -> new LinearGradient.Stop(color, 1);
+            return new Fill.LinearGradientFill.Stop(color, percent(100));
 
         if (scanner.next == ',')
             if (first)
-                return uv -> new LinearGradient.Stop(color, 0);
+                return new Fill.LinearGradientFill.Stop(color, zero());
             else
                 throw new CSSScanner.CSSParseException("no fraction provided for gradient stop and not first or last");
 
-        NumberWithUnit f = parseNumberWithUnit();
-        I<Double> fraction = switch (f.unit) {
-            case NULL -> uv -> f.n; // ???
-            case PERCENT -> uv -> f.n / 100;
-            case PX -> uv -> uv.px(f.n) / ((double) lineLength.value(uv));
-        };
-
-        return uv -> new LinearGradient.Stop(color, fraction.value(uv));
+        return new Fill.LinearGradientFill.Stop(color, parseLength());
     }
 
-    private static I<Point> leftTop() {
-        return u -> Point.ORIGO;
+    private static PointSpec leftTop() {
+        return new PointSpec(zero(), zero());
     }
 
-    private static I<Point> leftBottom() {
-        return u -> new Point(0, u.heightPercent(100));
+    private static PointSpec leftBottom() {
+        return new PointSpec(zero(), percent(100));
     }
 
-    private static I<Point> rightTop() {
-        return u -> new Point(u.widthPercent(100), 0);
+    private static PointSpec rightTop() {
+        return new PointSpec(percent(100), zero());
     }
 
-    public I<Point> parsePoint() {
-        I<Integer> x = parseLength(UnitValues::widthPercent);
+    public PointSpec parsePoint() {
+        scanner.skipWhitespaces();
+        Length x = parseLength();
         scanner.expectAndSkipWhitespaces();
-        I<Integer> y = parseLength(UnitValues::heightPercent);
-        return u -> new Point(x.value(u), y.value(u));
+        Length y = parseLength();
+        return new PointSpec(x, y);
     }
 
-    public I<Integer> parseLength(BiFunction<UnitValues, Double, Integer> percentageProvider) {
-        NumberWithUnit u = parseNumberWithUnit();
-        if (u.unit == Unit.NULL && u.n != 0)
-            throw new CSSScanner.CSSParseException("no unit specified but numeric value is non-zero: " + u.n);
-        return switch (u.unit) {
-            case NULL -> uv -> 0;
-            case PX -> uv -> uv.px(u.n);
-            case PERCENT -> {
-                if (percentageProvider == null)
-                    throw new CSSScanner.CSSParseException("percentage not supported here");
-                else
-                    yield uv -> percentageProvider.apply(uv, u.n);
-            }
+    public Length parseLength() {
+        NumberWithUnit n = parseNumberWithUnit();
+        return switch (n.unit) {
+            case NULL -> throw new CSSScanner.CSSParseException("expected length unit");
+            case PX -> new Length(n.val(), 0, 0);
+            case PERCENT -> new Length(0, 0, n.val());
         };
     }
 
@@ -219,16 +213,54 @@ public class CSSParser {
             case "" -> Unit.NULL;
             default -> throw new CSSScanner.CSSParseException("unknown length unit: '" + unitString + "'");
         };
-        return new NumberWithUnit(d, unit);
+        return new CSSParser.NumberWithUnit(d, unit);
+    }
+
+    public List<Length> parseLengths() {
+        scanner.skipWhitespaces();
+
+        List<Length> lengths = new ArrayList<>();
+        do {
+            lengths.add(parseLength());
+            scanner.skipWhitespaces();
+        } while (scanner.next != ';');
+
+        return lengths;
+    }
+
+    public List<TransitionSpec<?>> parseTransitionList() {
+        List<TransitionSpec<?>> transitions = new ArrayList<>();
+        scanner.skipWhitespaces();
+        do {
+            String propName = scanner.readIdentifier();
+            scanner.skipWhitespaces();
+            Duration duration = parseDuration();
+            transitions.add(new TransitionSpec<>(CSSProperty.ofName(propName), duration));
+            scanner.skipWhitespaces();
+        } while (scanner.next == ',');
+        return transitions;
+    }
+
+    private Duration parseDuration() {
+        String s = scanner.readIdentifier();
+        if (s.endsWith("ms"))
+            return Duration.ofMillis(Integer.parseInt(s.substring(0, s.length() - "ms".length())));
+        else if (s.endsWith("s"))
+            return Duration.ofSeconds(Integer.parseInt(s.substring(0, s.length() - "s".length())));
+        else
+            throw new CSSScanner.CSSParseException("unknown duration unit: " + s);
     }
 
     public record NumberWithUnit(double n, Unit unit) {
-    }
 
-    public enum Unit {NULL, PX, PERCENT}
+        public NumberWithUnit {
+            if (!Double.isFinite(n))
+                throw new IllegalArgumentException(n + " " + unit);
+        }
 
-    enum Direction {
-        HORIZONTAL, VERTICAL
+        public int val() {
+            return (int) Math.round(n * 16384);
+        }
     }
 
 }

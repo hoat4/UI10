@@ -1,52 +1,32 @@
-package ui10.renderer.java2d;
+package ui10.renderer6.java2d;
 
 import ui10.binding.ObservableList;
 import ui10.window.Desktop;
 import ui10.window.Window;
-import ui10.nodes.EventLoop;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-public class AWTDesktop {
-
-    private final EventLoop eventLoop;
-    public final Desktop desktop = new Desktop();
-
-    public AWTDesktop(EventLoop eventLoop) {
-        this.eventLoop = eventLoop;
-    }
+public class AWTDesktop extends Desktop {
 
     {
-        desktop.windows.subscribe(
-                ObservableList.simpleListSubscriber(this::showWindow, this::hideWindow));
+        windows.subscribe(ObservableList.simpleListSubscriber(this::showWindow, this::hideWindow));
     }
 
     private void showWindow(Window window) {
-        JFrame frame = new JFrame("Ablak");
+        if (window.rendererData != null)
+            throw new IllegalStateException(window + " is already displayed");
+
+        AWTWindowImpl frame = new AWTWindowImpl(window, this);
         window.rendererData = frame;
-        NodeRendererComponent comp = new NodeRendererComponent(eventLoop);
-        comp.root.bindTo(window.content);
-        JLabel label = new JLabel("               szöveg");
-        label.setFont(new Font("Segoe UI",0,20));
-        frame.setBackground(Color.WHITE);
-        frame.getContentPane().setBackground(Color.WHITE);
-        label.setBackground(Color.WHITE);
-        frame.add(comp);
-        frame.setSize(400, 300);
+
+        frame.addNotify();
+        frame.setSize(frame.getInsets().left + 640 + frame.getInsets().right,
+                frame.getInsets().top + 480 + frame.getInsets().bottom);
         frame.setLocationRelativeTo(null);
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                desktop.windows.remove(window);
-            }
-        });
+        frame.applySize();
         frame.setVisible(true);
     }
 
     private void hideWindow(Window window) {
-        ((JFrame)window.rendererData).dispose();
+        ((AWTWindowImpl) window.rendererData).dispose();
+        window.rendererData = null;
     }
 }

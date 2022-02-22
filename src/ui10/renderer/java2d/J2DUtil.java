@@ -1,14 +1,16 @@
-package ui10.renderer.java2d;
+package ui10.renderer6.java2d;
 
-import ui10.geom.Point;
-import ui10.geom.Rectangle;
-import ui10.geom.Size;
+import ui10.geom.*;
+import ui10.geom.shape.BézierPath;
+import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.image.Fill;
 import ui10.image.LinearGradient;
 import ui10.image.RGBColor;
 
-import java.awt.*;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Objects;
@@ -16,11 +18,11 @@ import java.util.Objects;
 public class J2DUtil {
 
     static float i2px(int i) {
-        return i / 1000f;
+        return i / 1f;
     }
 
     static int px2i(double i) {
-        return (int) (i * 1000.0 + .5);
+        return (int) (i * 1.0 + .5);
     }
 
     public static Rectangle rect(Rectangle2D r) {
@@ -64,5 +66,41 @@ public class J2DUtil {
             return new LinearGradientPaint(point(g.start()), point(g.end()), fractions, colors);
         } else
             throw new UnsupportedOperationException(fill.toString());
+    }
+
+
+    public static Path2D.Double shapeToPath2D(Shape shape) {
+        PathBuilder pb = new PathBuilder();
+        if (shape.bounds().isEmpty())
+            return pb.path;
+        for (BézierPath p : shape.outlines()) {
+            p.iterate(pb);
+        }
+        return pb.path;
+    }
+
+    private static class PathBuilder implements BézierPath.PathConsumer {
+
+        public final Path2D.Double path = new Path2D.Double(Path2D.WIND_EVEN_ODD);
+
+        @Override
+        public void moveTo(Point p) {
+            path.moveTo(p.x(), p.y());
+        }
+
+        @Override
+        public void lineTo(Point p) {
+            path.lineTo(p.x(), p.y());
+        }
+
+        @Override
+        public void quadCurveTo(Point p, Point control) {
+            path.quadTo(control.x(), control.y(), p.x(), p.y());
+        }
+
+        @Override
+        public void cubicCurveTo(Point p, Point control1, Point control2) {
+            path.curveTo(control1.x(), control1.y(),control2.x(), control2.y(), p.x(), p.y());
+        }
     }
 }

@@ -1,21 +1,19 @@
-package ui10.decoration.css;
+package ui10.ui6.decoration.css;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.stream.Collectors;
 
-class CSSScanner {
+public class CSSScanner {
 
     private final Reader reader;
-    int next;
+    int next, next1;
 
     public CSSScanner(Reader reader) {
         this.reader = reader;
 
-        try {
-            next = reader.read();
-        } catch (IOException e) {
-            throw new CSSParseException(e);
-        }
+        take();
+        take();
     }
 
     public int take() {
@@ -23,12 +21,26 @@ class CSSScanner {
         if (c == -1)
             throw new CSSParseException("EOF");
 
+        readImpl();
+        while (next == '/' && next1 == '*') {
+            readImpl();
+            readImpl();
+            while(next != '*' || next1 != '/')
+                readImpl();
+            readImpl();
+            readImpl();
+        }
+
+        return c;
+    }
+
+    private void readImpl() {
+        next = next1;
         try {
-            next = reader.read();
+            next1 = reader.read();
         } catch (IOException e) {
             throw new CSSParseException(e);
         }
-        return c;
     }
 
     public void expectAndSkipWhitespaces() {
@@ -51,7 +63,15 @@ class CSSScanner {
     public void expect(int e) {
         int a = take();
         if (a != e)
-            throw new CSSParseException("expected '" + chToString(e) + "', but got " + chToString(a));
+            throw new CSSParseException("expected " + chToString(e) + ", but got " + chToString(a));
+    }
+
+    public int expectAnyOf(String s) {
+        int a = take();
+        if (s.indexOf(a) == -1)
+            throw new CSSParseException("expected " + s.codePoints().mapToObj(CSSScanner::chToString).
+                    collect(Collectors.joining(" or ")) + ", but got " + chToString(a));
+        return a;
     }
 
     public String skipWhitespaceAndReadIdentifier() {
