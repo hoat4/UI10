@@ -4,7 +4,7 @@ import ui10.binding.ScalarProperty;
 
 import ui10.geom.Fraction;
 import ui10.geom.Point;
-import ui10.nodes.EventLoop;
+import ui10.base.EventLoop;
 
 import java.time.Duration;
 

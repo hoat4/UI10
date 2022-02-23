@@ -1,4 +1,4 @@
-package ui10.ui6.decoration;
+package ui10.decoration;
 
 import ui10.geom.Fraction;
 import ui10.geom.Point;
@@ -6,17 +6,17 @@ import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.Element;
-import ui10.ui6.LayoutContext2;
-import ui10.ui6.decoration.css.Length;
-import ui10.ui6.graphics.LinearGradient;
-import ui10.ui6.LayoutContext1;
-import ui10.ui6.layout.Layouts;
-import ui10.ui6.layout.SingleNodeLayout;
+import ui10.base.Element;
+import ui10.base.LayoutContext2;
+import ui10.decoration.css.Length;
+import ui10.graphics.LinearGradient;
+import ui10.base.LayoutContext1;
+import ui10.layout.Layouts;
+import ui10.layout.SingleNodeLayout;
 
 import java.util.List;
 
-import static ui10.ui6.layout.Layouts.withOpacity;
+import static ui10.layout.Layouts.withOpacity;
 
 public interface Fill {
 
@@ -25,7 +25,7 @@ public interface Fill {
     record ColorFill(Color color) implements Fill {
         @Override
         public Element makeElement(DecorationContext context) {
-            return new ui10.ui6.graphics.ColorFill(color);
+            return new ui10.graphics.ColorFill(color);
         }
     }
 

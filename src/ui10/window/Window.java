@@ -1,7 +1,7 @@
-package ui10.ui6.window;
+package ui10.window;
 
-import ui10.ui6.Element;
-import ui10.ui6.Pane;
+import ui10.base.Element;
+import ui10.base.Pane;
 
 public abstract class Window extends Pane {
 

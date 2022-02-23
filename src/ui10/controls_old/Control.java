@@ -1,3 +1,4 @@
+/*
 package ui10.controls;
 
 import ui10.binding.ObservableScalar;
@@ -22,3 +23,4 @@ public abstract class Control extends Pane {
     protected abstract void handleEvent(InputEvent e);
 
 }
+*/

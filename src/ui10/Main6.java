@@ -1,4 +1,4 @@
-package ui10.renderer.java2d;
+package ui10;
 
 import ui10.geom.Fraction;
 import ui10.geom.Insets;
@@ -12,6 +12,7 @@ import ui10.decoration.css.CSSParser;
 import ui10.decoration.css.CSSScanner;
 import ui10.graphics.ColorFill;
 import ui10.layout.Layouts;
+import ui10.renderer.java2d.AWTDesktop;
 import ui10.window.Window;
 
 import java.io.IOException;

@@ -1,3 +1,4 @@
+/*
 package ui10.controls;
 
 import ui10.binding.ObservableScalar;
@@ -35,3 +36,4 @@ public class Label extends Pane {
         return ObservableScalar.ofConstant(value);
     }
 }
+*/

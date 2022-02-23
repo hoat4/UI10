@@ -1,10 +1,8 @@
-package ui10.ui6.layout;
+package ui10.layout;
 
 import ui10.geom.*;
-import ui10.layout.BoxConstraints;
-import ui10.layout4.GrowFactor;
-import ui10.ui6.Element;
-import ui10.ui6.LayoutContext1;
+import ui10.base.Element;
+import ui10.base.LayoutContext1;
 
 import java.util.List;
 import java.util.function.BiConsumer;

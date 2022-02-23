@@ -1,4 +1,4 @@
-package ui10.ui6;
+package ui10.base;
 
 public class EventContext {
     public boolean stopPropagation;

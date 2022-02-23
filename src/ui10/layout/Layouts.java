@@ -1,14 +1,13 @@
-package ui10.ui6.layout;
+package ui10.layout;
 
 import ui10.geom.*;
 import ui10.geom.shape.RoundedRectangle;
 import ui10.geom.shape.Shape;
-import ui10.layout.BoxConstraints;
-import ui10.ui6.Element;
-import ui10.ui6.LayoutContext1;
-import ui10.ui6.LayoutContext2;
-import ui10.ui6.decoration.css.CSSClass;
-import ui10.ui6.graphics.Opacity;
+import ui10.base.Element;
+import ui10.base.LayoutContext1;
+import ui10.base.LayoutContext2;
+import ui10.decoration.css.CSSClass;
+import ui10.graphics.Opacity;
 
 import java.util.ArrayList;
 import java.util.Arrays;

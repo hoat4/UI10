@@ -1,3 +1,4 @@
+/*
 package ui10.renderer.java2d;
 
 import ui10.binding.ScalarProperty;
@@ -29,3 +30,4 @@ public class AWTInputEnvironment implements InputEnvironment {
     }
 
 }
+*/

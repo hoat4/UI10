@@ -1,23 +1,22 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
 import ui10.geom.Insets;
 import ui10.geom.Size;
 import ui10.renderer.java2d.AWTTextStyle;
-import ui10.ui6.Attribute;
-import ui10.ui6.Element;
-import ui10.ui6.Pane;
-import ui10.ui6.RenderableElement;
-import ui10.ui6.decoration.Border;
-import ui10.ui6.decoration.DecorationContext;
-import ui10.ui6.graphics.TextNode;
+import ui10.base.Attribute;
+import ui10.base.Element;
+import ui10.base.Pane;
+import ui10.base.RenderableElement;
+import ui10.decoration.Border;
+import ui10.decoration.DecorationContext;
+import ui10.graphics.TextNode;
 
 import java.util.*;
-import java.util.concurrent.ScheduledFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static ui10.ui6.layout.Layouts.*;
+import static ui10.layout.Layouts.*;
 
 public class Rule {
 

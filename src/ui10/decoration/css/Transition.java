@@ -1,8 +1,8 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
 import ui10.geom.Fraction;
-import ui10.ui6.Attribute;
-import ui10.ui6.Pane;
+import ui10.base.Attribute;
+import ui10.base.Pane;
 
 import java.util.Objects;
 import java.util.concurrent.ScheduledFuture;

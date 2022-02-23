@@ -1,4 +1,4 @@
-package ui10.ui6.controls;
+package ui10.controls;
 
 import ui10.binding.ScalarProperty;
 import ui10.geom.Rectangle;
@@ -6,17 +6,17 @@ import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.image.Colors;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.Element;
-import ui10.ui6.LayoutContext2;
-import ui10.ui6.Pane;
-import ui10.ui6.decoration.css.CSSClass;
-import ui10.ui6.graphics.ColorFill;
-import ui10.ui6.graphics.TextNode;
-import ui10.ui6.LayoutContext1;
+import ui10.base.Element;
+import ui10.base.LayoutContext2;
+import ui10.base.Pane;
+import ui10.decoration.css.CSSClass;
+import ui10.graphics.ColorFill;
+import ui10.graphics.TextNode;
+import ui10.base.LayoutContext1;
 
 import java.util.function.Consumer;
 
-import static ui10.ui6.decoration.css.CSSClass.withClass;
+import static ui10.decoration.css.CSSClass.withClass;
 
 public class TextField extends Pane {
 

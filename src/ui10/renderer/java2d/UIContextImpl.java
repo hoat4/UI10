@@ -1,6 +1,6 @@
-package ui10.renderer6.java2d;
+package ui10.renderer.java2d;
 
-import ui10.nodes.EventLoop;
+import ui10.base.EventLoop;
 import ui10.base.RenderableElement;
 import ui10.base.UIContext;
 

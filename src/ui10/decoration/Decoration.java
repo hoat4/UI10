@@ -1,7 +1,7 @@
-package ui10.ui6.decoration;
+package ui10.decoration;
 
-import ui10.ui6.Element;
-import ui10.ui6.Pane;
+import ui10.base.Element;
+import ui10.base.Pane;
 
 public interface Decoration {
 

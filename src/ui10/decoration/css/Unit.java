@@ -1,3 +1,3 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
 public enum Unit {NULL, PX, PERCENT}

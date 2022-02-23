@@ -1,7 +1,7 @@
-package ui10.ui6.decoration;
+package ui10.decoration;
 
 import ui10.geom.Point;
-import ui10.ui6.decoration.css.Length;
+import ui10.decoration.css.Length;
 
 public record PointSpec(Length x, Length y) {
 

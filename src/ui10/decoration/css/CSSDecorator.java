@@ -1,15 +1,15 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.Attribute;
-import ui10.ui6.Control;
-import ui10.ui6.Element;
-import ui10.ui6.Pane;
-import ui10.ui6.decoration.DecorationContext;
-import ui10.ui6.LayoutContext1;
-import ui10.ui6.LayoutContext2;
+import ui10.base.Attribute;
+import ui10.base.Control;
+import ui10.base.Element;
+import ui10.base.Pane;
+import ui10.decoration.DecorationContext;
+import ui10.base.LayoutContext1;
+import ui10.base.LayoutContext2;
 
 import java.util.ArrayList;
 import java.util.List;

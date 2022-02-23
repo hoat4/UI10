@@ -1,26 +1,16 @@
-package ui10.ui6.controls;
+package ui10.controls;
 
 import ui10.binding.EventBus;
 import ui10.binding.ScalarProperty;
 import ui10.binding.StandaloneEventBus;
 import ui10.binding.impl.SelfContainedScalarProperty;
-import ui10.geom.Insets;
-import ui10.image.Colors;
-import ui10.image.RGBColor;
 import ui10.input.InputEvent;
 import ui10.input.pointer.MouseEvent;
-import ui10.renderer.java2d.AWTTextStyle;
-import ui10.ui6.*;
-import ui10.ui6.decoration.css.CSSClass;
-import ui10.ui6.decoration.css.CSSPseudoClass;
-import ui10.ui6.graphics.ColorFill;
-import ui10.ui6.graphics.LinearGradient;
-import ui10.ui6.graphics.TextNode;
-import ui10.ui6.layout.Layouts;
+import ui10.base.*;
+import ui10.decoration.css.CSSPseudoClass;
+import ui10.graphics.TextNode;
 
-import static ui10.ui6.decoration.css.CSSClass.withClass;
-import static ui10.ui6.layout.Layouts.padding;
-import static ui10.ui6.layout.Layouts.wrapWithClass;
+import static ui10.decoration.css.CSSClass.withClass;
 
 public class Button extends Control {
 

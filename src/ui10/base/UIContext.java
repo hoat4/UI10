@@ -1,8 +1,4 @@
-package ui10.ui6;
-
-import ui10.nodes.EventLoop;
-
-import java.util.function.Consumer;
+package ui10.base;
 
 public interface UIContext {
 

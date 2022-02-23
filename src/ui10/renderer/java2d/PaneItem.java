@@ -1,4 +1,4 @@
-package ui10.renderer6.java2d;
+package ui10.renderer.java2d;
 
 import ui10.input.pointer.MouseEvent;
 import ui10.base.Control;

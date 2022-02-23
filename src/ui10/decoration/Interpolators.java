@@ -1,8 +1,8 @@
-package ui10.ui6.decoration;
+package ui10.decoration;
 
 import ui10.image.Color;
 import ui10.image.RGBColor;
-import ui10.ui6.decoration.css.Length;
+import ui10.decoration.css.Length;
 
 public class Interpolators {
 

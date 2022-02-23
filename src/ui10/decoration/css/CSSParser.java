@@ -1,12 +1,12 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
 
 import ui10.image.Color;
 import ui10.image.RGBColor;
-import ui10.ui6.Attribute;
-import ui10.ui6.decoration.BorderSpec;
-import ui10.ui6.decoration.Fill;
-import ui10.ui6.decoration.PointSpec;
+import ui10.base.Attribute;
+import ui10.decoration.BorderSpec;
+import ui10.decoration.Fill;
+import ui10.decoration.PointSpec;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ui10.ui6.decoration.css.CSSScanner.chToString;
-import static ui10.ui6.decoration.css.Length.percent;
-import static ui10.ui6.decoration.css.Length.zero;
+import static ui10.decoration.css.CSSScanner.chToString;
+import static ui10.decoration.css.Length.percent;
+import static ui10.decoration.css.Length.zero;
 
 public class CSSParser {
 

@@ -1,3 +1,4 @@
+/*
 package ui10.controls;
 
 import ui10.binding.ObservableScalar;
@@ -20,8 +21,6 @@ import ui10.nodes.Pane;
 import ui10.nodes.TextPane;
 
 import static ui10.binding.ObservableScalar.binding;
-
-
 
 public class TextField extends Control {
 
@@ -91,3 +90,4 @@ public class TextField extends Control {
         }
     }
 }
+*/

@@ -1,11 +1,11 @@
-package ui10.ui6.layout;
+package ui10.layout;
 
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
-import ui10.ui6.Element;
-import ui10.ui6.LayoutContext1;
-import ui10.ui6.LayoutContext2;
+import ui10.base.Element;
+import ui10.base.LayoutContext1;
+import ui10.base.LayoutContext2;
 
 import java.util.function.BiConsumer;
 

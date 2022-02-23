@@ -1,7 +1,7 @@
 package ui10.binding.impl;
 
 import ui10.binding.*;
-import ui10.nodes.UIThread;
+import ui10.base.UIThread;
 
 import java.util.ArrayList;
 import java.util.List;

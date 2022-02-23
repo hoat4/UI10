@@ -1,4 +1,4 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
 public record Length(int px, int em, int relative) {
     public static Length zero() {

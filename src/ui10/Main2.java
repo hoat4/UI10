@@ -11,7 +11,7 @@ import ui10.image.RGBColor;
 import ui10.layout.Centered;
 import ui10.layout.Padding;
 import ui10.layout.StackPane;
-import ui10.nodes.EventLoop;
+import ui10.base.EventLoop;
 import ui10.nodes2.*;
 import ui10.renderer.java2d.AWTDesktop;
 import ui10.renderer.java2d.AWTTextStyle;

@@ -1,3 +1,4 @@
+/*
 package ui10.controls;
 
 import ui10.binding.ScalarProperty;
@@ -21,3 +22,4 @@ public class TextButton extends Button<Label> {
     }
 
 }
+*/

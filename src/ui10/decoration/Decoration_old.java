@@ -1,3 +1,4 @@
+/*
 package ui10.decoration;
 
 import ui10.binding.PropertyHolder;
@@ -60,3 +61,4 @@ public abstract class Decoration extends PropertyHolder {
     }
 
 }
+*/

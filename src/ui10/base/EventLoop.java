@@ -1,4 +1,4 @@
-package ui10.nodes;
+package ui10.base;
 
 import ui10.geom.Fraction;
 

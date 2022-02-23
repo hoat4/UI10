@@ -1,7 +1,5 @@
 package ui10.binding;
 
-import ui10.nodes.Node;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +59,7 @@ public interface ObservableList<E> extends List<E>, Observable<ListChange<E>> {
         };
     }
 
-    static ObservableList<Node> constantEmpty() {
+    static <E> ObservableList<E> constantEmpty() {
         return new ObservableListImpl<>(); // TODO legyen konstans
     }
 

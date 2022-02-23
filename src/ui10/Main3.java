@@ -1,14 +1,15 @@
+/*
 package ui10;
 
 import ui10.binding.Scope;
-import ui10.controls.Button;
-import ui10.controls.Label;
-import ui10.controls.TextButton;
-import ui10.controls.TextField;
-import ui10.decoration.Box;
-import ui10.decoration.Decoration;
-import ui10.decoration.RuleBasedDecoration;
-import ui10.decoration.Tag;
+import ui10.controls_old.Button;
+import ui10.controls_old.Label;
+import ui10.controls_old.TextButton;
+import ui10.controls_old.TextField;
+import ui10.decoration_old.Box;
+import ui10.decoration_old.Decoration;
+import ui10.decoration_old.RuleBasedDecoration;
+import ui10.decoration_old.Tag;
 import ui10.geom.Insets;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
@@ -157,3 +158,4 @@ public class Main3 {
         return box;
     }
 }
+*/

@@ -1,8 +1,8 @@
-package ui10.layout4;
+package ui10.layout;
 
 import ui10.geom.Fraction;
-import ui10.ui6.Attribute;
-import ui10.ui6.Element;
+import ui10.base.Attribute;
+import ui10.base.Element;
 
 import java.util.Objects;
 

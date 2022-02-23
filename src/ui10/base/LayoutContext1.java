@@ -1,8 +1,6 @@
-package ui10.ui6;
+package ui10.base;
 
-import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
 import java.util.HashSet;

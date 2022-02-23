@@ -1,6 +1,5 @@
-package ui10.ui6;
+package ui10.base;
 
-import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
 
 import java.util.List;

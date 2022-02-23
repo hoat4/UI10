@@ -1,4 +1,4 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
 import java.time.Duration;
 

@@ -1,4 +1,4 @@
-package ui10.ui6.window;
+package ui10.window;
 
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;

@@ -1,9 +1,8 @@
-package ui10.ui6.layout;
+package ui10.layout;
 
 import ui10.geom.Axis;
 import ui10.geom.Fraction;
 import ui10.geom.Size;
-import ui10.layout.BoxConstraints;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
-import ui10.ui6.decoration.DecorationContext;
+import ui10.decoration.DecorationContext;
 
 public interface Expression<T> {
 

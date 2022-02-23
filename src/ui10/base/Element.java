@@ -1,4 +1,4 @@
-package ui10.ui6;
+package ui10.base;
 
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -17,6 +17,7 @@ public abstract class Element {
 
     // LAYOUT
 
+    // nevek 4-es layoutban computeSize és setBounds voltak
     protected abstract Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1);
 
     protected abstract void performLayoutImpl(Shape shape, LayoutContext2 context);

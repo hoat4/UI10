@@ -1,10 +1,10 @@
-package ui10.ui6.graphics;
+package ui10.graphics;
 
 import ui10.geom.Size;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
-import ui10.ui6.RenderableElement;
-import ui10.ui6.LayoutContext1;
+import ui10.base.RenderableElement;
+import ui10.base.LayoutContext1;
 
 public class ColorFill extends RenderableElement {
 

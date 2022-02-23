@@ -1,6 +1,4 @@
-package ui10.ui6;
-
-import ui10.nodes.EventLoop;
+package ui10.base;
 
 public interface RendererData {
 

@@ -1,4 +1,4 @@
-package ui10.ui6.decoration;
+package ui10.decoration;
 
 import ui10.geom.Fraction;
 

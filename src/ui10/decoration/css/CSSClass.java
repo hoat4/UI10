@@ -1,7 +1,7 @@
-package ui10.ui6.decoration.css;
+package ui10.decoration.css;
 
-import ui10.ui6.Attribute;
-import ui10.ui6.Element;
+import ui10.base.Attribute;
+import ui10.base.Element;
 
 public class CSSClass extends Attribute {
 
