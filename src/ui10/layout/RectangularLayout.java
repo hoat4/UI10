@@ -9,13 +9,15 @@ import ui10.base.LayoutContext2;
 
 import java.util.function.BiConsumer;
 
-abstract class RectangularLayout extends Element {
+public abstract class RectangularLayout extends Element {
     @Override
     protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
         Rectangle shapeBounds = shape.bounds();
         Size size = shapeBounds.size();
         doPerformLayout(size, (elem, rect) -> {
-            context.placeElement(elem, rect.translate(shapeBounds.topLeft()).intersectionWith(shape));
+            Shape elemShape = rect.translate(shapeBounds.topLeft()).intersectionWith(shape);
+            if (elemShape != null) // ilyenkor inkább nulla méretű shape-pel kéne hozzáadni
+                context.placeElement(elem, elemShape);
         }, context);
     }
 

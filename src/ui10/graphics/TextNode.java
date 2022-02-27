@@ -68,7 +68,7 @@ public class TextNode extends RenderableElement {
 
     @Override
     public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-        return textStyle.textSize(text).size().divide(1000);
+        return textStyle.textSize(text).size();
     }
 
     @Override

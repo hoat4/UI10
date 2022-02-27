@@ -6,12 +6,15 @@ import ui10.base.*;
 
 import java.awt.*;
 
+import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.pointer.MouseEvent;
 import ui10.base.LayoutContext2;
 import ui10.window.Window;
 
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -31,7 +34,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
         renderer.root = renderer.makeItem(window);
         window.focusContext = new FocusContext();
 
-        enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
+        enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK | AWTEvent.KEY_EVENT_MASK);
         setTitle("Ablak");
 
         addNotify();
@@ -39,7 +42,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
     }
 
     public void applySize() {
-        renderer.uiContext.requestLayout(new UIContext.LayoutTask(window, ()->{
+        renderer.uiContext.requestLayout(new UIContext.LayoutTask(window, () -> {
             Rectangle rect = new Rectangle(
                     getWidth() - getInsets().left - getInsets().right,
                     getHeight() - getInsets().top - getInsets().bottom);
@@ -86,6 +89,15 @@ public class AWTWindowImpl extends Frame implements RendererData {
     }
 
     @Override
+    protected void processKeyEvent(KeyEvent e) {
+        switch (e.getID()) {
+            case KeyEvent.KEY_PRESSED -> {
+                dispatchKeyEvent(new AWTKeyTypeEvent(e));
+            }
+        }
+    }
+
+    @Override
     protected void processMouseEvent(java.awt.event.MouseEvent e) {
         switch (e.getID()) {
             case java.awt.event.MouseEvent.MOUSE_PRESSED:
@@ -111,7 +123,31 @@ public class AWTWindowImpl extends Frame implements RendererData {
                 if (eventContext.stopPropagation)
                     break;
 
-                l.get(i).bubble(e, eventContext);
+                l.get(i).dispatchInputEvent(e, eventContext, false);
+            }
+        });
+    }
+
+    private void dispatchKeyEvent(KeyTypeEvent e) {
+        eventLoop().runLater(() -> {
+            Control focusedControl = window.focusContext.focusedControl.get();
+            List<Control> hierarchy = new ArrayList<>();
+            for (RenderableElement re = focusedControl; re != null; re = re.parent) {
+                if (re instanceof Control c)
+                    hierarchy.add(0, c);
+            }
+
+            EventContext eventContext = new EventContext();
+            for (Control c : hierarchy) {
+                c.dispatchInputEvent(e, eventContext, true);
+                if (eventContext.stopPropagation)
+                    return;
+            }
+            Collections.reverse(hierarchy);
+            for (Control c : hierarchy) {
+                c.dispatchInputEvent(e, eventContext, false);
+                if (eventContext.stopPropagation)
+                    return;
             }
         });
     }

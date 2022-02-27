@@ -59,7 +59,7 @@ public interface Keyboard {
     record StandardTextSymbol(String text) implements StandardSymbol {}
 
     enum StandardFunctionSymbol implements StandardSymbol {
-        LEFT, RIGHT, UP, DOWN
+        LEFT, RIGHT, UP, DOWN, BACKSPACE, DELETE
     }
 
     interface Modifier {}

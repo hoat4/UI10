@@ -1,5 +1,6 @@
 package ui10.geom;
 
+import ui10.geom.shape.RoundedRectangle;
 import ui10.geom.shape.Shape;
 
 public record Insets(int top, int right, int bottom, int left) {
@@ -33,6 +34,8 @@ public record Insets(int top, int right, int bottom, int left) {
     }
 
     public Shape removeFrom(Shape shape) {
-        return shape.intoBounds(shape.bounds().withInnerInsets(this));
+        if (shape instanceof RoundedRectangle r)
+            return new RoundedRectangle(r.rectangle().withInnerInsets(this), r.radius()); // radiust csökkenteni kéne
+        return shape.intoBounds(shape.bounds().withInnerInsets(this)); // ez nem jó, torzít
     }
 }

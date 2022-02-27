@@ -8,8 +8,6 @@ import java.util.List;
 
 public abstract class Shape {
 
-    public static final Shape NULL = Rectangle.of(Size.ZERO);
-
     public abstract List<BézierPath> outlines();
 
     public Rectangle bounds() {
@@ -30,6 +28,8 @@ public abstract class Shape {
 
     // nullable
     public Shape intersectionWith(Shape other) {
+        if (this instanceof Rectangle)
+            return other.intersectionWith(this); // TODO
         return ShapeOperations.intersection(this, other);
     }
 

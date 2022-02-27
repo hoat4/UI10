@@ -41,7 +41,7 @@ public class PaneItem extends Item<Pane> {
     @Override
     public boolean captureMouseEvent(MouseEvent p, List<Control> l, EventContext eventContext) {
         if (node instanceof Control c) {
-            c.capture(p, eventContext);
+            c.dispatchInputEvent(p, eventContext, true);
             if (eventContext.stopPropagation)
                 return true;
 

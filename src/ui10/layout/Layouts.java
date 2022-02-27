@@ -112,7 +112,7 @@ public class Layouts {
     }
 
     public static Element padding(Element content, Insets insets) {
-        return new ShapedPadding(content, insets);
+        return new Padding(content, insets);
     }
 
     private static class Padding extends SingleNodeLayout {

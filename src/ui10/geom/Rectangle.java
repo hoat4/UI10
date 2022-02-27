@@ -34,22 +34,16 @@ public class Rectangle extends Shape {
         return size.width() == 0 || size.height() == 0;
     }
 
-    public Point rightBottom() {
-        if (isEmpty())
-            throw new UnsupportedOperationException();
-        return topLeft.add(size).subtract(new Size(1, 1));
+    public Point bottomRight() {
+        return topLeft.add(size);
     }
 
-    public Point rightTop() {
-        if (isEmpty())
-            throw new UnsupportedOperationException();
-        return topLeft.add(size.width(), 0).subtract(new Size(1, 0));
+    public Point topRight() {
+        return topLeft.add(size.width(), 0);
     }
 
-    public Point leftBottom() {
-        if (isEmpty())
-            throw new UnsupportedOperationException();
-        return topLeft.add(0, size.height()).subtract(new Size(0, 1));
+    public Point bottomLeft() {
+        return topLeft.add(0, size.height());
     }
 
     public static Rectangle union(Rectangle a, Rectangle b) { // ez valójában nem is unió
@@ -70,11 +64,23 @@ public class Rectangle extends Shape {
         if (a == null || a.isEmpty() || b == null || b.isEmpty())
             return null;
 
-        Rectangle r = of(
+        if (a.right() <= b.left() || b.right() <= a.left() ||
+                a.bottom() <= b.top() || b.bottom() <= a.top())
+            return null;
+
+        return of(
                 Point.max(a.topLeft, b.topLeft),
-                Point.min(a.rightBottom(), b.rightBottom())
+                Point.min(a.bottomRight(), b.bottomRight())
         );
-        return r.size.isZero() ? null : r;
+    }
+
+    public static Rectangle cornerAt(Corner corner, Point p, Size size) {
+        return switch (corner) {
+            case TOP_LEFT -> new Rectangle(p, size);
+            case TOP_RIGHT -> new Rectangle(p.subtract(size.width(), 0), size);
+            case BOTTOM_RIGHT -> new Rectangle(p.subtract(size), size);
+            case BOTTOM_LEFT -> new Rectangle(p.subtract(0, size.width()), size);
+        };
     }
 
     public static Rectangle of(Size size) {
@@ -83,7 +89,7 @@ public class Rectangle extends Shape {
 
     public static Rectangle of(Point topLeft, Point rightBottom) {
         return new Rectangle(topLeft,
-                new Size(rightBottom.x() - topLeft.x() + 1, rightBottom.y() - topLeft.y() + 1));
+                new Size(rightBottom.x() - topLeft.x(), rightBottom.y() - topLeft.y()));
     }
 
     @Override
@@ -139,9 +145,16 @@ public class Rectangle extends Shape {
                 point.x() < topLeft.x() + size.width() && point.y() < topLeft.y() + size.height();
     }
 
+    public boolean contains(Rectangle rectangle) {
+        return rectangle.equals(intersection(this, rectangle));
+    }
+
     //    @Override
     public int containment(Rectangle rectangle) {
-        return intersection(this, rectangle).area();
+        Rectangle r = intersection(this, rectangle);
+        if (r == null)
+            return 0;
+        return r.area();
     }
 
     //@Override
@@ -154,9 +167,9 @@ public class Rectangle extends Shape {
     public List<BézierPath> outlines() {
         return List.of(
                 BézierPath.builder().
-                        moveTo(rightTop().add(1, 0)).
-                        lineTo(rightBottom().add(1, 1)).
-                        lineTo(leftBottom().add(0, 1)).
+                        moveTo(topRight()).
+                        lineTo(bottomRight()).
+                        lineTo(bottomLeft()).
                         lineTo(topLeft()).
                         build()
         );
@@ -192,8 +205,16 @@ public class Rectangle extends Shape {
         return topLeft.x();
     }
 
+    public int right() {
+        return topLeft.x() + size.width();
+    }
+
     public int top() {
         return topLeft.y();
+    }
+
+    public int bottom() {
+        return topLeft.y() + size.height();
     }
 
     public int width() {
@@ -202,6 +223,15 @@ public class Rectangle extends Shape {
 
     public int height() {
         return size.height();
+    }
+
+    public Point corner(Corner corner) {
+        return switch (corner) {
+            case TOP_LEFT -> topLeft();
+            case TOP_RIGHT -> topRight();
+            case BOTTOM_LEFT -> bottomLeft();
+            case BOTTOM_RIGHT -> bottomRight();
+        };
     }
 
     @Override
@@ -220,5 +250,10 @@ public class Rectangle extends Shape {
     @Override
     public String toString() {
         return "Rect {" + topLeft + " " + size + "}";
+    }
+
+    public enum Corner {
+        TOP_LEFT, BOTTOM_LEFT,
+        BOTTOM_RIGHT, TOP_RIGHT
     }
 }

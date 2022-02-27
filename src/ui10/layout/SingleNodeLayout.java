@@ -21,7 +21,10 @@ public abstract class SingleNodeLayout extends Element {
 
     @Override
     protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-        context.placeElement(content, computeContentShape(shape, context));
+        Shape contentShape = computeContentShape(shape, context);
+        // ilyenkor lehet hogy mégis hozzá kéne adni, de mondjuk 0 méretű téglalapként
+        if (contentShape != null)
+            context.placeElement(content, contentShape);
     }
 
     protected abstract Shape computeContentShape(Shape containerShape, LayoutContext2 context);

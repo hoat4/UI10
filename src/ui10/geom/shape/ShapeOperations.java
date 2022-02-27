@@ -79,6 +79,10 @@ public class ShapeOperations {
     }
 
     public static Shape intoBounds(Shape shape, Rectangle b) {
+        if (b.isEmpty())
+            // ilyenkor adjuk vissza b-t?
+            throw new IllegalArgumentException(shape+", "+b);
+
         Rectangle a = shape.bounds();
         Shape s = new TransformedShape(shape) {
             @Override
@@ -110,8 +114,10 @@ public class ShapeOperations {
         return Rectangle.union(a.bounds(), b.bounds());
     }
 
-    public static Shape intersection(Shape shape, Shape other) {
-        throw new UnsupportedOperationException(shape+", "+other);
+    public static Shape intersection(Shape a, Shape b) {
+        if (a.bounds().intersectionWith(b.bounds()) == null)
+            return null;
+        throw new UnsupportedOperationException(a+", "+b);
     }
 
     public static Shape subtract(Shape a, Shape b) {
@@ -123,7 +129,10 @@ public class ShapeOperations {
                     return List.of(o2.get(0), o1.get(0));
                 }
             };
-        else
-            throw new UnsupportedOperationException();
+        else {
+            if (a.bounds().intersectionWith(b.bounds()) == null)
+                return a;
+            throw new UnsupportedOperationException(a+", "+b);
+        }
     }
 }

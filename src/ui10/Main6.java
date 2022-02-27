@@ -34,15 +34,16 @@ public class Main6 {
         Button button = new Button();
         button.onAction.subscribe(__ -> System.out.println("Hello world!"));
 
-        tf.attributes().add(new GrowFactor(Fraction.of(2, 1)));
+        button.attributes().add(new GrowFactor(Fraction.of(0)));
+        tf.attributes().add(new GrowFactor(Fraction.of(0)));
 
         Element content = withClass("root",
-                //vertically(button, tf)
+                centered(vertically(button, tf))
 
-                grid(3,
-                        new Button(), new Button(), new Button(),
-                        new Button(), new Button(), new Button()
-                )
+                //grid(3,
+                //        new Button(), new Button(), new Button(),
+                //        new Button(), new Button(), new Button()
+                //)
 
                 //centered(roundRectangle(10, stack(
                 //         Layouts.padding(new ColorFill(Colors.RED), new Insets(25)), new ColorFill(Colors.GREEN)

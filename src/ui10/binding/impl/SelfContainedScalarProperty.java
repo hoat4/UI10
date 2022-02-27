@@ -44,9 +44,13 @@ public class SelfContainedScalarProperty<T> implements ScalarProperty<T>, Consum
 
     @Override
     public T get() {
-        ReadTransaction t = ((UIThread)Thread.currentThread()).currentReadTransaction;
-        if (t != null)
-            t.onRead(this);
+        if (Thread.currentThread() instanceof UIThread uiThread) {
+            ReadTransaction t = uiThread.currentReadTransaction;
+            if (t != null)
+                t.onRead(this);
+        } else {
+            System.err.println("Property read from non-UI thread: " + this + ", " + Thread.currentThread().getName());
+        }
         return transformedValue;
     }
 

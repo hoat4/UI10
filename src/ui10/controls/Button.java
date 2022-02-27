@@ -4,7 +4,6 @@ import ui10.binding.EventBus;
 import ui10.binding.ScalarProperty;
 import ui10.binding.StandaloneEventBus;
 import ui10.binding.impl.SelfContainedScalarProperty;
-import ui10.input.InputEvent;
 import ui10.input.pointer.MouseEvent;
 import ui10.base.*;
 import ui10.decoration.css.CSSPseudoClass;
@@ -13,8 +12,6 @@ import ui10.graphics.TextNode;
 import static ui10.decoration.css.CSSClass.withClass;
 
 public class Button extends Control {
-
-    private boolean _pressed;
 
     private final TextNode textNode = withClass("button-text", new TextNode());
 
@@ -26,7 +23,7 @@ public class Button extends Control {
         withClass("button", this);
         textNode.text("Gomb");
 
-        pressed().subscribe(e->{
+        pressed().subscribe(e -> {
             requestLayout();
             System.out.println(e.newValue());
             if (!e.newValue())
@@ -43,18 +40,18 @@ public class Button extends Control {
         return textNode;
     }
 
-    @Override
-    public void bubble(InputEvent event, EventContext eventContext) {
-        if (event instanceof MouseEvent.MousePressEvent) {
-            focusContext.focusedControl.set(this);
+    @EventHandler
+    private void onMousePress(MouseEvent.MousePressEvent event, EventContext eventContext) {
+        focusContext.focusedControl.set(this);
 
-            pressed().set(true);
-            attributes().add(new CSSPseudoClass("active"));
-        }
-        if (event instanceof MouseEvent.MouseReleaseEvent) {
-            pressed().set(false);
-            attributes().remove(new CSSPseudoClass("active"));
-        }
+        pressed().set(true);
+        attributes().add(new CSSPseudoClass("active"));
+    }
+
+    @EventHandler
+    private void onMouseRelease(MouseEvent.MouseReleaseEvent event, EventContext eventContext) {
+        pressed().set(false);
+        attributes().remove(new CSSPseudoClass("active"));
     }
 
 }

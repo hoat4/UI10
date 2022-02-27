@@ -73,6 +73,10 @@ public record Fraction(int numerator, int denominator) {
         return new Fraction((int) (d * denominator), denominator);
     }
 
+    public static Fraction of(int value) {
+        return new Fraction(value, 1);
+    }
+
     public float toFloat() {
         return (float) numerator / denominator;
     }
