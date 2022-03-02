@@ -32,7 +32,7 @@ public class TextNode extends RenderableElement {
     public TextNode text(String text) {
         if (!Objects.equals(text, this.text)) {
             this.text = text;
-            invalidateRendererData();
+            invalidate();
         }
         return this;
     }

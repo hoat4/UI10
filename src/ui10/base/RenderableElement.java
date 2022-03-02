@@ -11,6 +11,7 @@ public abstract class RenderableElement extends Element {
 
     public RendererData rendererData;
     public RenderableElement parent;
+    public UIContext uiContext;
 
     protected Shape shape;
     protected List<LayoutContext1.LayoutDependency> layoutDependencies;
@@ -40,20 +41,18 @@ public abstract class RenderableElement extends Element {
         return shape;
     }
 
-    protected void invalidateRendererData() {
+    public void invalidate() {
         if (rendererData != null)
-            requestLayout();
-    }
-
-    public void requestLayout() {
-        rendererData.invalidateRendererData();
-        rendererData.uiContext().requestLayout(new UIContext.LayoutTask(this, () -> {
+            rendererData.invalidateRendererData();
+        if (uiContext == null)
+            return;
+        uiContext.requestLayout(new UIContext.LayoutTask(this, () -> {
             LayoutContext1 ctx = new LayoutContext1();
 
             for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
                 if (!ctx.preferredSize(this, dep.inputConstraints()).equals(dep.size())) {
                     Objects.requireNonNull(parent, this::toString);
-                    parent.requestLayout();
+                    parent.invalidate();
                     return;
                 }
             }

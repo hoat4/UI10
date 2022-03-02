@@ -2,13 +2,16 @@ package ui10.geom.shape;
 
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
-import ui10.geom.Size;
+import ui10.geom.ScanLine;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class Shape {
 
     public abstract List<BézierPath> outlines();
+
+    public abstract void scan(Rectangle clip, Consumer<ScanLine> consumer);
 
     public Rectangle bounds() {
         return ShapeOperations.bounds(this);

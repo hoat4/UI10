@@ -33,6 +33,11 @@ public record RGBColor(double red, double green, double blue, double alpha) impl
                 (int) (blue * 255 + 0.5) << 8 | (int) (alpha * 255 + 0.5);
     }
 
+    public int toIntARGB() {
+        return (int) (alpha * 255 + 0.5) << 24 | (int) (red * 255 + 0.5) << 16
+                | (int) (green * 255 + 0.5) << 8 | (int) (blue * 255 + 0.5);
+    }
+
     @Override
     public RGBColor toRGBColor() {
         return this;
@@ -49,7 +54,7 @@ public record RGBColor(double red, double green, double blue, double alpha) impl
         if (brightnessFactor < 0)
             b = b + b * brightnessFactor;
         else if (brightnessFactor > 0)
-            b = b + (1-b)*brightnessFactor;
+            b = b + (1 - b) * brightnessFactor;
 
         return new HSBColor(hsb.hue(), hsb.saturation(), b).toRGBColor();
     }
@@ -57,6 +62,6 @@ public record RGBColor(double red, double green, double blue, double alpha) impl
     @Override
     public String toString() {
         // TODO alpha
-        return String.format("#%02X%02X%02X", (int) (red*255+.5), (int) (green*255+.5), (int) (blue*255+.5));
+        return String.format("#%02X%02X%02X", (int) (red * 255 + .5), (int) (green * 255 + .5), (int) (blue * 255 + .5));
     }
 }

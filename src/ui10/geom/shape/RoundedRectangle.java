@@ -1,10 +1,13 @@
 package ui10.geom.shape;
 
+import org.w3c.dom.css.Rect;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
+import ui10.geom.ScanLine;
 import ui10.geom.Size;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static java.util.Arrays.stream;
 import static ui10.geom.Rectangle.Corner.*;
@@ -98,8 +101,38 @@ public class RoundedRectangle extends CompositeShape {
         }
 
         @Override
+        public void scan(Rectangle clip, Consumer<ScanLine> consumer) {
+            Rectangle r = clip.intersectionWith(rectangle);
+            if (r == null)
+                return;
+
+            for (int y = r.top(); y < r.bottom(); y++) {
+                int radius = rectangle.height();
+                int x2 = switch (corner) { // [1, r]
+                    case TOP_LEFT, TOP_RIGHT -> {
+                        int y2 = radius - (y - rectangle.top()) - 1; // [0, r-1]
+                        yield (int) (Math.sqrt(radius * radius - y2 * y2));
+                    }
+                    case BOTTOM_LEFT, BOTTOM_RIGHT -> {
+                        int y2 = y - rectangle.top(); // [0, r-1]
+                        yield (int) (radius - Math.sqrt(radius * radius - y2 * y2));
+                    }
+                };
+                ScanLine scanLine = switch (corner) {
+                    case TOP_LEFT -> new ScanLine(y, rectangle.right() - x2 - 1, rectangle.right());
+                    case TOP_RIGHT -> new ScanLine(y, rectangle.left(), rectangle.left() + x2 + 1);
+                    case BOTTOM_LEFT -> new ScanLine(y, rectangle.left() + x2, rectangle.right());
+                    case BOTTOM_RIGHT -> new ScanLine(y, rectangle.left(), rectangle.right() - x2);
+                };
+                scanLine = scanLine.clip(r);
+                if (scanLine != null)
+                    consumer.accept(scanLine);
+            }
+        }
+
+        @Override
         public String toString() {
-            return "Rounded "+corner+" corner at "+rectangle;
+            return "Rounded " + corner + " corner at " + rectangle;
         }
     }
 }

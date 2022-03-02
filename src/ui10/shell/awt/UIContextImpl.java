@@ -1,8 +1,9 @@
-package ui10.renderer.java2d;
+package ui10.shell.awt;
 
 import ui10.base.EventLoop;
 import ui10.base.RenderableElement;
 import ui10.base.UIContext;
+import ui10.shell.renderer.java2d.J2DRenderer;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -14,11 +15,11 @@ public class UIContextImpl implements UIContext {
 
     private final List<LayoutTask> layoutTasks = new ArrayList<>();
 
-    private final J2DRenderer renderer;
+    private final AWTRenderer renderer;
 
     private int inLayout =-1;
 
-    public UIContextImpl(J2DRenderer renderer) {
+    public UIContextImpl(AWTRenderer renderer) {
         this.renderer = renderer;
     }
 
@@ -47,7 +48,7 @@ public class UIContextImpl implements UIContext {
         layoutTasks.add(task);
     }
 
-    void performLayouts() {
+    public void performLayouts() {
         System.out.println(layoutTasks);
         for (inLayout = 0; inLayout < layoutTasks.size(); inLayout++) {
             LayoutTask t = layoutTasks.get(inLayout);

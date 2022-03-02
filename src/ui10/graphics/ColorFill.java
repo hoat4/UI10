@@ -23,12 +23,17 @@ public class ColorFill extends RenderableElement {
 
     public ColorFill color(Color color) {
         this.color = color;
-        invalidateRendererData();
+        invalidate();
         return this;
     }
 
     @Override
     public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
         return constraints.min();
+    }
+
+    @Override
+    public String toString() {
+        return "ColorFill {color=" + color + ", shape=" + shape + "}";
     }
 }

@@ -4,9 +4,11 @@ import org.w3c.dom.css.Rect;
 import ui10.geom.Fraction;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
+import ui10.geom.ScanLine;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
@@ -23,6 +25,11 @@ public class CompositeShape extends Shape {
     @Override
     public List<BézierPath> outlines() {
         return shapes.stream().flatMap(shape -> shape.outlines().stream()).toList();
+    }
+
+    @Override
+    public void scan(Rectangle clip, Consumer<ScanLine> callback) {
+        shapes.forEach(shape -> shape.scan(clip, callback));
     }
 
     @Override

@@ -50,7 +50,7 @@ public abstract class Pane extends RenderableElement {
      */
     protected void invalidatePane() {
         valid = false;
-        requestLayout();
+        invalidate();
     }
 
     @Override
@@ -69,6 +69,7 @@ public abstract class Pane extends RenderableElement {
             public void accept(RenderableElement e) {
                 children.add(e);
                 e.parent = Pane.this;
+                e.uiContext = uiContext;
                 if (e instanceof Pane p)
                     p.focusContext = focusContext;
             }

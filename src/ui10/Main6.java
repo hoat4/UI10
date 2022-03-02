@@ -12,7 +12,7 @@ import ui10.decoration.css.CSSParser;
 import ui10.decoration.css.CSSScanner;
 import ui10.graphics.ColorFill;
 import ui10.layout.Layouts;
-import ui10.renderer.java2d.AWTDesktop;
+import ui10.shell.awt.AWTDesktop;
 import ui10.window.Window;
 
 import java.io.IOException;
@@ -38,7 +38,8 @@ public class Main6 {
         tf.attributes().add(new GrowFactor(Fraction.of(0)));
 
         Element content = withClass("root",
-                centered(vertically(button, tf))
+                firstContent()
+                //centered(vertically(button, tf))
 
                 //grid(3,
                 //        new Button(), new Button(), new Button(),

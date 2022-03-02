@@ -1,4 +1,4 @@
-package ui10.renderer.java2d;
+package ui10.shell.awt;
 
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.keyboard.Keyboard;

@@ -1,5 +1,5 @@
 /*
-package ui10.renderer.java2d;
+package ui10.shell.renderer.java2d;
 
 import ui10.binding.ScalarProperty;
 import ui10.input.*;

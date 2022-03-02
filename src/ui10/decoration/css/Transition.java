@@ -25,7 +25,7 @@ public class Transition<T> extends Attribute {
 
     public void progress(Fraction fraction) {
         this.progress = fraction;
-        pane.requestLayout();
+        pane.invalidate();
     }
 
     public Fraction progress() {

@@ -9,7 +9,7 @@ import ui10.geom.Size;
 import ui10.image.RGBColor;
 import ui10.node.*;
 import ui10.nodes.*;
-import ui10.renderer.java2d.AWTDesktop;
+import ui10.shell.renderer.java2d.AWTDesktop;
 
 import java.time.Duration;
 

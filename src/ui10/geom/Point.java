@@ -92,4 +92,12 @@ public record Point(int x, int y) {
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
+
+    public Point withX(int x) {
+        return new Point(x, y);
+    }
+
+    public Point withY(int y) {
+        return new Point(x, y);
+    }
 }

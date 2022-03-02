@@ -2,7 +2,7 @@ package ui10.decoration.css;
 
 import ui10.geom.Insets;
 import ui10.geom.Size;
-import ui10.renderer.java2d.AWTTextStyle;
+import ui10.shell.renderer.java2d.AWTTextStyle;
 import ui10.base.Attribute;
 import ui10.base.Element;
 import ui10.base.Pane;
@@ -169,9 +169,9 @@ public class Rule {
                 t.activeAnimation.cancel(false);
 
             RenderableElement r = (RenderableElement) e;
-            transition.activeAnimation = r.rendererData.eventLoop().beginAnimation(transition.spec.duration(), f -> {
+            transition.activeAnimation = r.uiContext.eventLoop().beginAnimation(transition.spec.duration(), f -> {
                 t.progress(f);
-                r.requestLayout();
+                r.invalidate();
             });
         }
     }

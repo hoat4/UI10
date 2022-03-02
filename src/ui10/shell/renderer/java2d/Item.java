@@ -1,4 +1,4 @@
-package ui10.renderer.java2d;
+package ui10.shell.renderer.java2d;
 
 import ui10.input.pointer.MouseEvent;
 import ui10.base.EventLoop;
@@ -31,22 +31,12 @@ public abstract class Item<N extends RenderableElement> implements RendererData 
     }
 
     @Override
-    public EventLoop eventLoop() {
-        return uiContext().eventLoop();
-    }
-
-    @Override
     public void invalidateRendererData() {
         //if (valid) {
             valid = false;
             //bufferedImage = null;
             //renderer.requestRepaint();
         //}
-    }
-
-    @Override
-    public UIContext uiContext() {
-        return renderer.uiContext;
     }
 
     private void validate() {

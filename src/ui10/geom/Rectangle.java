@@ -1,10 +1,12 @@
 package ui10.geom;
 
+import jdk.incubator.foreign.MemoryAccess;
 import ui10.geom.shape.BézierPath;
 import ui10.geom.shape.Shape;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static ui10.geom.Point.ORIGO;
 
@@ -175,6 +177,14 @@ public class Rectangle extends Shape {
         );
     }
 
+
+    @Override
+    public void scan(Rectangle clip, Consumer<ScanLine> consumer) {
+        Rectangle r = intersectionWith(clip);
+        for (int y = 0; y < r.height(); y++)
+            consumer.accept(new ScanLine(r.topLeft().add(0, y), r.width()));
+    }
+
     @Override
     public Shape unionWith(Shape other) {
         if (isEmpty())
@@ -193,6 +203,13 @@ public class Rectangle extends Shape {
 
         if (!(other instanceof Rectangle))
             return super.intersectionWith(other);
+
+        return intersection(this, (Rectangle) other);
+    }
+
+    public Rectangle intersectionWith(Rectangle other) {
+        if (size.isZero())
+            return this;
 
         return intersection(this, (Rectangle) other);
     }

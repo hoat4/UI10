@@ -1,4 +1,4 @@
-package ui10.renderer.java2d;
+package ui10.shell.awt;
 
 import ui10.geom.Point;
 import ui10.base.EventLoop;
@@ -9,6 +9,8 @@ import java.awt.*;
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.pointer.MouseEvent;
 import ui10.base.LayoutContext2;
+import ui10.shell.renderer.java2d.J2DRenderer;
+import ui10.shell.renderer.java2d.J2DUtil;
 import ui10.window.Window;
 
 import java.awt.event.KeyEvent;
@@ -20,32 +22,34 @@ import java.util.concurrent.ExecutionException;
 
 public class AWTWindowImpl extends Frame implements RendererData {
 
-    private final J2DRenderer renderer;
+    private final AWTRenderer renderer;
     private final Window window;
     private final AWTDesktop desktop;
+    private final int scale;
 
-    public AWTWindowImpl(Window window, AWTDesktop desktop) throws HeadlessException {
+    public AWTWindowImpl(Window window, AWTDesktop desktop, int scale) throws HeadlessException {
         this.window = window;
         this.desktop = desktop;
-
-        renderer = new J2DRenderer();
-        renderer.c = this;
-
-        renderer.root = renderer.makeItem(window);
-        window.focusContext = new FocusContext();
+        this.scale = scale;
 
         enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK | AWTEvent.KEY_EVENT_MASK);
         setTitle("Ablak");
 
         addNotify();
         createBufferStrategy(2);
+
+        renderer = new AwtSwRenderer();
+        renderer.awtWindow = this;
+        window.uiContext = renderer.uiContext;
+        renderer.initRoot(window);
+        window.focusContext = new FocusContext();
     }
 
     public void applySize() {
         renderer.uiContext.requestLayout(new UIContext.LayoutTask(window, () -> {
             Rectangle rect = new Rectangle(
-                    getWidth() - getInsets().left - getInsets().right,
-                    getHeight() - getInsets().top - getInsets().bottom);
+                    (getWidth() - getInsets().left - getInsets().right) / scale,
+                    (getHeight() - getInsets().top - getInsets().bottom) / scale);
             new LayoutContext2() {
                 @Override
                 public void accept(RenderableElement element) {
@@ -55,18 +59,8 @@ public class AWTWindowImpl extends Frame implements RendererData {
     }
 
     @Override
-    public EventLoop eventLoop() {
-        return renderer.uiContext.eventLoop();
-    }
-
-    @Override
     public void invalidateRendererData() {
         renderer.requestRepaint();
-    }
-
-    @Override
-    public UIContext uiContext() {
-        return renderer.uiContext;
     }
 
     @Override
@@ -114,10 +108,10 @@ public class AWTWindowImpl extends Frame implements RendererData {
     }
 
     private void dispatchMouseEvent(MouseEvent e) {
-        eventLoop().runLater(() -> {
+        renderer.uiContext.eventLoop().runLater(() -> {
             List<Control> l = new ArrayList<>();
             EventContext eventContext = new EventContext();
-            if (!renderer.root.captureMouseEvent(e, l, eventContext))
+            if (!renderer.captureMouseEvent(e, eventContext, l))
                 return;
             for (int i = l.size() - 1; i >= 0; i--) {
                 if (eventContext.stopPropagation)
@@ -129,7 +123,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
     }
 
     private void dispatchKeyEvent(KeyTypeEvent e) {
-        eventLoop().runLater(() -> {
+        renderer.uiContext.eventLoop().runLater(() -> {
             Control focusedControl = window.focusContext.focusedControl.get();
             List<Control> hierarchy = new ArrayList<>();
             for (RenderableElement re = focusedControl; re != null; re = re.parent) {

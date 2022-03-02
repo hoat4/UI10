@@ -24,7 +24,7 @@ public class Button extends Control {
         textNode.text("Gomb");
 
         pressed().subscribe(e -> {
-            requestLayout();
+            invalidate();
             System.out.println(e.newValue());
             if (!e.newValue())
                 onAction.postEvent(null);

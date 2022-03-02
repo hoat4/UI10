@@ -21,8 +21,8 @@ import ui10.layout.Grid;
 import ui10.layout.Padding;
 import ui10.layout.StackPane;
 import ui10.nodes.*;
-import ui10.renderer.java2d.AWTDesktop;
-import ui10.renderer.java2d.AWTTextStyle;
+import ui10.shell.renderer.java2d.AWTDesktop;
+import ui10.shell.renderer.java2d.AWTTextStyle;
 import ui10.window.Desktop;
 import ui10.window.Window;
 

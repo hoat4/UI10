@@ -5,7 +5,6 @@ import ui10.geom.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 public class ShapeOperations {
 
@@ -48,18 +47,6 @@ public class ShapeOperations {
         return (a + b - 1) / b;
     }
 
-    public static Shape transform(Shape shape, UnaryOperator<Point> op) {
-        return new Shape() {
-            @Override
-            public List<BézierPath> outlines() {
-                List<BézierPath> a = shape.outlines(), b = new ArrayList<>();
-                for (BézierPath p : a)
-                    b.add(p.transform(op));
-                return b;
-            }
-        };
-    }
-
     private static abstract class TransformedShape extends Shape {
         private final Shape original;
 
@@ -75,13 +62,30 @@ public class ShapeOperations {
             return b;
         }
 
+        @Override
+        public void scan(Rectangle clip, Consumer<ScanLine> consumer) {
+            //Rectangle transformedClip = Rectangle.of(reverseTransform(clip.topLeft()), reverseTransform(clip.bottomRight()));
+            original.scan(original.bounds(), scanLine -> {
+                // ez így nem fog működni, ha a transform figyelembe veszi Y-t is az X kiszámításához
+                consumer.accept(new ScanLine(transform(scanLine.origin()), transform(scanLine.rightPoint())).clip(clip));
+            });
+        }
+
+        /**
+         * From original shape coordinate system to this {@linkplain TransformedShape} coordinate system
+         */
         protected abstract Point transform(Point p);
+
+        // /**
+        //  * From this {@linkplain TransformedShape} coordinate system to original shape coordinate system
+        //  */
+        // protected abstract Point reverseTransform(Point p);
     }
 
     public static Shape intoBounds(Shape shape, Rectangle b) {
         if (b.isEmpty())
             // ilyenkor adjuk vissza b-t?
-            throw new IllegalArgumentException(shape+", "+b);
+            throw new IllegalArgumentException(shape + ", " + b);
 
         Rectangle a = shape.bounds();
         Shape s = new TransformedShape(shape) {
@@ -105,7 +109,7 @@ public class ShapeOperations {
                 return shape + " into " + b;
             }
         };
-        assert s.bounds().equals(b.bounds()) : s.bounds() +", "+ b+", " + shape.bounds() + ", " + a.bounds();
+        assert s.bounds().equals(b.bounds()) : s.bounds() + ", " + b + ", " + shape.bounds() + ", " + a.bounds();
         return s;
     }
 
@@ -117,22 +121,63 @@ public class ShapeOperations {
     public static Shape intersection(Shape a, Shape b) {
         if (a.bounds().intersectionWith(b.bounds()) == null)
             return null;
-        throw new UnsupportedOperationException(a+", "+b);
+        throw new UnsupportedOperationException(a + ", " + b);
     }
 
     public static Shape subtract(Shape a, Shape b) {
         List<BézierPath> o1 = a.outlines(), o2 = b.outlines();
         if (o1.size() == 1 && o2.size() == 1)
             return new Shape() {
+
                 @Override
                 public List<BézierPath> outlines() {
                     return List.of(o2.get(0), o1.get(0));
+                }
+
+                @Override
+                public void scan(Rectangle clip, Consumer<ScanLine> consumer) {
+                    List<ScanLine> otherLines = new ArrayList<>();
+                    b.scan(clip, otherLines::add);
+                    if (otherLines.isEmpty()) {
+                        a.scan(clip, consumer);
+                        return;
+                    }
+
+                    a.scan(clip, scanLine -> {
+                        List<ScanLine> a1 = new ArrayList<>();
+                        List<ScanLine> b1 = new ArrayList<>();
+                        a1.add(scanLine);
+                        for (ScanLine l2 : otherLines) {
+                            for (ScanLine l1 : a1) {
+                                if (l1.y() != l2.y())
+                                    continue;
+                                if (l2.right() <= l1.left() || l2.left() >= l1.right())
+                                    continue;
+
+                                if (l2.left() > l1.left())
+                                    b1.add(new ScanLine(l1.y(), l1.left(), l2.left()));
+                                if (l2.right() < l1.right())
+                                    b1.add(new ScanLine(l1.y(), l2.right(), l1.right()));
+                            }
+
+                            List<ScanLine> tmp = b1;
+                            b1 = a1;
+                            a1 = tmp;
+                            b1.clear();
+                        }
+                        a1.forEach(consumer);
+                    });
+                }
+
+                @Override
+                public String toString() {
+                    return "Subtract " + b + " from " + a;
                 }
             };
         else {
             if (a.bounds().intersectionWith(b.bounds()) == null)
                 return a;
-            throw new UnsupportedOperationException(a+", "+b);
+            throw new UnsupportedOperationException(a + ", " + b);
         }
     }
 }

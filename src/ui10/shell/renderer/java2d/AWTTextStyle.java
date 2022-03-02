@@ -1,11 +1,11 @@
-package ui10.renderer.java2d;
+package ui10.shell.renderer.java2d;
 
 import ui10.font.FontMetrics;
 import ui10.font.TextStyle;
 
 import java.awt.*;
 
-import static ui10.renderer.java2d.J2DUtil.px2i;
+import static ui10.shell.renderer.java2d.J2DUtil.px2i;
 
 public class AWTTextStyle implements TextStyle {
 
