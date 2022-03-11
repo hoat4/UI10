@@ -13,6 +13,7 @@ import ui10.decoration.css.CSSScanner;
 import ui10.graphics.ColorFill;
 import ui10.layout.Layouts;
 import ui10.shell.awt.AWTDesktop;
+import ui10.shell.renderer.sw.FontTest;
 import ui10.window.Window;
 
 import java.io.IOException;
@@ -38,7 +39,8 @@ public class Main6 {
         tf.attributes().add(new GrowFactor(Fraction.of(0)));
 
         Element content = withClass("root",
-                firstContent()
+                //firstContent()
+                centered(new FontTest())
                 //centered(vertically(button, tf))
 
                 //grid(3,

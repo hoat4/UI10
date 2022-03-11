@@ -18,8 +18,8 @@ import ui10.image.Color;
 public class SWRasterizer {
 
     private RenderableElement root;
-    private MemorySegment buffer;
-    private Rectangle renderRect;
+    public MemorySegment buffer;
+    public Rectangle renderRect;
     private Fraction opacity;
 
     public void initRoot(RenderableElement element) {
@@ -58,6 +58,9 @@ public class SWRasterizer {
                 renderElement(opacityElement.content);
                 this.opacity = prevOpacity;
             }
+            case SWRenderableElement element ->{
+                element.draw(this, element.getShapeOrFail().bounds());
+            }
             default -> {
                 System.err.println("Unknown element: " + e);
             }
@@ -73,7 +76,7 @@ public class SWRasterizer {
         });
     }
 
-    private int coord(Point p) {
+    public int coord(Point p) {
         return p.y() * renderRect.width() + p.x();
     }
 }
