@@ -39,6 +39,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
         createBufferStrategy(2);
 
         renderer = new AwtSwRenderer();
+        //renderer = new J2DRenderer();
         renderer.awtWindow = this;
         window.uiContext = renderer.uiContext;
         renderer.initRoot(window);

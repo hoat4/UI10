@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 public class FontGen {
 
@@ -38,7 +37,10 @@ public class FontGen {
             section.curves2 = section.curves.stream().map(p -> internPolynomial(makePolynomial(p))).toList();
 
         System.out.println(polynomials.size());
-        polynomials.forEach(InternedPolynomial::print);
+        for (int i = 0; i < polynomials.size(); i++) {
+            System.out.print("(p" + i + ") ");
+            polynomials.get(i).print();
+        }
         System.out.println();
 
         int y = 0;
@@ -46,7 +48,7 @@ public class FontGen {
             if (section.y != y) {
                 printWhiteLines(section.y - y);
             }
-            System.out.print(section.height + ":");
+            System.out.print("(y=" + section.y + ") " + section.height + ":");
             for (int i = 0; i < section.curves2.size(); i += 2) {
                 System.out.print(" " + polynomials.indexOf(section.curves2.get(i)));
                 int rightP = polynomials.indexOf(section.curves2.get(i + 1));
@@ -64,7 +66,7 @@ public class FontGen {
         List<Integer> ints = new ArrayList<>();
         ints.add((int) Math.round(p.coefficients[0]));
         for (int i = 1; i < p.coefficients.length; i++)
-            ints.add((int) Math.round(256 * p.coefficients[i]));
+            ints.add((int) Math.round((1 << 24) * p.coefficients[i]));
         InternedPolynomial i = new InternedPolynomial(ints);
         if (!polynomials.contains(i))
             polynomials.add(i);
@@ -77,6 +79,55 @@ public class FontGen {
         if (values.size() == 1)
             return new Polynomial(values.get(0).y());
 
+        //System.out.println(makeP3(List.of(values.get(0), values.get(values.size() - 1))));
+        //Polynomial p = makeP2(values);
+        int maxPts = 3;
+        if (values.size() > maxPts) {
+            List<Point> l = values;
+            values = IntStream.range(0, maxPts).mapToObj(i -> l.get((int) Math.round(i * l.size() / (double) maxPts))).toList();
+        }
+        Polynomial p = makePolynomialImpl(values);
+        System.out.println(values + " -> " + p);
+        return p;
+    }
+
+    private static Polynomial makePolynomialImpl(List<Point> points) {
+        // Gauss-elimination
+
+        int n = points.size();
+        double[][] matrix = new double[n][n + 1]; // row-first
+        for (int i = 0; i < n; i++) {
+            Point point = points.get(i);
+            for (int j = 0; j < n; j++) {
+                matrix[i][j] = Math.pow(point.x(), j);
+            }
+            matrix[i][n] = point.y();
+        }
+        //System.out.println();
+        //System.out.println("step 1: " + Arrays.deepToString(matrix));
+        for (int i = 0; i < n; i++)
+            for (int j = i + 1; j < n; j++)
+                mulSub(matrix, i, j);
+        //System.out.println("step 2: " + Arrays.deepToString(matrix));
+        double[] p = new double[n];
+        for (int i = n - 1; i >= 0; i--) {
+            p[i] = matrix[i][n] / matrix[i][i];
+            //  System.out.println("step 2/" + i + ": " + Arrays.deepToString(matrix));
+            for (int j = 0; j < i; j++)
+                mulSub(matrix, i, j);
+        }
+        //System.out.println("step 3: " + Arrays.deepToString(matrix));
+        return new Polynomial(p);
+    }
+
+    private static void mulSub(double[][] matrix, int i, int j) { // m[j] -= m[i] * m[j][i] / m[i][i]
+        double q = matrix[j][i] / matrix[i][i];
+        for (int k = 0; k < matrix[i].length; k++) {
+            matrix[j][k] -= matrix[i][k] * q;
+        }
+    }
+
+    private Polynomial makeP2(List<Point> values) {
         double x1 = values.get(0).x(), y1 = values.get(0).y();
         double x2 = values.get(values.size() - 1).x(), y2 = values.get(values.size() - 1).y();
         double m = (y1 - y2) / (x1 - x2);
@@ -101,8 +152,8 @@ public class FontGen {
             Segment segment = thisRow.get(i);
             currentSection.curves.get(i * 2).add(segment.leftPoint());
             currentSection.curves.get(i * 2 + 1).add(segment.rightPoint());
-            currentSection.height++;
         }
+        currentSection.height++;
     }
 
     private boolean intersectsHorizontally(Segment a, Segment b) {
@@ -128,9 +179,9 @@ public class FontGen {
         try {
             g.setColor(Color.WHITE);
             g.fillRect(0, 0, img.getWidth(), img.getHeight());
-            g.setFont(new Font(Font.DIALOG, Font.ITALIC, 100));
+            g.setFont(new Font(Font.DIALOG, Font.PLAIN, 100));
             g.setColor(Color.BLACK);
-            g.drawString("A", 10, g.getFontMetrics().getAscent() + 10);
+            g.drawString("J", 10, g.getFontMetrics().getAscent() + 10);
         } finally {
             g.dispose();
         }
@@ -151,7 +202,7 @@ public class FontGen {
             }
         }
 
-            new FontGen().processSegments(segments);
+        new FontGen().processSegments(segments);
 
 //        List<Integer> cols = segments.stream().flatMap(t -> Stream.of(t.x1, t.x2)).
 //                distinct().sorted().collect(Collectors.toList());
@@ -180,11 +231,11 @@ public class FontGen {
 
     private static void printWhiteLines(int rem) {
         while (rem > 127) {
-            System.out.println(255);
+            System.out.println("255 (127)");
             rem -= 127;
         }
         if (rem > 0)
-            System.out.println(rem | 128);
+            System.out.println((rem | 128) + " (" + rem + ")");
     }
 
     private record Segment(int y, int x1, int x2) {

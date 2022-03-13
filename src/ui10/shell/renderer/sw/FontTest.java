@@ -53,22 +53,24 @@ public class FontTest extends SWRenderableElement {
                     int[] leftPolynomial = polynomials[leftPolynomialNumber];
                     int[] rightPolynomial = polynomials[rightPolynomialNumber & 127];
 
-                    int left = leftPolynomial[0];
-                    for (int i = 1, y2 = y; i < leftPolynomial.length; i++) {
-                        left += leftPolynomial[i] * y2 >> 8;
+                    long left = leftPolynomial[0];
+                    for (long i = 1, y2 = y; i < leftPolynomial.length; i++) {
+                        left += leftPolynomial[(int) i] * y2 >> 16;
                         y2 *= y;
                     }
 
-                    int right = rightPolynomial[0];
-                    for (int i = 1, y2 = y; i < rightPolynomial.length; i++) {
-                        right += rightPolynomial[i] * y2 >> 8;
+                    long right = rightPolynomial[0];
+                    for (long i = 1, y2 = y; i < rightPolynomial.length; i++) {
+                        right += rightPolynomial[(int) i] * y2 >> 16;
                         y2 *= y;
                     }
 
                     System.out.println(y + ": " + left + ", " + right);
 
-                    for (int pos = g.coord(new Point(rectangle.left() + left, rectangle.top() + y)),
-                         end = pos + right - left; pos < end; pos++) {
+                    // MemoryAccess.setIntAtIndex(g.buffer, g.coord(new Point(rectangle.left(),rectangle.top()+y)), 0xFFFF0000);
+                    int leftI = (int)left, rightI = (int)right;
+                    for (int pos = g.coord(new Point(rectangle.left() + leftI, rectangle.top() + y)),
+                         end = pos + rightI - leftI; pos < end; pos++) {
 
                         MemoryAccess.setIntAtIndex(g.buffer, pos, 0xFF000000);
                     }
