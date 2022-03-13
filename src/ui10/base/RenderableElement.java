@@ -37,7 +37,7 @@ public abstract class RenderableElement extends Element {
 
     public Shape getShapeOrFail() {
         if (shape == null)
-            throw new IllegalStateException("no clip for " + this);
+            throw new IllegalStateException("no shape for " + this);
         return shape;
     }
 
@@ -46,31 +46,46 @@ public abstract class RenderableElement extends Element {
             rendererData.invalidateRendererData();
         if (uiContext == null)
             return;
-        uiContext.requestLayout(new UIContext.LayoutTask(this, () -> {
-            LayoutContext1 ctx = new LayoutContext1();
+        uiContext.requestLayout(new UIContext.LayoutTask(this, this::revalidate));
+    }
 
-            for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
-                if (!ctx.preferredSize(this, dep.inputConstraints()).equals(dep.size())) {
-                    Objects.requireNonNull(parent, this::toString);
-                    parent.invalidate();
-                    return;
-                }
+    private void revalidate() {
+        //System.out.println("revalidate " + this + ": " + shape);
+
+        if (shape == null)
+            throw new IllegalStateException(); // should not happen
+
+        LayoutContext1 ctx = new LayoutContext1();
+
+        for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
+            if (!ctx.preferredSizeIgnoreReplacement(this, dep.inputConstraints()).equals(dep.size())) {
+                Objects.requireNonNull(parent, this::toString);
+                parent.invalidate();
+                return;
             }
+        }
 
-            new LayoutContext2() {
-                    @Override
-                    public void accept(RenderableElement element) {
-                    }
+        try {
+            performLayoutImpl(shape, new LayoutContext2() {
+                @Override
+                public void accept(RenderableElement element) {
+                    // maybe this is an invalid operation?
+                    // if only Pane (of RenderableElement subclasses) can have children, then yes
+                    throw new UnsupportedOperationException("TODO");
+                }
 
-                    @Override
-                    public List<LayoutDependency> getDependencies(RenderableElement element) {
-                        if (element == RenderableElement.this)
-                            return layoutDependencies;
-                        else
-                            return super.getDependencies(element);
-                    }
-                }.placeElement(this, shape);
-        }));
+                @Override
+                public List<LayoutDependency> getDependencies(RenderableElement element) {
+                    if (element == RenderableElement.this)
+                        return layoutDependencies;
+                    else
+                        return super.getDependencies(element);
+                }
+            });
+        } catch (RuntimeException e) {
+            System.err.print("Failed to layout " + this + ": ");
+            e.printStackTrace();
+        }
     }
 
     public static RenderableElement of(Element node) {

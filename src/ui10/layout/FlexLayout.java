@@ -20,6 +20,7 @@ class FlexLayout {
 
     public List<Size> childrenSizes;
     public Size containerSize;
+    public int gap;
 
     // in this class, "width" means primary axis size, "height" means secondary axis size
     private int width, height;
@@ -36,6 +37,7 @@ class FlexLayout {
         distributeRemainingSpace();
 
         containerSize = Size.of(primaryAxis, width, height);
+        System.out.println("cs:"+containerSize);
     }
 
     private void computeHeight() {
@@ -47,7 +49,8 @@ class FlexLayout {
 
     private void layoutWithoutGrow() {
         this.childrenSizes = new ArrayList<>();
-        var w = containerConstraints.max().value(primaryAxis);
+        int allGaps = gap * Math.max(0, elements.size() - 1);
+        var w = Size.subtract(containerConstraints.max().value(primaryAxis), allGaps);
         for (FlexElement e : elements) {
             var l = e.preferredSize(new BoxConstraints(
                     Size.of(primaryAxis, 0, height),
@@ -57,7 +60,8 @@ class FlexLayout {
                 w -= l.value(primaryAxis);
             childrenSizes.add(l);
         }
-        width = childrenSizes.stream().mapToInt(l -> l.value(primaryAxis)).sum();
+        System.out.println(allGaps+" -> "+childrenSizes);
+        width = childrenSizes.stream().mapToInt(l -> l.value(primaryAxis)).sum() + allGaps;
     }
 
 

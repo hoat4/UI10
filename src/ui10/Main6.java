@@ -1,7 +1,9 @@
 package ui10;
 
+import ui10.controls.Label;
 import ui10.geom.Fraction;
 import ui10.geom.Insets;
+import ui10.graphics.TextNode;
 import ui10.image.Colors;
 import ui10.layout.GrowFactor;
 import ui10.base.Element;
@@ -13,6 +15,7 @@ import ui10.decoration.css.CSSScanner;
 import ui10.graphics.ColorFill;
 import ui10.layout.Layouts;
 import ui10.shell.awt.AWTDesktop;
+import ui10.shell.renderer.java2d.AWTTextStyle;
 import ui10.shell.renderer.sw.FontTest;
 import ui10.window.Window;
 
@@ -40,13 +43,14 @@ public class Main6 {
 
         Element content = withClass("root",
                 //firstContent()
-                centered(new FontTest())
+                //centered(new FontTest())
+                //centered(button)
                 //centered(vertically(button, tf))
 
-                //grid(3,
-                //        new Button(), new Button(), new Button(),
-                //        new Button(), new Button(), new Button()
-                //)
+                centered(withClass("main", grid(2,
+                        new Label("text1"), tf,
+                        new Button(), button
+                )))
 
                 //centered(roundRectangle(10, stack(
                 //         Layouts.padding(new ColorFill(Colors.RED), new Insets(25)), new ColorFill(Colors.GREEN)

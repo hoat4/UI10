@@ -13,7 +13,7 @@ public class AWTDesktop extends Desktop {
 
     private void showWindow(Window window) {
         Size size = new Size(640, 480);
-        int scale = 2;
+        int scale = 1;
         size = size.multiply(scale);
 
         if (window.rendererData != null)

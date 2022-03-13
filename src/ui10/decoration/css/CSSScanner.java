@@ -74,6 +74,10 @@ public class CSSScanner {
         return a;
     }
 
+    public boolean isIdentifier() {
+        return Character.isJavaIdentifierPart(next);
+    }
+
     public String skipWhitespaceAndReadIdentifier() {
         skipWhitespaces();
         return readIdentifier();

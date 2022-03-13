@@ -51,6 +51,8 @@ public class Rule {
             case "border" -> put(CSSProperty.border, parser.parseBorder());
             case "font-size" -> put(CSSProperty.fontSize, parser.parseLength());
             case "transition" -> put(CSSProperty.transition, parser.parseTransitionList());
+            case "gap" -> put(CSSProperty.gap, parser.parseLength());
+            case "text-align" -> put(CSSProperty.textAlign, parser.parseTextAlign());
             default -> throw new UnsupportedOperationException("unknown CSS property: " + name);
         }
     }
@@ -77,13 +79,23 @@ public class Rule {
 
     private <T> void apply1(CSSProperty<T> prop, Consumer<T> consumer) {
         T value = get(prop);
+        // this should not check != null, because then it can't reset properties
         if (value != null)
             consumer.accept(value);
     }
 
+    private <T> void applyCustomPropToSelf(CSSProperty<T> prop, Element e, DecorationContext context) {
+        T value = get(prop);
+        if (e instanceof Styleable s)
+            s.setProperty(prop, value, context);
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
     public void apply1(Element e, DecorationContext context) {
-        apply1(CSSProperty.fontSize, fontSize -> ((TextNode) e).textStyle(AWTTextStyle.of(context.length(fontSize))));
-        apply1(CSSProperty.textColor, textColor -> ((TextNode) e).fill(textColor.makeElement(context)));
+        applyCustomPropToSelf(CSSProperty.fontSize, e, context);
+        applyCustomPropToSelf(CSSProperty.textColor, e, context);
+        applyCustomPropToSelf(CSSProperty.gap, e, context);
+        applyCustomPropToSelf(CSSProperty.textAlign, e, context);
     }
 
     private <T> Element prop2(CSSProperty<T> prop, Element e, BiFunction<Element, T, Element> f) {

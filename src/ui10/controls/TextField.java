@@ -2,6 +2,9 @@ package ui10.controls;
 
 import ui10.base.*;
 import ui10.binding.ScalarProperty;
+import ui10.decoration.DecorationContext;
+import ui10.decoration.css.CSSProperty;
+import ui10.decoration.css.Styleable;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -22,7 +25,7 @@ import java.util.function.Consumer;
 import static ui10.decoration.css.CSSClass.withClass;
 import static ui10.input.keyboard.Keyboard.StandardFunctionSymbol.*;
 
-public class TextField extends Control {
+public class TextField extends Control implements Styleable {
 
     public final ScalarProperty<String> text = ScalarProperty.createWithDefault("TextField.text", "szöveg");
     public final ScalarProperty<Integer> caretPosition = ScalarProperty.createWithDefault("TextField.caretPosition", 0);
@@ -111,4 +114,12 @@ public class TextField extends Control {
             text.set(text.get().substring(0, caretPosition.get()) + text.get().substring(caretPosition.get() + 1));
     }
 
+    @Override
+    public String elementName() {
+        return "TextField";
+    }
+
+    @Override
+    public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
+    }
 }

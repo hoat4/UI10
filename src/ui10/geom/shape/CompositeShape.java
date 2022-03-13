@@ -1,7 +1,5 @@
 package ui10.geom.shape;
 
-import org.w3c.dom.css.Rect;
-import ui10.geom.Fraction;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.ScanLine;
@@ -83,4 +81,10 @@ public class CompositeShape extends Shape {
     }
 
     // equals?
+
+
+    @Override
+    public String toString() {
+        return shapes.toString();
+    }
 }

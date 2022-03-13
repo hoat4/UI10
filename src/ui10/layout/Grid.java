@@ -1,5 +1,9 @@
 package ui10.layout;
 
+import ui10.decoration.DecorationContext;
+import ui10.decoration.css.CSSProperty;
+import ui10.decoration.css.Length;
+import ui10.decoration.css.Styleable;
 import ui10.geom.*;
 import ui10.base.Element;
 import ui10.base.LayoutContext1;
@@ -9,9 +13,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-class Grid extends RectangularLayout {
+public class Grid extends RectangularLayout implements Styleable {
 
     public final List<? extends List<? extends Element>> rows;
+
+    public int gap = 0;
 
     public Grid(List<? extends List<? extends Element>> rows) {
         this.rows = rows;
@@ -24,17 +30,7 @@ class Grid extends RectangularLayout {
 
     @Override
     protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-        GridLayout layout = computeLayout(constraints, context1);
-
-        int w = 0;
-        for (int i = 0; i < layout.cols.length; i++)
-            w += layout.cols[i];
-
-        int h = 0;
-        for (int i = 0; i < layout.rows.length; i++)
-            h += layout.rows[i];
-
-        return new Size(w, h);
+        return computeLayout(constraints, context1).containerSize;
     }
 
     @Override
@@ -49,9 +45,9 @@ class Grid extends RectangularLayout {
             for (int col = 0; col < row.size(); col++) {
                 int colWidth = layout.cols[col];
                 placer.accept(row.get(col), new Rectangle(new Point(x, y), new Size(colWidth, rowHeight)));
-                x += colWidth;
+                x += colWidth + gap;
             }
-            y += rowHeight;
+            y += rowHeight + gap;
         }
     }
 
@@ -59,16 +55,34 @@ class Grid extends RectangularLayout {
         List<Column> cols = IntStream.range(0, rows.get(0).size()).mapToObj(i -> new Column(i, context)).toList();
 
         FlexLayout l = new FlexLayout(Axis.HORIZONTAL, constraints, cols);
+        l.gap = gap;
         l.layout();
+
+        int width = l.containerSize.width();
 
         int[] colWidths = l.childrenSizes.stream().mapToInt(Size::width).toArray();
 
         List<Row> rows = this.rows.stream().map(r -> new Row(colWidths, r, context)).toList();
         l = new FlexLayout(Axis.VERTICAL, constraints, rows);
+        l.gap = gap;
         l.layout();
 
+        int height = l.containerSize.height();
+
         int[] rowHeights = l.childrenSizes.stream().mapToInt(Size::height).toArray();
-        return new GridLayout(colWidths, rowHeights);
+        return new GridLayout(colWidths, rowHeights, new Size(width, height));
+    }
+
+    @Override
+    public String elementName() {
+        return null; // not a real control, only a layout
+    }
+
+    @Override
+    public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
+        if (property.equals(CSSProperty.gap)) {
+            gap = value == null ? 0 : decorationContext.length((Length) value); // TODO relative values
+        }
     }
 
     private class Column implements FlexLayout.FlexElement {
@@ -131,6 +145,6 @@ class Grid extends RectangularLayout {
         }
     }
 
-    private record GridLayout(int[] cols, int[] rows) {
+    private record GridLayout(int[] cols, int[] rows, Size containerSize) {
     }
 }

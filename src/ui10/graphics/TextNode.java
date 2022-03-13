@@ -1,21 +1,28 @@
 package ui10.graphics;
 
+import ui10.decoration.DecorationContext;
+import ui10.decoration.Fill;
+import ui10.decoration.css.CSSProperty;
+import ui10.decoration.css.Length;
+import ui10.decoration.css.Styleable;
 import ui10.font.TextStyle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
+import ui10.image.Colors;
 import ui10.layout.BoxConstraints;
 import ui10.base.Element;
 import ui10.base.LayoutContext2;
 import ui10.base.RenderableElement;
 import ui10.base.LayoutContext1;
+import ui10.shell.renderer.java2d.AWTTextStyle;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class TextNode extends RenderableElement {
+public class TextNode extends RenderableElement implements Styleable {
 
     private String text;
-    private Element fill;
+    private Element fill = new ColorFill(Colors.BLACK);
     private TextStyle textStyle;
 
     public TextNode() {
@@ -37,14 +44,16 @@ public class TextNode extends RenderableElement {
         return this;
     }
 
-    public Element fill() {
+    public Element textFill() {
         return fill;
     }
 
-    public TextNode fill(Element fill) {
+    public TextNode textFill(Element fill) {
+        Objects.requireNonNull(fill);
+
         if (!Objects.equals(fill, this.fill)) {
             this.fill = fill;
-            // invalidateRendererData();
+            invalidate();
         }
         return this;
     }
@@ -56,7 +65,7 @@ public class TextNode extends RenderableElement {
     public TextNode textStyle(TextStyle textStyle) {
         if (!Objects.equals(textStyle, this.textStyle)) {
             this.textStyle = textStyle;
-            //invalidateRendererData();
+            invalidate();
         }
         return this;
     }
@@ -68,11 +77,25 @@ public class TextNode extends RenderableElement {
 
     @Override
     public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-        return textStyle.textSize(text).size();
+        // TODO mit csináljunk, ha nem stimmel?
+        return constraints.clamp(textStyle.textSize(text).size());
     }
 
     @Override
     protected void onShapeApplied(Shape shape, LayoutContext2 context) {
         LayoutContext2.ignoring().placeElement(fill, shape);
+    }
+
+    @Override
+    public String elementName() {
+        return null; // should return an element name?
+    }
+
+    @Override
+    public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
+        if (property.equals(CSSProperty.textColor)&&value != null)
+            textFill(((Fill) value).makeElement(decorationContext));
+        if (property.equals(CSSProperty.fontSize)&&value != null)
+            textStyle(AWTTextStyle.of(decorationContext.length((Length) value)));
     }
 }

@@ -66,7 +66,8 @@ public record BoxConstraints(Size min, Size max) {
     }
 
     public boolean contains(Size size) {
-        return true; // TODO
+        return size.width() >= min.width() && size.width() <= max.width()
+                && size.height() >= min.height() && size.height() <= max.height();
     }
 
     public BoxConstraints withWidth(int min, int max) {

@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static ui10.geom.Point.ORIGO;
+
 // TODO absolutePositioned layout pointra és rectangle-re
 public class Layouts {
 
@@ -259,6 +261,74 @@ public class Layouts {
         for (int i = 0; i < elements.length; i += cols)
             rows.add(List.of(Arrays.copyOfRange(elements, i, i + cols)));
         return new Grid(rows);
+    }
+
+    public static Element halign(HorizontalAlignment align, Element element) {
+        return new HAlign(element, align);
+    }
+
+    private static class HAlign extends SingleNodeRectangularLayout {
+
+        private final HorizontalAlignment align;
+
+        HAlign(Element content, HorizontalAlignment align) {
+            super(content);
+            this.align = align;
+        }
+
+        @Override
+        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+            Size contentSize = context1.preferredSize(content, constraints.withMinimum(constraints.min().withWidth(0)));
+            return constraints.clamp(contentSize);
+        }
+
+        @Override
+        protected Rectangle computeContentBounds(Size size, LayoutContext1 context) {
+            Size contentSize = context.preferredSize(content, new BoxConstraints(size.withWidth(0), size));
+            return switch (align) {
+                case LEFT -> Rectangle.of(contentSize);
+                case CENTER -> Rectangle.of(size).centered(contentSize);
+                case RIGHT -> Rectangle.cornerAt(Rectangle.Corner.BOTTOM_RIGHT, Point.of(size), contentSize);
+            };
+        }
+    }
+
+    public static enum HorizontalAlignment {
+        LEFT, CENTER, RIGHT
+    }
+
+    public static Element valign(VerticalAlignment align, Element element) {
+        return new VAlign(element, align);
+    }
+
+    private static class VAlign extends SingleNodeRectangularLayout {
+
+        private final VerticalAlignment align;
+
+        VAlign(Element content, VerticalAlignment align) {
+            super(content);
+            this.align = align;
+        }
+
+        @Override
+        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+            Size contentSize = context1.preferredSize(content, constraints.withMinimum(constraints.min().withHeight(0)));
+            return constraints.clamp(contentSize);
+        }
+
+        @Override
+        protected Rectangle computeContentBounds(Size size, LayoutContext1 context) {
+            Size contentSize = context.preferredSize(content, new BoxConstraints(size.withHeight(0), size));
+            return switch (align) {
+                case TOP -> Rectangle.of(contentSize);
+                case CENTER -> Rectangle.of(size).centered(contentSize);
+                case BOTTOM -> Rectangle.cornerAt(Rectangle.Corner.BOTTOM_RIGHT, Point.of(size), contentSize);
+            };
+        }
+    }
+
+    public static enum VerticalAlignment {
+        TOP, CENTER, BOTTOM
     }
 
 }

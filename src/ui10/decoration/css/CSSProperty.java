@@ -1,5 +1,6 @@
 package ui10.decoration.css;
 
+import ui10.controls.Label;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.Fill;
 import ui10.decoration.Interpolator;
@@ -9,12 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class CSSProperty<T> {
+public class CSSProperty<T> {
 
     private static final Map<String, CSSProperty<?>> properties = new HashMap<>();
 
-    static final CSSProperty<Fill> textColor = new CSSProperty<>("color", Interpolators.FILL);
-    static final CSSProperty<Length> fontSize = new CSSProperty<>("font-size", Interpolators.LENGTH);
+    public static final CSSProperty<Fill> textColor = new CSSProperty<>("color", Interpolators.FILL);
+    public static final CSSProperty<Length> fontSize = new CSSProperty<>("font-size", Interpolators.LENGTH);
 
     static final CSSProperty<Length> marginTop = new CSSProperty<>("margin-top", Interpolators.LENGTH);
     static final CSSProperty<Length> marginRight = new CSSProperty<>("margin-right", Interpolators.LENGTH);
@@ -32,6 +33,9 @@ class CSSProperty<T> {
     static final CSSProperty<Length> minWidth = new CSSProperty<>("min-width", Interpolators.LENGTH);
     static final CSSProperty<Length> minHeight = new CSSProperty<>("min-height", Interpolators.LENGTH);
     static final CSSProperty<BorderSpec> border = new CSSProperty<>("border", null);
+
+    public static final CSSProperty<Length> gap = new CSSProperty<>("gap", Interpolators.LENGTH);
+    public static final CSSProperty<Label.TextAlign> textAlign = new CSSProperty<>("text-align", null);
 
     static final CSSProperty<List<TransitionSpec<?>>> transition = new CSSProperty<>("transition", null);
 

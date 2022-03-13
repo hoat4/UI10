@@ -18,13 +18,13 @@ public class TextItem extends Item<TextNode> {
 
     @Override
     protected void validateImpl() {
-        Objects.requireNonNull(node.fill());
+        Objects.requireNonNull(node.textFill());
         Objects.requireNonNull(node.text());
         Objects.requireNonNull(node.textStyle());
 
-        if (!Objects.equals(prevFill, node.fill())) {
-            prevFill = node.fill();
-            fill = renderer.makeItem(RenderableElement.of(node.fill()));
+        if (!Objects.equals(prevFill, node.textFill())) {
+            prevFill = node.textFill();
+            fill = renderer.makeItem(RenderableElement.of(node.textFill()));
         }
 
         // TODO cache textlayout vagy glyphvector vagy amit kell

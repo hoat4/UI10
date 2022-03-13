@@ -15,19 +15,7 @@ public class LayoutContext1 {
         Objects.requireNonNull(constraints);
 
         if (e.replacement() == null || inReplacement.contains(e)) {
-            Size s = e.preferredSizeImpl(constraints, this);
-
-            if (s.isInfinite())
-                throw new IllegalStateException("preferred size must be finite: " + s + " (by " + e + ")"); // milyen exceptionnek kéne ennek lennie?
-            if (!constraints.contains(s))
-                throw new IllegalStateException("invalid size returned by preferredSizeImpl for " +
-                        constraints + ": " + s + " (by " + e + ")");
-
-            Objects.requireNonNull(s, this::toString);
-            if (e instanceof RenderableElement)
-                addLayoutDependency((RenderableElement) e,
-                        new LayoutContext1.LayoutDependency(constraints, s));
-            return s;
+            return preferredSizeIgnoreReplacement(e, constraints);
         } else {
             inReplacement.add(e);
             try {
@@ -36,6 +24,22 @@ public class LayoutContext1 {
                 inReplacement.remove(e);
             }
         }
+    }
+
+    Size preferredSizeIgnoreReplacement(Element e, BoxConstraints constraints) {
+        Size s = e.preferredSizeImpl(constraints, this);
+
+        if (s.isInfinite())
+            throw new IllegalStateException("preferred size must be finite: " + s + " (by " + e + ")"); // milyen exceptionnek kéne ennek lennie?
+        if (!constraints.contains(s))
+            throw new IllegalStateException("invalid size returned by preferredSizeImpl for " +
+                    constraints + ": " + s + " (by " + e + ")");
+
+        Objects.requireNonNull(s, this::toString);
+        if (e instanceof RenderableElement)
+            addLayoutDependency((RenderableElement) e,
+                    new LayoutDependency(constraints, s));
+        return s;
     }
 
 
@@ -50,6 +54,14 @@ public class LayoutContext1 {
         // these known shapes should be used later to avoid computing preferred shapes redundantly
     }
 
+    /**
+     * This info applies to the element itself, not its replacement
+     */
     record LayoutDependency(BoxConstraints inputConstraints, Size size/*, LayoutExtra extra*/) {
+
+        LayoutDependency {
+            Objects.requireNonNull(inputConstraints);
+            Objects.requireNonNull(size);
+        }
     }
 }

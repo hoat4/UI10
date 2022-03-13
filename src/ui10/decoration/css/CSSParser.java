@@ -1,6 +1,7 @@
 package ui10.decoration.css;
 
 
+import ui10.controls.Label;
 import ui10.image.Color;
 import ui10.image.RGBColor;
 import ui10.base.Attribute;
@@ -37,12 +38,20 @@ public class CSSParser {
             //    vars.put(varName, )
             //}
 
-            int c = scanner.expectAnyOf(".:");
-            Attribute a = switch (c) {
-                case '.' -> new CSSClass(scanner.readIdentifier());
-                case ':' -> new CSSPseudoClass(scanner.readIdentifier());
-                default -> throw new RuntimeException(Integer.toString(c));
-            };
+
+            Attribute a;
+            if (scanner.isIdentifier()) {
+                a = new CSSElementName(scanner.readIdentifier());
+            }else {
+                // ez így nem jó, pontatlan lesz a parse exception ha nem '.' és nem ':', mert nem fog benne szereplni
+                // hogy lehet identifier is
+                int c = scanner.expectAnyOf(".:");
+                a = switch (c) {
+                    case '.' -> new CSSClass(scanner.readIdentifier());
+                    case ':' -> new CSSPseudoClass(scanner.readIdentifier());
+                    default -> throw new RuntimeException(Integer.toString(c));
+                };
+            }
             scanner.skipWhitespaces();
             scanner.expect("{");
 
@@ -249,6 +258,16 @@ public class CSSParser {
             return Duration.ofSeconds(Integer.parseInt(s.substring(0, s.length() - "s".length())));
         else
             throw new CSSScanner.CSSParseException("unknown duration unit: " + s);
+    }
+
+    public Label.TextAlign parseTextAlign() {
+        String s = scanner.readIdentifier();
+        return switch (s) {
+            case "left" -> Label.TextAlign.LEFT;
+            case "center" -> Label.TextAlign.CENTER;
+            case "right" -> Label.TextAlign.RIGHT;
+            default -> throw new CSSScanner.CSSParseException("unknown text align value: " + s);
+        };
     }
 
     public record NumberWithUnit(double n, Unit unit) {

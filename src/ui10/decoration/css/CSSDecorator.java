@@ -1,18 +1,14 @@
 package ui10.decoration.css;
 
+import ui10.base.*;
+import ui10.decoration.DecorationContext;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
-import ui10.base.Attribute;
-import ui10.base.Control;
-import ui10.base.Element;
-import ui10.base.Pane;
-import ui10.decoration.DecorationContext;
-import ui10.base.LayoutContext1;
-import ui10.base.LayoutContext2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class CSSDecorator extends Element {
@@ -21,6 +17,8 @@ public class CSSDecorator extends Element {
     final CSSParser css;
 
     public CSSDecorator(Element content, CSSParser css) {
+        Objects.requireNonNull(content);
+
         this.content = content;
         this.css = css;
 
@@ -49,7 +47,10 @@ public class CSSDecorator extends Element {
         if (element instanceof Pane p) {
             p.decorator = this::applyOnPaneContent;
         } else {
-            element.enumerateStaticChildren(this::applyOnRegularElement);
+            element.enumerateStaticChildren(e ->{
+                Objects.requireNonNull(e);
+                applyOnRegularElement(e);
+            });
             applyReplacements(element, element, context);
         }
     }
@@ -87,6 +88,8 @@ public class CSSDecorator extends Element {
 
     private Rule ruleOf(Element e) {
         List<Attribute> attributes = new ArrayList<>();
+        if (e instanceof Styleable s && s.elementName() != null)
+            attributes.add(new CSSElementName(s.elementName()));
         attributes.addAll(e.attributes());
         if (e == this.content)
             attributes.add(new CSSPseudoClass("root"));

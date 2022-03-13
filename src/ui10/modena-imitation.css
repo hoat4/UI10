@@ -1,7 +1,7 @@
 :root {
     background: #F4F4F4;
 }
-.text-field {
+TextField {
     padding: 5px;
     border: 1px solid linear-gradient(to bottom, #CDCDCD, #B8B8B8);
     background: linear-gradient(from 0px 0px to 0px 5px, #EEE, #fff);
@@ -9,7 +9,7 @@
  }
 .text { font-size: 16px; color: #323232; }
 
-.button {
+Button {
     border: 1px solid #B6B6B6;
     border-radius: 5px;
     background: linear-gradient(to bottom, #EFEFEF, #D9D9D9);
@@ -20,3 +20,8 @@
 .button-text { font-size: 20px; color: #000; }
 :active { background: linear-gradient(to bottom, #E2E2E2, #CDCDCD); }
 /*:focus {border: 5px solid #f00;}*/
+
+.label-text { font-size: 16px; }
+.main { gap: 10px; }
+
+Label { text-align: left;}

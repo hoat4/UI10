@@ -4,6 +4,9 @@ import ui10.binding.EventBus;
 import ui10.binding.ScalarProperty;
 import ui10.binding.StandaloneEventBus;
 import ui10.binding.impl.SelfContainedScalarProperty;
+import ui10.decoration.DecorationContext;
+import ui10.decoration.css.CSSProperty;
+import ui10.decoration.css.Styleable;
 import ui10.input.pointer.MouseEvent;
 import ui10.base.*;
 import ui10.decoration.css.CSSPseudoClass;
@@ -11,7 +14,7 @@ import ui10.graphics.TextNode;
 
 import static ui10.decoration.css.CSSClass.withClass;
 
-public class Button extends Control {
+public class Button extends Control implements Styleable {
 
     private final TextNode textNode = withClass("button-text", new TextNode());
 
@@ -20,7 +23,6 @@ public class Button extends Control {
     private final ScalarProperty<Boolean> pressed = new SelfContainedScalarProperty<>("pressed");
 
     {
-        withClass("button", this);
         textNode.text("Gomb");
 
         pressed().subscribe(e -> {
@@ -54,4 +56,12 @@ public class Button extends Control {
         attributes().remove(new CSSPseudoClass("active"));
     }
 
+    @Override
+    public String elementName() {
+        return "Button";
+    }
+
+    @Override
+    public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
+    }
 }
