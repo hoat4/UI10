@@ -5,7 +5,6 @@ import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
 import ui10.layout.BoxConstraints;
-import ui10.base.LayoutContext2;
 import ui10.base.RenderableElement;
 import ui10.base.LayoutContext1;
 
@@ -48,7 +47,7 @@ public class LinearGradient extends RenderableElement {
     public static LinearGradient vertical(Color from, Color to) {
         return new LinearGradient() {
             @Override
-            protected void onShapeApplied(Shape shape, LayoutContext2 context) {
+            protected void onShapeApplied(Shape shape) {
                 stops.clear();
                 stops.add(new Stop(from, 0));
                 stops.add(new Stop(to, shape.bounds().size().height() - 1));

@@ -5,7 +5,6 @@ import ui10.decoration.Fill;
 import ui10.decoration.css.CSSProperty;
 import ui10.decoration.css.Length;
 import ui10.decoration.css.Styleable;
-import ui10.font.FontMetrics;
 import ui10.font.TextStyle;
 import ui10.geom.Point;
 import ui10.geom.Size;
@@ -114,7 +113,7 @@ public class TextNode extends RenderableElement implements Styleable {
     }
 
     @Override
-    protected void onShapeApplied(Shape shape, LayoutContext2 context) {
+    protected void onShapeApplied(Shape shape) {
         LayoutContext2.ignoring().placeElement(fill, shape);
     }
 

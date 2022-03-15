@@ -36,12 +36,7 @@ public abstract class Pane extends RenderableElement {
 
     public List<RenderableElement> renderableElements() {
         if (!valid)
-            onShapeApplied(shape, new LayoutContext2() {
-                @Override
-                public void accept(RenderableElement element) {
-                    throw new UnsupportedOperationException();
-                }
-            });
+            onShapeApplied(shape);
         return children;
     }
 
@@ -59,11 +54,12 @@ public abstract class Pane extends RenderableElement {
     }
 
     @Override
-    protected void onShapeApplied(Shape shape, LayoutContext2 context) {
+    protected void onShapeApplied(Shape shape) {
         for (RenderableElement child : children)
             child.parent = null;
         children.clear();
 
+        // inter-container layout dependencies are not supported currently
         new LayoutContext2() {
             @Override
             public void accept(RenderableElement e) {
@@ -72,16 +68,6 @@ public abstract class Pane extends RenderableElement {
                 e.uiContext = uiContext;
                 if (e instanceof Pane p)
                     p.focusContext = focusContext;
-            }
-
-            @Override
-            public List<LayoutDependency> getDependencies(RenderableElement element) {
-                return context.getDependencies(element);
-            }
-
-            @Override
-            public void addLayoutDependency(RenderableElement element, LayoutDependency d) {
-                context.addLayoutDependency(element, d);
             }
         }.placeElement(getContent(), shape);
     }

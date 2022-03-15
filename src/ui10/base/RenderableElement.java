@@ -30,10 +30,10 @@ public abstract class RenderableElement extends Element {
         if (changed && rendererData != null)
             rendererData.invalidateRendererData();
 
-        onShapeApplied(shape, context);
+        onShapeApplied(shape);
     }
 
-    protected void onShapeApplied(Shape shape, LayoutContext2 context) {
+    protected void onShapeApplied(Shape shape) {
     }
 
     public Shape getShapeOrFail() {
@@ -71,22 +71,7 @@ public abstract class RenderableElement extends Element {
         }
 
         try {
-            performLayoutImpl(shape, new LayoutContext2() {
-                @Override
-                public void accept(RenderableElement element) {
-                    // maybe this is an invalid operation?
-                    // if only Pane (of RenderableElement subclasses) can have children, then yes
-                    throw new UnsupportedOperationException("TODO");
-                }
-
-                @Override
-                public List<LayoutDependency> getDependencies(RenderableElement element) {
-                    if (element == RenderableElement.this)
-                        return layoutDependencies;
-                    else
-                        return super.getDependencies(element);
-                }
-            });
+            onShapeApplied(shape);
         } catch (RuntimeException e) {
             System.err.print("Failed to layout " + this + ": ");
             e.printStackTrace();

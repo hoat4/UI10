@@ -36,7 +36,7 @@ public class Opacity extends RenderableElement {
     }
 
     @Override
-    protected void onShapeApplied(Shape shape, LayoutContext2 context) {
+    protected void onShapeApplied(Shape shape) {
         LayoutContext2.ignoring().placeElement(content, shape);
     }
 }
