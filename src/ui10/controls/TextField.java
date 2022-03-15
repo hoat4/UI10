@@ -5,6 +5,7 @@ import ui10.binding.ScalarProperty;
 import ui10.decoration.DecorationContext;
 import ui10.decoration.css.CSSProperty;
 import ui10.decoration.css.Styleable;
+import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -35,8 +36,8 @@ public class TextField extends Control implements Styleable {
 
     private final TextNode textNode = withClass("text", new TextNode());
     private final ColorFill caret = withClass("caret", new ColorFill().color(Colors.BLACK));
-
-    private final ColorFill selectionFill = withClass("selection", new ColorFill().color(RGBColor.ofRGB(0x0096C9)));
+    private final TextNode textNodeSel = withClass("selection", new TextNode());
+    private final TextNode textNodeAfterSel = withClass("text", new TextNode());
 
     private int selectionBegin;
 
@@ -51,7 +52,16 @@ public class TextField extends Control implements Styleable {
     @Override
     protected void validate() {
         super.validate();
-        textNode.text(text.get());
+
+        if (selection.get() == null) {
+            textNode.text(text.get());
+            textNodeSel.text(null);
+            textNodeAfterSel.text(null);
+        } else {
+            textNode.text(text.get().substring(0, selection.get().begin));
+            textNodeSel.text(text.get().substring(selection.get().begin, selection.get().end));
+            textNodeAfterSel.text(text.get().substring(selection.get().end));
+        }
     }
 
     @Override
@@ -61,12 +71,15 @@ public class TextField extends Control implements Styleable {
             public void enumerateStaticChildren(Consumer<Element> consumer) {
                 consumer.accept(textNode);
                 consumer.accept(caret);
-                consumer.accept(selectionFill);
+                if (selection.get() != null) {
+                    consumer.accept(textNodeSel);
+                    consumer.accept(textNodeAfterSel);
+                }
             }
 
             @Override
             public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-                return context.preferredSize(textNode, constraints);
+                return constraints.clamp(textNode.textStyle().textSize(text.get()).size());
             }
 
             @Override
@@ -77,11 +90,15 @@ public class TextField extends Control implements Styleable {
 
                     int beginX = textPosToX(begin), endX = textPosToX(end);
 
-                    Rectangle selShape = new Rectangle(beginX, 0, endX - beginX, size.height());
-                    placer.accept(selectionFill, selShape);
+                    Rectangle r = Rectangle.of(size.withWidth(beginX));
+                    placer.accept(textNode, r);
+                    r = new Rectangle(r.topRight(), size.withWidth(endX - beginX));
+                    placer.accept(textNodeSel, r);
+                    r = new Rectangle(r.topRight(), size.withWidth(size.width() - endX));
+                    placer.accept(textNodeAfterSel, r);
+                } else {
+                    placer.accept(textNode, Rectangle.of(size));
                 }
-
-                placer.accept(textNode, Rectangle.of(size));
 
                 int caretX = textPosToX(caretPosition.get());
 
@@ -99,7 +116,7 @@ public class TextField extends Control implements Styleable {
     @EventHandler
     private void onMousePress(MouseEvent.MousePressEvent event, EventContext context) {
         focusContext.focusedControl.set(this);
-        int newPos = textNode.pickTextPos(event.point().subtract(relativePos(textNode)));
+        int newPos = pickTextPos(event.point().subtract(relativePos(textNode)));
         caretPosition.set(newPos);
         this.selectionBegin = newPos;
         selection.set(null);
@@ -107,11 +124,29 @@ public class TextField extends Control implements Styleable {
 
     @EventHandler
     private void onMouseDrag(MouseEvent.MouseDragEvent event, EventContext context) {
-        caretPosition.set(textNode.pickTextPos(event.point().subtract(relativePos(textNode))));
+        caretPosition.set(pickTextPos(event.point().subtract(relativePos(textNode))));
 
         int begin = Math.min(selectionBegin, caretPosition.get());
         int end = Math.max(selectionBegin, caretPosition.get());
         selection.set(begin == end ? null : new Selection(begin, end));
+    }
+
+    private int pickTextPos(Point p) {
+        int i = textNode.textLayout.pickTextPos(p);
+        int l1 = textNode.text().length();
+        if (selection.get() == null || i < l1)
+            return i;
+
+        p = p.subtract(textNode.textLayout.metrics().width(), 0);
+        i = textNodeSel.textLayout.pickTextPos(p);
+
+        int l2 = textNodeSel.text().length();
+        if (i < l2)
+            return l1 + i;
+
+        p = p.subtract(textNodeSel.textLayout.metrics().width(), 0);
+        i = textNodeAfterSel.textLayout.pickTextPos(p);
+        return l1 + l2 + i;
     }
 
     @EventHandler

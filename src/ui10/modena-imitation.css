@@ -8,6 +8,7 @@ TextField {
     border-radius: 3px;
  }
 .text { font-size: 16px; color: #323232; }
+.selection { background: #0096C9; color: #fff; font-size: 16px; }
 
 Button {
     border: 1px solid #B6B6B6;

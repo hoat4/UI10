@@ -1,5 +1,9 @@
 package ui10.graphics;
 
+import ui10.base.Element;
+import ui10.base.LayoutContext1;
+import ui10.base.LayoutContext2;
+import ui10.base.RenderableElement;
 import ui10.decoration.DecorationContext;
 import ui10.decoration.Fill;
 import ui10.decoration.css.CSSProperty;
@@ -11,13 +15,8 @@ import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.image.Colors;
 import ui10.layout.BoxConstraints;
-import ui10.base.Element;
-import ui10.base.LayoutContext2;
-import ui10.base.RenderableElement;
-import ui10.base.LayoutContext1;
 import ui10.shell.renderer.java2d.AWTTextStyle;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -26,7 +25,7 @@ public class TextNode extends RenderableElement implements Styleable {
     private String text = "";
     private Element fill = new ColorFill(Colors.BLACK);
     private TextStyle textStyle;
-    private List<HighlightedRange> highlights;
+    public TextLayout textLayout;
 
     public TextNode() {
     }
@@ -63,16 +62,6 @@ public class TextNode extends RenderableElement implements Styleable {
         return this;
     }
 
-    public List<HighlightedRange> highlights() {
-        return highlights;
-    }
-
-    public void highlights(List<HighlightedRange> highlights) {
-        this.highlights = highlights;
-        if (!Objects.equals(highlights, highlights))
-        invalidate();
-    }
-
     public TextStyle textStyle() {
         return textStyle;
     }
@@ -83,22 +72,6 @@ public class TextNode extends RenderableElement implements Styleable {
             invalidate();
         }
         return this;
-    }
-
-    public int pickTextPos(Point p) {
-        int x = p.x();
-
-        int prevW = 0;
-        for (int i = 1; i <= text.length(); i++) {
-            int w = textStyle.textSize(text.substring(0, i)).width();
-            int mid = (prevW + w * 2) / 3;
-
-            if (mid >= x)
-                return i - 1;
-
-            prevW = w;
-        }
-        return text.length();
     }
 
     @Override
@@ -128,8 +101,5 @@ public class TextNode extends RenderableElement implements Styleable {
             textFill(((Fill) value).makeElement(decorationContext));
         if (property.equals(CSSProperty.fontSize) && value != null)
             textStyle(AWTTextStyle.of(decorationContext.length((Length) value)));
-    }
-
-    public static record HighlightedRange(int begin, int end, Fill color) {
     }
 }

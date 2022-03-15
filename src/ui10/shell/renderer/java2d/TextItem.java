@@ -27,6 +27,8 @@ public class TextItem extends Item<TextNode> {
             fill = renderer.makeItem(RenderableElement.of(node.textFill()));
         }
 
+        node.textLayout = new J2DTextLayout(node.text(), (AWTTextStyle) node.textStyle());
+
         // TODO cache textlayout vagy glyphvector vagy amit kell
     }
 
