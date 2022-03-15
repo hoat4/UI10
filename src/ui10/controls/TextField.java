@@ -9,6 +9,7 @@ import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.image.Colors;
+import ui10.image.RGBColor;
 import ui10.input.InputEvent;
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.keyboard.Keyboard;
@@ -18,6 +19,7 @@ import ui10.decoration.css.CSSClass;
 import ui10.graphics.ColorFill;
 import ui10.graphics.TextNode;
 import ui10.layout.RectangularLayout;
+import ui10.window.Cursor;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -29,14 +31,21 @@ public class TextField extends Control implements Styleable {
 
     public final ScalarProperty<String> text = ScalarProperty.createWithDefault("TextField.text", "szöveg");
     public final ScalarProperty<Integer> caretPosition = ScalarProperty.createWithDefault("TextField.caretPosition", 0);
+    public final ScalarProperty<Selection> selection = ScalarProperty.create("TextField.selection");
 
     private final TextNode textNode = withClass("text", new TextNode());
     private final ColorFill caret = withClass("caret", new ColorFill().color(Colors.BLACK));
+
+    private final ColorFill selectionFill = withClass("selection", new ColorFill().color(RGBColor.ofRGB(0x0096C9)));
+
+    private int selectionBegin;
 
     {
         attributes().add(new CSSClass("text-field"));
         text.subscribe(e -> invalidatePane());
         caretPosition.subscribe(e -> invalidatePane());
+        selection.subscribe(e -> invalidatePane());
+        cursor.set(Cursor.TEXT);
     }
 
     @Override
@@ -52,6 +61,7 @@ public class TextField extends Control implements Styleable {
             public void enumerateStaticChildren(Consumer<Element> consumer) {
                 consumer.accept(textNode);
                 consumer.accept(caret);
+                consumer.accept(selectionFill);
             }
 
             @Override
@@ -61,12 +71,26 @@ public class TextField extends Control implements Styleable {
 
             @Override
             protected void doPerformLayout(Size size, BiConsumer<Element, Rectangle> placer, LayoutContext1 context) {
+                if (selection.get() != null) {
+                    int begin = selection.get().begin;
+                    int end = selection.get().end;
+
+                    int beginX = textPosToX(begin), endX = textPosToX(end);
+
+                    Rectangle selShape = new Rectangle(beginX, 0, endX - beginX, size.height());
+                    placer.accept(selectionFill, selShape);
+                }
+
                 placer.accept(textNode, Rectangle.of(size));
 
-                int caretX = textNode.textStyle().textSize(text.get().substring(0, caretPosition.get())).width();
+                int caretX = textPosToX(caretPosition.get());
 
                 Rectangle caretShape = new Rectangle(caretX, 0, 1, size.height());
                 placer.accept(caret, caretShape);
+            }
+
+            private int textPosToX(Integer x) {
+                return textNode.textStyle().textSize(text.get().substring(0, x)).width();
             }
 
         };
@@ -75,6 +99,19 @@ public class TextField extends Control implements Styleable {
     @EventHandler
     private void onMousePress(MouseEvent.MousePressEvent event, EventContext context) {
         focusContext.focusedControl.set(this);
+        int newPos = textNode.pickTextPos(event.point().subtract(relativePos(textNode)));
+        caretPosition.set(newPos);
+        this.selectionBegin = newPos;
+        selection.set(null);
+    }
+
+    @EventHandler
+    private void onMouseDrag(MouseEvent.MouseDragEvent event, EventContext context) {
+        caretPosition.set(textNode.pickTextPos(event.point().subtract(relativePos(textNode))));
+
+        int begin = Math.min(selectionBegin, caretPosition.get());
+        int end = Math.max(selectionBegin, caretPosition.get());
+        selection.set(begin == end ? null : new Selection(begin, end));
     }
 
     @EventHandler
@@ -90,12 +127,14 @@ public class TextField extends Control implements Styleable {
 
     @OnFunctionKey(LEFT)
     public void left() {
+        selection.set(null);
         if (caretPosition.get() > 0)
             caretPosition.set(caretPosition.get() - 1);
     }
 
     @OnFunctionKey(RIGHT)
     public void right() {
+        selection.set(null);
         if (caretPosition.get() < text.get().length())
             caretPosition.set(caretPosition.get() + 1);
     }
@@ -104,7 +143,7 @@ public class TextField extends Control implements Styleable {
     public void backspace() {
         if (caretPosition.get() > 0) {
             text.set(text.get().substring(0, caretPosition.get() - 1) + text.get().substring(caretPosition.get()));
-            caretPosition.set(caretPosition.get()-1);
+            caretPosition.set(caretPosition.get() - 1);
         }
     }
 
@@ -121,5 +160,8 @@ public class TextField extends Control implements Styleable {
 
     @Override
     public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
+    }
+
+    private record Selection(int begin, int end) {
     }
 }

@@ -49,7 +49,7 @@ public class UIContextImpl implements UIContext {
     }
 
     public void performLayouts() {
-        System.out.println(layoutTasks);
+        //System.out.println(layoutTasks);
         for (inLayout = 0; inLayout < layoutTasks.size(); inLayout++) {
             LayoutTask t = layoutTasks.get(inLayout);
             t.task().run();

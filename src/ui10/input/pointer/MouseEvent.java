@@ -19,6 +19,20 @@ public interface MouseEvent extends InputEvent {
         }
     }
 
+    record MouseDragEvent(Point point) implements MouseButtonEvent {
+        @Override
+        public MouseEvent subtract(Point offset) {
+            return new MouseDragEvent(point.subtract(offset));
+        }
+    }
+
+    record MouseMoveEvent(Point point) implements MouseButtonEvent {
+        @Override
+        public MouseEvent subtract(Point offset) {
+            return new MouseMoveEvent(point.subtract(offset));
+        }
+    }
+
     record MouseReleaseEvent(Point point, MouseButton button) implements MouseButtonEvent {
         @Override
         public MouseEvent subtract(Point offset) {

@@ -23,14 +23,19 @@ public class Button extends Control implements Styleable {
     private final ScalarProperty<Boolean> pressed = new SelfContainedScalarProperty<>("pressed");
 
     {
-        textNode.text("Gomb");
-
         pressed().subscribe(e -> {
             invalidate();
             System.out.println(e.newValue());
             if (!e.newValue())
                 onAction.postEvent(null);
         });
+    }
+
+    public Button() {
+    }
+
+    public Button(String text) {
+        text(text);
     }
 
     public ScalarProperty<Boolean> pressed() {
@@ -40,6 +45,14 @@ public class Button extends Control implements Styleable {
     @Override
     public Element content() {
         return textNode;
+    }
+
+    public void text(String text) {
+        textNode.text(text);
+    }
+
+    public String text() {
+        return textNode.text();
     }
 
     @EventHandler

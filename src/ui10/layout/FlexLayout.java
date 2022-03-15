@@ -37,7 +37,6 @@ class FlexLayout {
         distributeRemainingSpace();
 
         containerSize = Size.of(primaryAxis, width, height);
-        System.out.println("cs:"+containerSize);
     }
 
     private void computeHeight() {
@@ -60,7 +59,6 @@ class FlexLayout {
                 w -= l.value(primaryAxis);
             childrenSizes.add(l);
         }
-        System.out.println(allGaps+" -> "+childrenSizes);
         width = childrenSizes.stream().mapToInt(l -> l.value(primaryAxis)).sum() + allGaps;
     }
 

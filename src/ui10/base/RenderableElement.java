@@ -1,5 +1,6 @@
 package ui10.base;
 
+import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 
 import java.util.List;
@@ -39,6 +40,10 @@ public abstract class RenderableElement extends Element {
         if (shape == null)
             throw new IllegalStateException("no shape for " + this);
         return shape;
+    }
+
+    public Point origin() {
+        return getShapeOrFail().bounds().topLeft();
     }
 
     public void invalidate() {

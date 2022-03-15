@@ -11,6 +11,7 @@ import ui10.input.pointer.MouseEvent;
 import ui10.base.LayoutContext2;
 import ui10.shell.renderer.java2d.J2DRenderer;
 import ui10.shell.renderer.java2d.J2DUtil;
+import ui10.window.Cursor;
 import ui10.window.Window;
 
 import java.awt.event.KeyEvent;
@@ -32,7 +33,8 @@ public class AWTWindowImpl extends Frame implements RendererData {
         this.desktop = desktop;
         this.scale = scale;
 
-        enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK | AWTEvent.KEY_EVENT_MASK);
+        enableEvents(AWTEvent.WINDOW_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK
+                | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.KEY_EVENT_MASK);
         setTitle("Ablak");
 
         addNotify();
@@ -94,6 +96,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
     @Override
     protected void processMouseEvent(java.awt.event.MouseEvent e) {
+        super.processMouseEvent(e);
         switch (e.getID()) {
             case java.awt.event.MouseEvent.MOUSE_PRESSED:
                 dispatchMouseEvent(new ui10.input.pointer.MouseEvent.MousePressEvent(
@@ -108,17 +111,45 @@ public class AWTWindowImpl extends Frame implements RendererData {
         }
     }
 
+    @Override
+    protected void processMouseMotionEvent(java.awt.event.MouseEvent e) {
+        super.processMouseMotionEvent(e);
+        switch (e.getID()) {
+            case java.awt.event.MouseEvent.MOUSE_MOVED:
+                dispatchMouseEvent(new MouseEvent.MouseMoveEvent(
+                        new Point(e.getX() - getInsets().left, e.getY() - getInsets().top)));
+                break;
+            case java.awt.event.MouseEvent.MOUSE_DRAGGED:
+                dispatchMouseEvent(new MouseEvent.MouseDragEvent(
+                        new Point(e.getX() - getInsets().left, e.getY() - getInsets().top)));
+                break;
+        }
+    }
+
     private void dispatchMouseEvent(MouseEvent e) {
         renderer.uiContext.eventLoop().runLater(() -> {
             List<Control> l = new ArrayList<>();
             EventContext eventContext = new EventContext();
-            if (!renderer.captureMouseEvent(e, eventContext, l))
+            if (!renderer.captureMouseEvent(e, eventContext, l)) {
+                setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
                 return;
+            }
+            Cursor cursor = Cursor.POINTER;
+            for (Control control : l) {
+                if (control.cursor.get() != null)
+                    cursor = control.cursor.get();
+            }
+            setCursor(switch(cursor) {
+                case POINTER -> java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR);
+                case TEXT -> java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.TEXT_CURSOR);
+            });
             for (int i = l.size() - 1; i >= 0; i--) {
                 if (eventContext.stopPropagation)
                     break;
 
-                l.get(i).dispatchInputEvent(e, eventContext, false);
+                Control control = l.get(i);
+                MouseEvent translatedEvent = e.subtract(control.origin());
+                control.dispatchInputEvent(translatedEvent, eventContext, false);
             }
         });
     }

@@ -35,7 +35,7 @@ public class Main6 {
         AWTDesktop desktop = new AWTDesktop();
         TextField tf = new TextField();
 
-        Button button = new Button();
+        Button button = new Button("Gomb");
         button.onAction.subscribe(__ -> System.out.println("Hello world!"));
 
         button.attributes().add(new GrowFactor(Fraction.of(0)));
@@ -49,7 +49,7 @@ public class Main6 {
 
                 centered(withClass("main", grid(2,
                         new Label("text1"), tf,
-                        new Button(), button
+                        new Button("Gomb"), button
                 )))
 
                 //centered(roundRectangle(10, stack(

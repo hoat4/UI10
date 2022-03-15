@@ -1,12 +1,14 @@
 package ui10.base;
 
+import ui10.binding.ScalarProperty;
+import ui10.geom.Point;
 import ui10.input.InputEvent;
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.keyboard.Keyboard;
+import ui10.window.Cursor;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +18,8 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public abstract class Control extends Pane {
+
+    public final ScalarProperty<Cursor> cursor = ScalarProperty.create("Control.cursor");
 
     public final void dispatchInputEvent(InputEvent event, EventContext context, boolean capture) {
         // reportolni kéne, hogy félrevezető az iterate-ben a hasNext elnevezése
@@ -66,6 +70,10 @@ public abstract class Control extends Pane {
 
     public void onFocusLost() {
         invalidatePane();
+    }
+
+    protected Point relativePos(RenderableElement e) {
+        return e.origin().subtract(origin());
     }
 
     @Target(METHOD)
