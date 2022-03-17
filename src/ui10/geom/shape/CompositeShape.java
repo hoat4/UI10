@@ -12,9 +12,9 @@ import java.util.stream.Stream;
 
 public class CompositeShape extends Shape {
 
-    public final List<Shape> shapes;
+    public final List<? extends Shape> shapes;
 
-    public CompositeShape(List<Shape> shapes) {
+    public CompositeShape(List<? extends Shape> shapes) {
         if (shapes.isEmpty())
             throw new IllegalArgumentException("empty shape list");
         this.shapes = shapes;

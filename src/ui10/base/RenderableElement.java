@@ -15,7 +15,7 @@ public abstract class RenderableElement extends Element {
     public UIContext uiContext;
 
     protected Shape shape;
-    protected List<LayoutContext1.LayoutDependency> layoutDependencies;
+    protected List<LayoutContext1.LayoutDependency<?, ?>> layoutDependencies;
 
     @Override
     public void enumerateStaticChildren(Consumer<Element> consumer) {
@@ -62,8 +62,8 @@ public abstract class RenderableElement extends Element {
 
         LayoutContext1 ctx = new LayoutContext1();
 
-        for (LayoutContext1.LayoutDependency dep : layoutDependencies) {
-            if (!ctx.preferredSizeIgnoreReplacement(this, dep.inputConstraints()).equals(dep.size())) {
+        for (LayoutContext1.LayoutDependency<?, ?> dep : layoutDependencies) {
+            if (ctx.isInvalidated(this, dep)) {
                 Objects.requireNonNull(parent, this::toString);
                 parent.invalidate();
                 return;

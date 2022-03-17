@@ -80,6 +80,22 @@ public record Size(int width, int height) {
         }
     }
 
+    public Size subtractWidth(int w) {
+        try {
+            return new Size(subtract(width, w), height);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("couldn't subtract width " + w + " from " + this);
+        }
+    }
+
+    public Size subtractHeight(int h) {
+        try {
+            return new Size(width, subtract(height, h));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("couldn't subtract height " + h + " from " + this);
+        }
+    }
+
     public Size subtractOrClamp(Point p) {
         return new Size(Math.max(0, subtract(width, p.x())), Math.max(0, subtract(height, p.y())));
     }

@@ -31,8 +31,8 @@ public class Opacity extends RenderableElement {
     }
 
     @Override
-    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-        return context1.preferredSize(content, constraints);
+    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return context.preferredSize(content, constraints);
     }
 
     @Override

@@ -3,7 +3,7 @@ package ui10;
 import ui10.controls.Label;
 import ui10.geom.Fraction;
 import ui10.geom.Insets;
-import ui10.graphics.TextNode;
+import ui10.layout.FlowLayout;
 import ui10.image.Colors;
 import ui10.layout.GrowFactor;
 import ui10.base.Element;
@@ -15,14 +15,13 @@ import ui10.decoration.css.CSSScanner;
 import ui10.graphics.ColorFill;
 import ui10.layout.Layouts;
 import ui10.shell.awt.AWTDesktop;
-import ui10.shell.renderer.java2d.AWTTextStyle;
-import ui10.shell.renderer.sw.FontTest;
 import ui10.window.Window;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.List;
 
 import static ui10.decoration.css.CSSClass.withClass;
 import static ui10.layout.Layouts.*;
@@ -35,7 +34,7 @@ public class Main6 {
         AWTDesktop desktop = new AWTDesktop();
         TextField tf = new TextField();
 
-        Button button = new Button("Gomb");
+        Button button = new Button("fi");
         button.onAction.subscribe(__ -> System.out.println("Hello world!"));
 
         button.attributes().add(new GrowFactor(Fraction.of(0)));
@@ -47,10 +46,12 @@ public class Main6 {
                 //centered(button)
                 //centered(vertically(button, tf))
 
-                centered(withClass("main", grid(2,
-                        new Label("text1"), tf,
-                        new Button("Gomb"), button
-                )))
+                new FlowLayout(List.of(new Label("asdfasdfasdfasdfasdfasdfasdfasdfasdf "),
+                        new Label("fdsafdsafdsafdsafdsafdsafdsa"), new Label(" asdf")))
+                //centered(withClass("main", grid(2,
+                //        new Label("\u0628\u0623\u062a"), tf,
+                //        new Button("\uD83D\uDC4C"), button
+                //)))
 
                 //centered(roundRectangle(10, stack(
                 //         Layouts.padding(new ColorFill(Colors.RED), new Insets(25)), new ColorFill(Colors.GREEN)

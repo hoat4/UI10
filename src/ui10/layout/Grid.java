@@ -29,8 +29,8 @@ public class Grid extends RectangularLayout implements Styleable {
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-        return computeLayout(constraints, context1).containerSize;
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        return computeLayout(constraints, context).containerSize;
     }
 
     @Override

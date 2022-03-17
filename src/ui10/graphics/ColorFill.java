@@ -28,7 +28,7 @@ public class ColorFill extends RenderableElement {
     }
 
     @Override
-    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         return constraints.min();
     }
 

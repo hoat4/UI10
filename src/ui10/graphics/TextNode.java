@@ -80,7 +80,7 @@ public class TextNode extends RenderableElement implements Styleable {
     }
 
     @Override
-    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         // TODO mit csináljunk, ha nem stimmel?
         return constraints.clamp(textStyle.textSize(text).size());
     }

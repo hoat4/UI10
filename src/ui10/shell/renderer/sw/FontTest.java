@@ -24,7 +24,7 @@ public class FontTest extends SWRenderableElement {
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         return new Size(256, 256);
     }
 

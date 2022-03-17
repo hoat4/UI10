@@ -22,7 +22,7 @@ public abstract class SingleNodeRectangularLayout extends RectangularLayout {
     }
 
     @Override
-    protected abstract Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1);
+    protected abstract Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context);
 
     @Override
     protected void doPerformLayout(Size size, BiConsumer<Element, Rectangle> placer, LayoutContext1 context) {

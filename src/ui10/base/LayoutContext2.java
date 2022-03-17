@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public abstract class LayoutContext2 extends LayoutContext1 implements Consumer<RenderableElement> {
 
-    private final Map<RenderableElement, List<LayoutDependency>> dependencies = new HashMap<>();
+    private final Map<RenderableElement, List<LayoutDependency<?, ?>>> dependencies = new HashMap<>();
 
     public void placeElement(Element element, Shape shape) {
         Objects.requireNonNull(element, "element");
@@ -32,12 +32,12 @@ public abstract class LayoutContext2 extends LayoutContext1 implements Consumer<
     /**
      * Finds which elements depend on the specified element
      */
-    public List<LayoutDependency> getDependencies(RenderableElement element) {
+    public List<LayoutDependency<?, ?>> getDependencies(RenderableElement element) {
         return dependencies.getOrDefault(element, Collections.emptyList());
     }
 
     @Override
-    void addLayoutDependency(RenderableElement element, LayoutDependency d) {
+    void addLayoutDependency(RenderableElement element, LayoutDependency<?, ?> d) {
         dependencies.computeIfAbsent(element, __ -> new ArrayList<>()).add(d);
     }
 

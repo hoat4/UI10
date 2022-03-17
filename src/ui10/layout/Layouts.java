@@ -277,8 +277,8 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-            Size contentSize = context1.preferredSize(content, constraints.withMinimum(constraints.min().withWidth(0)));
+        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+            Size contentSize = context.preferredSize(content, constraints.withMinimum(constraints.min().withWidth(0)));
             return constraints.clamp(contentSize);
         }
 
@@ -311,8 +311,8 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1) {
-            Size contentSize = context1.preferredSize(content, constraints.withMinimum(constraints.min().withHeight(0)));
+        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+            Size contentSize = context.preferredSize(content, constraints.withMinimum(constraints.min().withHeight(0)));
             return constraints.clamp(contentSize);
         }
 

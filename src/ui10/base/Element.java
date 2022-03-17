@@ -18,7 +18,7 @@ public abstract class Element {
     // LAYOUT
 
     // nevek 4-es layoutban computeSize és setBounds voltak
-    protected abstract Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context1);
+    protected abstract Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context);
 
     protected abstract void performLayoutImpl(Shape shape, LayoutContext2 context);
 
