@@ -9,6 +9,8 @@ public class CSSScanner {
     private final Reader reader;
     int next, next1;
 
+    private int line = 1, col = 1;
+
     public CSSScanner(Reader reader) {
         this.reader = reader;
 
@@ -25,7 +27,7 @@ public class CSSScanner {
         while (next == '/' && next1 == '*') {
             readImpl();
             readImpl();
-            while(next != '*' || next1 != '/')
+            while (next != '*' || next1 != '/')
                 readImpl();
             readImpl();
             readImpl();
@@ -35,6 +37,13 @@ public class CSSScanner {
     }
 
     private void readImpl() {
+        if (next == '\n') {
+            line++;
+            col = 1;
+        } else
+            col++;
+
+
         next = next1;
         try {
             next1 = reader.read();
@@ -53,6 +62,14 @@ public class CSSScanner {
     public void skipWhitespaces() {
         while (Character.isWhitespace(next))
             take();
+    }
+
+    public boolean tryRead(char c) {
+        if (next == c) {
+            take();
+            return true;
+        } else
+            return false;
     }
 
     public void expect(String s) {
@@ -74,22 +91,55 @@ public class CSSScanner {
         return a;
     }
 
-    public boolean isIdentifier() {
-        return Character.isJavaIdentifierPart(next);
-    }
-
     public String skipWhitespaceAndReadIdentifier() {
         skipWhitespaces();
         return readIdentifier();
     }
 
+    public String tryReadIdentifier() {
+        StringBuilder sb = new StringBuilder();
+        if (next == '-') {
+            sb.appendCodePoint(take());
+            if (next == '_' || next >= 'A' && next <= 'Z' || next >= 'a' && next <= 'z' || next >= 128)
+                sb.appendCodePoint(take());
+            else
+                // kötőjel önmagában nem értelmes identifier
+                // itt vissza kéne rakni a kötőjelet és visszaadni nullt
+                throw new UnsupportedOperationException("pushback not supported");
+        } else if (next == '_' || next >= 'A' && next <= 'Z' || next >= 'a' && next <= 'z' || next >= 128)
+            sb.appendCodePoint(take());
+        else
+            return null;
+
+        while (next == '_' || next == '-' || next >= 'A' && next <= 'Z' ||
+                next >= 'a' && next <= 'z' || next >= '0' && next <= '9' || next >= 128)
+            sb.appendCodePoint(take());
+
+        return sb.toString();
+    }
+
     public String readIdentifier() {
-        var sb = new StringBuilder();
-        while (Character.isJavaIdentifierPart(next) || next == '-')
+        String id = tryReadIdentifier();
+        if (id == null)
+            // ez az exception így nem jó, lehet hogy nem az első karakter a váratlan
+            throw new CSSParseException("expected identifer, but got " + chToString(next));
+        return id;
+    }
+
+    public String readAlphanumericWord() {
+        StringBuilder sb = new StringBuilder();
+        while (Character.isJavaIdentifierPart(next))
+            sb.append((char) take());
+        return sb.toString();
+    }
+
+    public int readUnsignedInteger() {
+        StringBuilder sb = new StringBuilder();
+        while (next >= '0' && next <= '9')
             sb.append((char) take());
         if (sb.isEmpty())
-            throw new CSSParseException("expected identifer, but got " + chToString(next));
-        return sb.toString();
+            throw new CSSParseException("expected an unsigned integer, but got " + chToString(next));
+        return Integer.parseInt(sb.toString());
     }
 
     public void expectIdentifier(String e) {
@@ -119,9 +169,9 @@ public class CSSScanner {
     }
 
 
-    public static class CSSParseException extends RuntimeException {
+    public class CSSParseException extends RuntimeException {
         public CSSParseException(String message) {
-            super(message);
+            super(message + " (at line " + line + ", col " + col + ")");
         }
 
         public CSSParseException(Throwable cause) {

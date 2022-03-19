@@ -18,10 +18,22 @@ public class Label extends Control implements Styleable {
     private TextNode textNode = new TextNode();
     private TextAlign textAlign = DEFAULT_TEXT_ALIGN;
 
+    public Label() {
+        this("");
+    }
+
     public Label(String text) {
         textNode.attributes().add(new CSSClass("label-text"));
         textNode.text(text);
         attributes().add(new CSSClass("label"));
+    }
+
+    public void text(String text) {
+        textNode.text(text);
+    }
+
+    public String text() {
+        return textNode.text();
     }
 
     // ennek semmi értelme publikusnak lennie, ha CSS úgyis folyton felülírja
@@ -49,6 +61,7 @@ public class Label extends Control implements Styleable {
     public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
         if (property.equals(CSSProperty.textAlign))
             textAlign(value == null ? DEFAULT_TEXT_ALIGN : (TextAlign) value);
+        textNode.setProperty(property, value, decorationContext);
     }
 
     public enum TextAlign {

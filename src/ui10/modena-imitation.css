@@ -22,7 +22,13 @@ Button {
 :active { background: linear-gradient(to bottom, #E2E2E2, #CDCDCD); }
 /*:focus {border: 5px solid #f00;}*/
 
-.label-text { font-size: 16px; }
 .main { gap: 10px; }
 
-Label { text-align: left;}
+Label { text-align: left; font-size: 16px; }
+
+Table { border: 1px solid #C8C8C8; }
+TableHeader { background: linear-gradient(to bottom, #EFEFEF, #D9D9D9); }
+TableColumnHeader { font-weight: bold; padding: 5px 6px; font-size: 12px; text-align: center; }
+TableRow { min-height: 32px;}
+TableRow:nth-child(2n+1) { background: #FFFFFF;}
+TableRow:nth-child(2n) { background: #F9F9F9; }

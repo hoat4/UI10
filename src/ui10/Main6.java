@@ -1,6 +1,7 @@
 package ui10;
 
 import ui10.controls.Label;
+import ui10.controls.TableView;
 import ui10.geom.Fraction;
 import ui10.geom.Insets;
 import ui10.layout.FlowLayout;
@@ -41,13 +42,18 @@ public class Main6 {
         tf.attributes().add(new GrowFactor(Fraction.of(0)));
 
         Element content = withClass("root",
+                new TableView(List.of(
+                        new TableView.TableColumn<>("Col1", null),
+                        new TableView.TableColumn<>("Col2", null)
+                ))
                 //firstContent()
                 //centered(new FontTest())
                 //centered(button)
                 //centered(vertically(button, tf))
 
-                new FlowLayout(List.of(new Label("asdfasdfasdfasdfasdfasdfasdfasdfasdf "),
-                        new Label("fdsafdsafdsafdsafdsafdsafdsa"), new Label(" asdf")))
+//                new FlowLayout(List.of(new Label("asdfasdfasdfasdfasdfasdfasdfasdfasdf "),
+                //                      new Label("fdsafdsafdsafdsafdsafdsafdsa"), new Label(" asdf")))
+
                 //centered(withClass("main", grid(2,
                 //        new Label("\u0628\u0623\u062a"), tf,
                 //        new Button("\uD83D\uDC4C"), button

@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 public class CSSDecorator extends Element {
 
-    private final Element content;
+    final Element content;
     final CSSParser css;
 
     public CSSDecorator(Element content, CSSParser css) {
@@ -87,20 +87,10 @@ public class CSSDecorator extends Element {
     }
 
     private Rule ruleOf(Element e) {
-        List<Attribute> attributes = new ArrayList<>();
-        if (e instanceof Styleable s && s.elementName() != null)
-            attributes.add(new CSSElementName(s.elementName()));
-        attributes.addAll(e.attributes());
-        if (e == this.content)
-            attributes.add(new CSSPseudoClass("root"));
-        if (e instanceof Control c && c.focusContext != null && c.focusContext.focusedControl.get() == c)
-            attributes.add(new CSSPseudoClass("focus"));
-
         Rule rule = new Rule();
 
-        for (Attribute a : attributes) {
-            Rule r = css.rules.get(a);
-            if (r != null) {
+        for (Rule r : css.rules) {
+            if (r.selector.test(e, this)) {
                 Rule r2 = new Rule();
                 r2.defaultsFrom(r);
                 r2.defaultsFrom(rule);

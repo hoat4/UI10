@@ -25,6 +25,7 @@ public class TextNode extends RenderableElement implements Styleable {
     private String text = "";
     private Element fill = new ColorFill(Colors.BLACK);
     private TextStyle textStyle;
+    private FontWeight fontWeight = FontWeight.NORMAL;
     public TextLayout textLayout;
 
     public TextNode() {
@@ -74,6 +75,14 @@ public class TextNode extends RenderableElement implements Styleable {
         return this;
     }
 
+    public FontWeight fontWeight() {
+        return fontWeight;
+    }
+
+    public void fontWeight(FontWeight fontWeight) {
+        this.fontWeight = fontWeight;
+    }
+
     @Override
     public void enumerateStaticChildren(Consumer<Element> consumer) {
         consumer.accept(fill);
@@ -100,6 +109,11 @@ public class TextNode extends RenderableElement implements Styleable {
         if (property.equals(CSSProperty.textColor) && value != null)
             textFill(((Fill) value).makeElement(decorationContext));
         if (property.equals(CSSProperty.fontSize) && value != null)
-            textStyle(AWTTextStyle.of(decorationContext.length((Length) value)));
+            textStyle(AWTTextStyle.of(decorationContext.length((Length) value), fontWeight == FontWeight.BOLD));
+        if (property.equals(CSSProperty.fontWeight) && value != null) {
+            fontWeight = (FontWeight) value;
+            if (textStyle != null)
+                textStyle = ((AWTTextStyle) textStyle).withBoldness(fontWeight == FontWeight.BOLD);
+        }
     }
 }

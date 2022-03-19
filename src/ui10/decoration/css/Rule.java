@@ -20,6 +20,8 @@ import static ui10.layout.Layouts.*;
 
 public class Rule {
 
+    public Selector selector;
+
     private final Map<CSSProperty<?>, Object> map = new HashMap<>();
 
     private final List<Transition<?>> transitions = new ArrayList<>();
@@ -53,6 +55,7 @@ public class Rule {
             case "transition" -> put(CSSProperty.transition, parser.parseTransitionList());
             case "gap" -> put(CSSProperty.gap, parser.parseLength());
             case "text-align" -> put(CSSProperty.textAlign, parser.parseTextAlign());
+            case "font-weight" -> put(CSSProperty.fontWeight, parser.parseFontWeight());
             default -> throw new UnsupportedOperationException("unknown CSS property: " + name);
         }
     }
@@ -65,7 +68,7 @@ public class Rule {
             case 2 -> lengths = List.of(lengths.get(0), lengths.get(1), lengths.get(0), lengths.get(1));
             case 4 -> {
             }
-            default -> throw new CSSScanner.CSSParseException("invalid count of lengths: " + lengths);
+            default -> throw parser.scanner.new CSSParseException("invalid count of lengths: " + lengths);
         }
         put(topProp, lengths.get(0));
         put(rightProp, lengths.get(1));
@@ -96,6 +99,7 @@ public class Rule {
         applyCustomPropToSelf(CSSProperty.textColor, e, context);
         applyCustomPropToSelf(CSSProperty.gap, e, context);
         applyCustomPropToSelf(CSSProperty.textAlign, e, context);
+        applyCustomPropToSelf(CSSProperty.fontWeight, e, context);
     }
 
     private <T> Element prop2(CSSProperty<T> prop, Element e, BiFunction<Element, T, Element> f) {

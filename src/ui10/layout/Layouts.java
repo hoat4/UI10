@@ -256,6 +256,14 @@ public class Layouts {
         return new LinearLayout(Axis.VERTICAL, List.of(elements));
     }
 
+    public static Element horizontally(List<? extends Element> elements) {
+        return new LinearLayout(Axis.HORIZONTAL, List.copyOf(elements));
+    }
+
+    public static Element horizontally(Element... elements) {
+        return new LinearLayout(Axis.HORIZONTAL, List.of(elements));
+    }
+
     public static Element grid(int cols, Element... elements) {
         List<List<Element>> rows = new ArrayList<>();
         for (int i = 0; i < elements.length; i += cols)
