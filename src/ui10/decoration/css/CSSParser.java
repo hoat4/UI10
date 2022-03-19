@@ -4,6 +4,7 @@ import ui10.controls.Label;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.Fill;
 import ui10.decoration.PointSpec;
+import ui10.geom.Fraction;
 import ui10.graphics.FontWeight;
 import ui10.image.Color;
 import ui10.image.RGBColor;
@@ -437,6 +438,13 @@ public class CSSParser {
             case "bold" -> FontWeight.BOLD;
             default -> throw scanner.new CSSParseException("unknown font weight value: " + s);
         };
+    }
+
+    public Fraction parseNumberAsFraction() {
+        // TODO eliminate doubles
+        String l = scanner.readPossibleChars("0123456789-.");
+        double d = Double.parseDouble(l);
+        return Fraction.of(d, (int)Math.pow(10, l.length()));
     }
 
     public record NumberWithUnit(double n, Unit unit) {

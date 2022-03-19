@@ -1,7 +1,13 @@
 package ui10.decoration.css;
 
+import ui10.controls.Label;
+import ui10.controls.TableView;
+import ui10.font.TextStyle;
 import ui10.geom.Insets;
 import ui10.geom.Size;
+import ui10.graphics.FontWeight;
+import ui10.layout.Grid;
+import ui10.layout.LinearLayout;
 import ui10.shell.renderer.java2d.AWTTextStyle;
 import ui10.base.Attribute;
 import ui10.base.Element;
@@ -56,6 +62,10 @@ public class Rule {
             case "gap" -> put(CSSProperty.gap, parser.parseLength());
             case "text-align" -> put(CSSProperty.textAlign, parser.parseTextAlign());
             case "font-weight" -> put(CSSProperty.fontWeight, parser.parseFontWeight());
+            case "flex-grow" -> put(CSSProperty.flexGrow, parser.parseNumberAsFraction());
+
+            case "row-height" -> put(CSSProperty.rowHeight, parser.parseLength());
+
             default -> throw new UnsupportedOperationException("unknown CSS property: " + name);
         }
     }
@@ -87,19 +97,15 @@ public class Rule {
             consumer.accept(value);
     }
 
-    private <T> void applyCustomPropToSelf(CSSProperty<T> prop, Element e, DecorationContext context) {
-        T value = get(prop);
-        if (e instanceof Styleable s)
-            s.setProperty(prop, value, context);
-    }
-
     @SuppressWarnings("Convert2MethodRef")
     public void apply1(Element e, DecorationContext context) {
-        applyCustomPropToSelf(CSSProperty.fontSize, e, context);
-        applyCustomPropToSelf(CSSProperty.textColor, e, context);
-        applyCustomPropToSelf(CSSProperty.gap, e, context);
-        applyCustomPropToSelf(CSSProperty.textAlign, e, context);
-        applyCustomPropToSelf(CSSProperty.fontWeight, e, context);
+        apply1(CSSProperty.fontSize, len-> e.setProperty(TextNode.FONT_SIZE_PROPERTY, context.length(len)));
+        apply1(CSSProperty.textColor, color-> e.setProperty(TextNode.TEXT_FILL_PROPERTY, color));
+        apply1(CSSProperty.fontWeight, weight-> e.setProperty(TextNode.FONT_WEIGHT_PROPERTY, weight));
+        apply1(CSSProperty.textAlign, textAlign-> e.setProperty(Label.TEXT_ALIGN_PROPERTY, textAlign));
+        apply1(CSSProperty.gap, gap -> e.setProperty(Grid.GAP_PROPERTY, context.length(gap)));
+        apply1(CSSProperty.rowHeight, h-> e.setProperty(TableView.ROW_HEIGHT_PROPERTY, context.length(h)));
+        apply1(CSSProperty.flexGrow, h-> e.setProperty(LinearLayout.GROW_FACTOR, h));
     }
 
     private <T> Element prop2(CSSProperty<T> prop, Element e, BiFunction<Element, T, Element> f) {

@@ -71,7 +71,7 @@ class FlexLayout {
         Fraction growFactorSum = elements.stream().map(FlexElement::growFactor).reduce(Fraction.ZERO, Fraction::add);
         int indexOfFirstGrowable = -1;
         for (int i = elements.size() - 1; i >= 0; i--) {
-            if (!elements.get(i).growFactor().equals(Fraction.ZERO)) {
+            if (!elements.get(i).growFactor().isZero()) {
                 indexOfFirstGrowable = i;
                 break;
             }
@@ -80,10 +80,10 @@ class FlexLayout {
         if (indexOfFirstGrowable == -1)
             return;
 
-        for (int i = 0; i < elements.size() && !growFactorSum.equals(Fraction.ZERO); i++) {
+        for (int i = 0; i < elements.size() && !growFactorSum.isZero(); i++) {
             FlexElement e = elements.get(i);
             Fraction growFactor = e.growFactor();
-            if (!growFactor.equals(Fraction.ZERO)) {
+            if (!growFactor.isZero()) {
                 Size currentSize = childrenSizes.get(i);
                 Fraction w2 = growFactor.multiply(remaining).divide(growFactorSum).add(currentSize.value(primaryAxis));
                 BoxConstraints c3 = new BoxConstraints(

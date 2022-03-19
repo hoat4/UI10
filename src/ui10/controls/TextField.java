@@ -2,9 +2,6 @@ package ui10.controls;
 
 import ui10.base.*;
 import ui10.binding.ScalarProperty;
-import ui10.decoration.DecorationContext;
-import ui10.decoration.css.CSSProperty;
-import ui10.decoration.css.Styleable;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
@@ -27,8 +24,9 @@ import java.util.function.Consumer;
 
 import static ui10.decoration.css.CSSClass.withClass;
 import static ui10.input.keyboard.Keyboard.StandardFunctionSymbol.*;
+import static ui10.layout.Layouts.horizontally;
 
-public class TextField extends Control implements Styleable {
+public class TextField extends Control  {
 
     public final ScalarProperty<String> text = ScalarProperty.createWithDefault("TextField.text", "szöveg");
     public final ScalarProperty<Integer> caretPosition = ScalarProperty.createWithDefault("TextField.caretPosition", 0);
@@ -79,7 +77,10 @@ public class TextField extends Control implements Styleable {
 
             @Override
             public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-                return constraints.clamp(textNode.textStyle().textSize(text.get()).size());
+                if (selection.get() == null)
+                    return context.preferredSize(textNode, constraints);
+                else
+                    return context.preferredSize(horizontally(textNode, textNodeSel, textNodeAfterSel), constraints);
             }
 
             @Override
@@ -191,10 +192,6 @@ public class TextField extends Control implements Styleable {
     @Override
     public String elementName() {
         return "TextField";
-    }
-
-    @Override
-    public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
     }
 
     private record Selection(int begin, int end) {

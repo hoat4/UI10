@@ -4,29 +4,30 @@ import ui10.base.Element;
 import ui10.base.LayoutContext1;
 import ui10.base.LayoutContext2;
 import ui10.base.RenderableElement;
+import ui10.binding2.Property;
 import ui10.decoration.DecorationContext;
 import ui10.decoration.Fill;
-import ui10.decoration.css.CSSProperty;
-import ui10.decoration.css.Length;
-import ui10.decoration.css.Styleable;
 import ui10.font.TextStyle;
-import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
-import ui10.image.Colors;
 import ui10.layout.BoxConstraints;
 import ui10.shell.renderer.java2d.AWTTextStyle;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class TextNode extends RenderableElement implements Styleable {
+public class TextNode extends RenderableElement {
+
+    public static final Property<Integer> FONT_SIZE_PROPERTY = new Property<>();
+    public static final Property<Fill> TEXT_FILL_PROPERTY = new Property<>();
+    public static final Property<FontWeight> FONT_WEIGHT_PROPERTY = new Property<>();
+
 
     private String text = "";
-    private Element fill = new ColorFill(Colors.BLACK);
-    private TextStyle textStyle;
-    private FontWeight fontWeight = FontWeight.NORMAL;
     public TextLayout textLayout;
+
+    private Fill fill;
+    private Element fillElem;
 
     public TextNode() {
     }
@@ -50,70 +51,42 @@ public class TextNode extends RenderableElement implements Styleable {
     }
 
     public Element textFill() {
-        return fill;
-    }
-
-    public TextNode textFill(Element fill) {
-        Objects.requireNonNull(fill);
-
-        if (!Objects.equals(fill, this.fill)) {
-            this.fill = fill;
-            invalidate();
+        Fill tf = getProperty(TEXT_FILL_PROPERTY);
+        Objects.requireNonNull(tf);
+        if (!Objects.equals(fill, tf)) {
+            fillElem = tf.makeElement(new DecorationContext()); // TODO
+            fill = tf;
         }
-        return this;
+        return fillElem;
     }
 
     public TextStyle textStyle() {
-        return textStyle;
+        return makeTextStyle(this);
     }
 
-    public TextNode textStyle(TextStyle textStyle) {
-        if (!Objects.equals(textStyle, this.textStyle)) {
-            this.textStyle = textStyle;
-            invalidate();
-        }
-        return this;
-    }
-
-    public FontWeight fontWeight() {
-        return fontWeight;
-    }
-
-    public void fontWeight(FontWeight fontWeight) {
-        this.fontWeight = fontWeight;
+    public static TextStyle makeTextStyle(Element e) {
+        return AWTTextStyle.of(e.getProperty(FONT_SIZE_PROPERTY), e.getProperty(FONT_WEIGHT_PROPERTY) == FontWeight.BOLD);
     }
 
     @Override
     public void enumerateStaticChildren(Consumer<Element> consumer) {
-        consumer.accept(fill);
+        // a fillt most nem lehet, mert a dekorálás még a logicalParent beállítása előtt kerül be
+        // consumer.accept(textFill());
     }
 
     @Override
     public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         // TODO mit csináljunk, ha nem stimmel?
-        return constraints.clamp(textStyle.textSize(text).size());
+        return constraints.clamp(textStyle().textSize(text).size());
     }
 
     @Override
     protected void onShapeApplied(Shape shape) {
-        LayoutContext2.ignoring().placeElement(fill, shape);
+        LayoutContext2.ignoring().placeElement(textFill(), shape);
     }
 
     @Override
     public String elementName() {
         return null; // should return an element name?
-    }
-
-    @Override
-    public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
-        if (property.equals(CSSProperty.textColor) && value != null)
-            textFill(((Fill) value).makeElement(decorationContext));
-        if (property.equals(CSSProperty.fontSize) && value != null)
-            textStyle(AWTTextStyle.of(decorationContext.length((Length) value), fontWeight == FontWeight.BOLD));
-        if (property.equals(CSSProperty.fontWeight) && value != null) {
-            fontWeight = (FontWeight) value;
-            if (textStyle != null)
-                textStyle = ((AWTTextStyle) textStyle).withBoldness(fontWeight == FontWeight.BOLD);
-        }
     }
 }

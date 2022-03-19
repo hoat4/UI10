@@ -61,6 +61,7 @@ public abstract class Pane extends RenderableElement {
 
         // inter-container layout dependencies are not supported currently
         new LayoutContext2() {
+
             @Override
             public void accept(RenderableElement e) {
                 children.add(e);

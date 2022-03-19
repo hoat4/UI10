@@ -1,26 +1,31 @@
 package ui10.layout;
 
-import ui10.decoration.DecorationContext;
-import ui10.decoration.css.CSSProperty;
-import ui10.decoration.css.Length;
-import ui10.decoration.css.Styleable;
-import ui10.geom.*;
 import ui10.base.Element;
 import ui10.base.LayoutContext1;
+import ui10.binding2.Property;
+import ui10.geom.*;
 
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-public class Grid extends RectangularLayout implements Styleable {
+public class Grid extends RectangularLayout {
+
+    public static final Property<Integer> GAP_PROPERTY = new Property<>();
 
     public final List<? extends List<? extends Element>> rows;
 
-    public int gap = 0;
+    private int gap = 0;
 
     public Grid(List<? extends List<? extends Element>> rows) {
         this.rows = rows;
+    }
+
+    @Override
+    public void initFromProps() {
+        Integer i = getProperty(GAP_PROPERTY);
+        gap = i == null ? 0 : i;
     }
 
     @Override
@@ -78,13 +83,6 @@ public class Grid extends RectangularLayout implements Styleable {
         return null; // not a real control, only a layout
     }
 
-    @Override
-    public <T> void setProperty(CSSProperty<T> property, T value, DecorationContext decorationContext) {
-        if (property.equals(CSSProperty.gap)) {
-            gap = value == null ? 0 : decorationContext.length((Length) value); // TODO relative values
-        }
-    }
-
     private class Column implements FlexLayout.FlexElement {
 
         private final int colIndex;
@@ -111,7 +109,7 @@ public class Grid extends RectangularLayout implements Styleable {
 
         @Override
         public Fraction growFactor() {
-            return GrowFactor.DEFAULT;
+            return LinearLayout.GROW_FACTOR.defaultValue;
         }
     }
 
@@ -141,7 +139,7 @@ public class Grid extends RectangularLayout implements Styleable {
 
         @Override
         public Fraction growFactor() {
-            return GrowFactor.DEFAULT;
+            return LinearLayout.GROW_FACTOR.defaultValue;
         }
     }
 

@@ -1,7 +1,12 @@
 package ui10.geom;
 
+// 0-t normalizáljuk 0/1-re? vagy ha nem, equals-t alakítsuk át hogy tekintse egyenlőnek minden 0/x-et?
 public record Fraction(int numerator, int denominator) {
 
+    public Fraction {
+        if (denominator == 0)
+            throw new IllegalArgumentException();
+    }
     public static final Fraction ZERO = new Fraction(0, 1);
     public static final Fraction HALF = new Fraction(1, 2);
     public static final Fraction WHOLE = new Fraction(1, 1);
@@ -26,8 +31,18 @@ public record Fraction(int numerator, int denominator) {
         return new Fraction(numerator * multiplier, denominator);
     }
 
+    public Fraction multiply(Fraction multiplier) {
+        return new Fraction(numerator * multiplier.numerator, denominator * multiplier.denominator);
+    }
+
     public Fraction divide(Fraction divisor) {
+        if (divisor.isZero())
+            throw new IllegalArgumentException("can't divide "+this+" by "+divisor);
         return new Fraction(numerator * divisor.denominator, denominator * divisor.numerator);
+    }
+
+    public boolean isZero() {
+        return numerator == 0;
     }
 
     public Fraction add(int i) {

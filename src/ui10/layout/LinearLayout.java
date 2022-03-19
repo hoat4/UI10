@@ -1,5 +1,6 @@
 package ui10.layout;
 
+import ui10.binding2.Property;
 import ui10.geom.*;
 import ui10.base.Element;
 import ui10.base.LayoutContext1;
@@ -8,7 +9,10 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-class LinearLayout extends RectangularLayout {
+// ez most csak a GROW_FACTOR miatt publikus
+public class LinearLayout extends RectangularLayout {
+
+    public static final Property<Fraction> GROW_FACTOR = new Property<>(Fraction.WHOLE, false);
 
     private final Axis primaryAxis;
     private final List<? extends Element> children;
@@ -53,11 +57,16 @@ class LinearLayout extends RectangularLayout {
 
                     @Override
                     public Fraction growFactor() {
-                        return GrowFactor.growFactor(e);
+                        return e.getProperty(GROW_FACTOR);
                     }
                 }).toList());
 
         l.layout();
         return l;
+    }
+
+    @Override
+    public String toString() {
+        return primaryAxis + "LY" + children;
     }
 }

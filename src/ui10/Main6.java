@@ -1,19 +1,18 @@
 package ui10;
 
-import ui10.controls.Label;
-import ui10.controls.TableView;
-import ui10.geom.Fraction;
-import ui10.geom.Insets;
-import ui10.layout.FlowLayout;
-import ui10.image.Colors;
-import ui10.layout.GrowFactor;
 import ui10.base.Element;
 import ui10.controls.Button;
+import ui10.controls.Label;
+import ui10.controls.TableView;
 import ui10.controls.TextField;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
 import ui10.decoration.css.CSSScanner;
+import ui10.geom.Fraction;
+import ui10.geom.Insets;
 import ui10.graphics.ColorFill;
+import ui10.image.Colors;
+import ui10.layout.FlowLayout;
 import ui10.layout.Layouts;
 import ui10.shell.awt.AWTDesktop;
 import ui10.window.Window;
@@ -38,20 +37,25 @@ public class Main6 {
         Button button = new Button("fi");
         button.onAction.subscribe(__ -> System.out.println("Hello world!"));
 
-        button.attributes().add(new GrowFactor(Fraction.of(0)));
-        tf.attributes().add(new GrowFactor(Fraction.of(0)));
+        //button.attributes().add(new GrowFactor(Fraction.of(0)));
+        //tf.attributes().add(new GrowFactor(Fraction.of(0)));
+
+        List<String> list = List.of("Hello", "world!");
 
         Element content = withClass("root",
-                new TableView(List.of(
-                        new TableView.TableColumn<>("Col1", null),
-                        new TableView.TableColumn<>("Col2", null)
-                ))
+                new TableView<>(List.of(
+                        new TableView.TableColumn<>("Col1", s -> s),
+                        new TableView.TableColumn<>("Col2", s -> String.valueOf(s.length()))
+                ), list)
+
                 //firstContent()
                 //centered(new FontTest())
                 //centered(button)
                 //centered(vertically(button, tf))
 
-//                new FlowLayout(List.of(new Label("asdfasdfasdfasdfasdfasdfasdfasdfasdf "),
+                //new Label("asdf")
+
+                //new FlowLayout(List.of(new Label("asdfasdfasdfasdfasdfasdfasdfasdfasdf "),
                 //                      new Label("fdsafdsafdsafdsafdsafdsafdsa"), new Label(" asdf")))
 
                 //centered(withClass("main", grid(2,

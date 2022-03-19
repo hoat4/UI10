@@ -3,13 +3,14 @@ package ui10.base;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class LayoutContext1 {
 
     final Set<Element> inReplacement = new HashSet<>();
+
+    public LayoutContext1() {
+    }
 
     public Size preferredSize(Element e, BoxConstraints constraints) {
         return preferredSize(e, constraints, LayoutProtocol.BOX);
@@ -21,6 +22,7 @@ public class LayoutContext1 {
 
         if (e.replacement() == null || inReplacement.contains(e)) {
             O output = protocol.preferredSize(e, constraints, this);
+
             Objects.requireNonNull(output, e::toString);
             if (e instanceof RenderableElement)
                 addLayoutDependency((RenderableElement) e, new LayoutDependency<>(constraints, output, protocol));
@@ -42,12 +44,9 @@ public class LayoutContext1 {
         return !Objects.equals(output, dep.size);
     }
 
-    // TODO "performing layout" helyett írjuk ki értelmesen, hogy elhelyezi az elementeket
-
     /**
      * Records that the current element must be layouted again if the size of the specified element is changed.
-     * This is invoked automatically by RenderableElement when computing preferred size and by Pane when performing
-     * layout.
+     * This is invoked only in this class, when an element has completed computing its preferred size.
      */
     void addLayoutDependency(RenderableElement element, LayoutDependency<?, ?> d) {
         // these known shapes should be used later to avoid computing preferred shapes redundantly

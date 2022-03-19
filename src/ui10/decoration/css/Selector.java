@@ -13,7 +13,7 @@ public interface Selector {
     record ElementSelector(String elementName) implements Selector {
         @Override
         public boolean test(Element e, CSSDecorator cssDecorator) {
-            return e instanceof Styleable s && elementName.equals(s.elementName());
+            return elementName.equals(e.elementName());
         }
     }
 

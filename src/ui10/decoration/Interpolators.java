@@ -1,5 +1,6 @@
 package ui10.decoration;
 
+import ui10.geom.Fraction;
 import ui10.image.Color;
 import ui10.image.RGBColor;
 import ui10.decoration.css.Length;
@@ -28,5 +29,9 @@ public class Interpolators {
             return new Fill.ColorFill(COLOR.interpolate(ac.color(), bc.color(), t));
         else
             return new Fill.InterpolatedFill(a, b, t);
+    };
+
+    public static final Interpolator<Fraction> FRACTION = (a, b, t) -> {
+        return Fraction.add(a.multiply(t), b.multiply(t.oneMinus()));
     };
 }

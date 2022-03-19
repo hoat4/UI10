@@ -5,6 +5,7 @@ import ui10.decoration.BorderSpec;
 import ui10.decoration.Fill;
 import ui10.decoration.Interpolator;
 import ui10.decoration.Interpolators;
+import ui10.geom.Fraction;
 import ui10.graphics.FontWeight;
 
 import java.util.HashMap;
@@ -36,10 +37,15 @@ public class CSSProperty<T> {
     static final CSSProperty<BorderSpec> border = new CSSProperty<>("border", null);
 
     public static final CSSProperty<Length> gap = new CSSProperty<>("gap", Interpolators.LENGTH);
+    static final CSSProperty<Fraction> flexGrow = new CSSProperty<>("flex-grow", Interpolators.FRACTION);
+
     public static final CSSProperty<Label.TextAlign> textAlign = new CSSProperty<>("text-align", null);
     public static final CSSProperty<FontWeight> fontWeight = new CSSProperty<>("font-weight", null);
 
     static final CSSProperty<List<TransitionSpec<?>>> transition = new CSSProperty<>("transition", null);
+
+    // NON-STANDARD
+    static final CSSProperty<Length> rowHeight = new CSSProperty<>("row-height", Interpolators.LENGTH);
 
     private final String name;
 
