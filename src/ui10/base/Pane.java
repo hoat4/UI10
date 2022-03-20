@@ -1,6 +1,7 @@
 package ui10.base;
 
 import ui10.binding2.ChangeEvent;
+import ui10.binding2.ElementEvent;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -8,7 +9,6 @@ import ui10.layout.BoxConstraints;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 
 public abstract class Pane extends RenderableElement {
 
@@ -21,8 +21,11 @@ public abstract class Pane extends RenderableElement {
     }
 
     @Override
-    void dispatchPropertyChange(ChangeEvent changeEvent) {
-        onPropertyChange(changeEvent);
+    void dispatchPropertyChangeImpl(ElementEvent changeEvent) {
+        if (subscriptions().contains(changeEvent.property()))
+            onPropertyChange(changeEvent);
+        for (ExternalListener<?> el : externalListeners)
+            elHelper(el, changeEvent);
 
         List<RenderableElement> prevChildren = List.copyOf(children);
 
@@ -31,12 +34,18 @@ public abstract class Pane extends RenderableElement {
 
         for (RenderableElement e : children)
             if (prevChildren.contains(e) && !e.props.containsKey(changeEvent.property())
-                    && !e.transientAncestorsProperties.containsKey(changeEvent))
-                // subscriptionst is figyelembe kéne venni
-                e.dispatchPropertyChange(changeEvent);
+                    && !e.transientAncestorsProperties.containsKey(changeEvent.property()))
+                // subscriptionst is figyelembe kéne venni, de az összes descendantét valahogy
+                e.dispatchPropertyChangeImpl(changeEvent);
     }
 
-    protected void onPropertyChange(ChangeEvent changeEvent) {
+    @SuppressWarnings("unchecked")
+    private <T> void elHelper(ExternalListener<?> l, ElementEvent evt){
+        if (l.prop().equals(evt.property()))
+            l.consumer().accept(evt);
+    }
+
+    protected void onPropertyChange(ElementEvent changeEvent) {
     }
 
     protected abstract Element content();

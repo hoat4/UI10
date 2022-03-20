@@ -5,6 +5,7 @@ import ui10.base.LayoutContext1;
 import ui10.base.LayoutContext2;
 import ui10.base.RenderableElement;
 import ui10.binding2.ChangeEvent;
+import ui10.binding2.ElementEvent;
 import ui10.binding2.Property;
 import ui10.decoration.DecorationContext;
 import ui10.decoration.Fill;
@@ -39,7 +40,7 @@ public class TextNode extends RenderableElement {
     }
 
     @Override
-    protected void onPropertyChange(ChangeEvent changeEvent) {
+    protected void onPropertyChange(ElementEvent changeEvent) {
         System.out.println(changeEvent);
         invalidate();
     }
@@ -82,13 +83,12 @@ public class TextNode extends RenderableElement {
     }
 
     @Override
-    public void enumerateStaticChildren(Consumer<Element> consumer) {
-        // a fillt most nem lehet, mert a dekorálás még a logicalParent beállítása előtt kerül be
-        // consumer.accept(textFill());
+    protected void enumerateStaticChildren(Consumer<Element> consumer) {
+        consumer.accept(textFill());
     }
 
     @Override
-    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         // TODO mit csináljunk, ha nem stimmel?
         return constraints.clamp(textStyle().textSize(text).size());
     }

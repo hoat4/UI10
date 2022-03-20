@@ -35,7 +35,7 @@ public class Main6 {
         TextField tf = new TextField();
 
         Button button = new Button("fi");
-        button.onAction.subscribe(__ -> System.out.println("Hello world!"));
+        button.onAction().subscribe(__ -> System.out.println("Hello world!"));
 
         //button.attributes().add(new GrowFactor(Fraction.of(0)));
         //tf.attributes().add(new GrowFactor(Fraction.of(0)));

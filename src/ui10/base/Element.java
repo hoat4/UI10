@@ -1,5 +1,8 @@
 package ui10.base;
 
+import ui10.binding.Observable;
+import ui10.binding2.ChangeEvent;
+import ui10.binding2.ElementEvent;
 import ui10.binding2.Property;
 import ui10.decoration.DecorationContext;
 import ui10.decoration.css.CSSDecorator;
@@ -19,6 +22,8 @@ public sealed abstract class Element permits TransientElement, RenderableElement
     @Deprecated // use properties instead
     private final Set<Attribute> attributes = new HashSet<>();
 
+    final List<ExternalListener<?>> externalListeners = new ArrayList<>();
+
     // LAYOUT
 
     // nevek 4-es layoutban computeSize és setBounds voltak
@@ -37,7 +42,7 @@ public sealed abstract class Element permits TransientElement, RenderableElement
      * set the Pane.decorator field because Panes usually recreate its children every time, so decorating them only once
      * is useless.
      */
-    public abstract void enumerateStaticChildren(Consumer<Element> consumer); // this does not honor replacement
+    protected abstract void enumerateStaticChildren(Consumer<Element> consumer); // this does not honor replacement
 
     public final Element replacement() {
         return replacement;
@@ -124,5 +129,22 @@ public sealed abstract class Element permits TransientElement, RenderableElement
 
     public <T> void setProperty(Property<T> prop, T value) {
         props.put(prop, value);
+    }
+
+    public <T> Observable<? extends ElementEvent> observable(Property<T> prop) {
+        return new Observable<>() {
+            @Override
+            public void subscribe(Consumer<? super ElementEvent> subscriber) {
+                externalListeners.add(new ExternalListener<>(prop, subscriber));
+            }
+
+            @Override
+            public void unsubscribe(Consumer<? super ElementEvent> subscriber) {
+                throw new UnsupportedOperationException("TODO");
+            }
+        };
+    }
+
+    record ExternalListener<T>(Property<T> prop, Consumer<? super ElementEvent> consumer) {
     }
 }

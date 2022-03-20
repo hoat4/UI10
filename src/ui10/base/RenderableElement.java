@@ -1,11 +1,11 @@
 package ui10.base;
 
 import ui10.binding2.ChangeEvent;
+import ui10.binding2.ElementEvent;
 import ui10.binding2.Property;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 
-import javax.print.attribute.standard.JobKOctets;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -48,7 +48,7 @@ public non-sealed abstract class RenderableElement extends Element {
     }
 
     @Override
-    public void enumerateStaticChildren(Consumer<Element> consumer) {
+    protected void enumerateStaticChildren(Consumer<Element> consumer) {
         // most subclasses have no children
     }
 
@@ -63,11 +63,16 @@ public non-sealed abstract class RenderableElement extends Element {
         onShapeApplied(shape);
     }
 
-    void dispatchPropertyChange(ChangeEvent changeEvent) {
+    public void dispatchElementEvent(ElementEvent event) {
+        if (initialized || !(event instanceof ChangeEvent<?>))
+            dispatchPropertyChangeImpl(event);
+    }
+
+    void dispatchPropertyChangeImpl(ElementEvent changeEvent) {
         onPropertyChange(changeEvent);
     }
 
-    protected void onPropertyChange(ChangeEvent changeEvent) {
+    protected void onPropertyChange(ElementEvent changeEvent) {
     }
 
     protected void onShapeApplied(Shape shape) {
@@ -122,7 +127,6 @@ public non-sealed abstract class RenderableElement extends Element {
     @Override
     public <T> void setProperty(Property<T> prop, T value) {
         super.setProperty(prop, value);
-        if (initialized)
-            dispatchPropertyChange(new ChangeEvent(prop, value));
+        dispatchElementEvent(new ChangeEvent(prop, value));
     }
 }
