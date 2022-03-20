@@ -4,6 +4,7 @@ import ui10.base.Element;
 import ui10.base.LayoutContext1;
 import ui10.base.LayoutContext2;
 import ui10.base.RenderableElement;
+import ui10.binding2.ChangeEvent;
 import ui10.binding2.Property;
 import ui10.decoration.DecorationContext;
 import ui10.decoration.Fill;
@@ -14,6 +15,7 @@ import ui10.layout.BoxConstraints;
 import ui10.shell.renderer.java2d.AWTTextStyle;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class TextNode extends RenderableElement {
@@ -34,6 +36,17 @@ public class TextNode extends RenderableElement {
 
     public TextNode(String text) {
         this.text = text;
+    }
+
+    @Override
+    protected void onPropertyChange(ChangeEvent changeEvent) {
+        System.out.println(changeEvent);
+        invalidate();
+    }
+
+    @Override
+    protected Set<Property<?>> subscriptions() {
+        return Set.of(TEXT_FILL_PROPERTY);
     }
 
     public String text() {

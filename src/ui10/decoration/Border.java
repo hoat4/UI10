@@ -1,5 +1,6 @@
 package ui10.decoration;
 
+import ui10.base.TransientElement;
 import ui10.geom.Insets;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -10,7 +11,7 @@ import ui10.base.LayoutContext1;
 
 import java.util.function.Consumer;
 
-public class Border extends Element {
+public class Border extends TransientElement {
 
     public final Insets insets;
     public final Element fill;

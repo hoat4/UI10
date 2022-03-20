@@ -1,5 +1,6 @@
 package ui10.layout;
 
+import ui10.base.TransientElement;
 import ui10.geom.*;
 import ui10.geom.shape.RoundedRectangle;
 import ui10.geom.shape.Shape;
@@ -23,7 +24,7 @@ public class Layouts {
         return new Empty();
     }
 
-    private static class Empty extends Element {
+    private static class Empty extends TransientElement {
 
         @Override
         public void enumerateStaticChildren(Consumer<Element> consumer) {
@@ -192,7 +193,7 @@ public class Layouts {
         return new StackLayout(nodes);
     }
 
-    private static class StackLayout extends Element {
+    private static class StackLayout extends TransientElement {
 
         private final List<Element> elements;
 

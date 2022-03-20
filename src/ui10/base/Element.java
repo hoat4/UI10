@@ -1,23 +1,20 @@
 package ui10.base;
 
 import ui10.binding2.Property;
+import ui10.decoration.DecorationContext;
 import ui10.decoration.css.CSSDecorator;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
-public abstract class Element {
+public sealed abstract class Element permits TransientElement, RenderableElement {
 
     protected Element replacement;
-    public Element logicalParent;
 
-    private final Map<Property<?>, Object> props = new HashMap<>();
+    final Map<Property<?>, Object> props = new HashMap<>();
 
     @Deprecated // use properties instead
     private final Set<Attribute> attributes = new HashSet<>();
@@ -56,14 +53,42 @@ public abstract class Element {
         // TODO onChange
     }
 
-    /**
-     * This should be called if an element is placed that is not enumerated by
-     * {@linkplain #enumerateStaticChildren(Consumer)}.
-     */
-    protected void initChild(Element e) {
-        getProperty(CSSDecorator.DECORATOR_PROPERTY).applyOnRegularElement(e, this);
-    }
     // MISC
+
+    abstract void initLogicalParent(Element logicalParent);
+
+    boolean initialized;
+
+    public void initParent(Element parent) {
+        initialized = false;
+
+        initLogicalParent(parent);
+
+        DecorationContext decorationContext = new DecorationContext();
+        CSSDecorator d = parent.getProperty(CSSDecorator.DECORATOR_PROPERTY);
+        if (d != null)
+            d.applySelf(this, decorationContext);
+        initFromProps();
+        if (d != null)
+            d.applyReplacements(this, decorationContext, parent);
+
+        initialized = true;
+
+        enumerateStaticChildren(e -> {
+            Objects.requireNonNull(e);
+            e.initParent(this);
+        });
+
+        Element e = this;
+        while (e instanceof TransientElement t)
+            e = t.logicalParent;
+        if (e != null)
+            ((RenderableElement) e).transientDescendantInterestedProperties.addAll(subscriptions());
+    }
+
+    protected Set<Property<?>> subscriptions() {
+        return Set.of();
+    }
 
     @Deprecated
     public Set<Attribute> attributes() {
@@ -77,7 +102,7 @@ public abstract class Element {
     }
 
     // PROPERTIES
-    public void initFromProps() { // értelmesebb név?
+    protected void initFromProps() { // értelmesebb név?
     }
 
     @SuppressWarnings("unchecked")
@@ -91,10 +116,11 @@ public abstract class Element {
 
         if (props.containsKey(prop))
             return (T) props.get(prop);
-        if (logicalParent == null)
-            return prop.defaultValue;
-        return logicalParent.getProperty(prop);
+
+        return getPropertyFromParent(prop);
     }
+
+    abstract <T> T getPropertyFromParent(Property<T> prop);
 
     public <T> void setProperty(Property<T> prop, T value) {
         props.put(prop, value);

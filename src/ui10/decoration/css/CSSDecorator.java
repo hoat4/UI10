@@ -1,9 +1,6 @@
 package ui10.decoration.css;
 
-import ui10.base.Element;
-import ui10.base.LayoutContext1;
-import ui10.base.LayoutContext2;
-import ui10.base.Pane;
+import ui10.base.*;
 import ui10.binding2.Property;
 import ui10.decoration.DecorationContext;
 import ui10.geom.Size;
@@ -13,7 +10,7 @@ import ui10.layout.BoxConstraints;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class CSSDecorator extends Element {
+public class CSSDecorator extends TransientElement {
 
     public static final Property<CSSDecorator> DECORATOR_PROPERTY = new Property<>();
 
@@ -27,7 +24,8 @@ public class CSSDecorator extends Element {
         this.css = css;
 
         setProperty(DECORATOR_PROPERTY, this);
-        applyOnRegularElement(content, this);
+        // ???
+        content.initParent(this);
     }
 
     @Override
@@ -45,53 +43,20 @@ public class CSSDecorator extends Element {
         context.placeElement(content, shape);
     }
 
-    public void applyOnRegularElement(Element element, Element parent) {
-        element.logicalParent = parent;
-
-        DecorationContext context = new DecorationContext();
-        applySelf(element, context);
-        element.initFromProps();
-
-        if (element instanceof Pane p) {
-            p.decorator = this::applyOnPaneContent;
-        } else {
-            element.enumerateStaticChildren(e -> {
-                Objects.requireNonNull(e);
-                applyOnRegularElement(e, element);
-            });
-            applyReplacements(element, element, context);
-        }
-    }
-
-    private void applyOnPaneContent(Pane pane, Element paneContent) {
-        paneContent.logicalParent = pane;
-
-        DecorationContext context = new DecorationContext();
-
-        applySelf(pane, context);
-        applySelf(paneContent, context);
-
-        paneContent.initFromProps();
-        paneContent.enumerateStaticChildren(e -> applyOnRegularElement(e, paneContent));
-
-        Element e = paneContent;
-
-        if (paneContent instanceof Pane p)
-            p.decorator = this::applyOnPaneContent;
-        else
-            e = ruleOf(paneContent).apply2(e, context);
-        e = ruleOf(pane).apply2(e, context);
-
-        if (e != paneContent)
-            paneContent.replacement(e);
-    }
-
-    private void applySelf(Element element, DecorationContext context) {
+    public void applySelf(Element element, DecorationContext context) {
         ruleOf(element).apply1(element, context);
     }
 
-    private void applyReplacements(Element selectorElement, Element element, DecorationContext context) {
-        Element e = ruleOf(selectorElement).apply2(element, context);
+    public void applyReplacements(Element element, DecorationContext context, Element logicalParent) {
+        Rule rule;
+        if (logicalParent instanceof Pane p)
+            rule = ruleOf(p);
+        else if (element instanceof Pane)
+            return;
+        else
+            rule = ruleOf(element);
+
+        Element e = rule.apply2(element, context);
 
         if (e != element)
             element.replacement(e);

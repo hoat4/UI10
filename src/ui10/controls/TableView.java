@@ -6,7 +6,6 @@ import ui10.base.LayoutContext2;
 import ui10.base.Pane;
 import ui10.binding2.Property;
 import ui10.decoration.IndexInSiblings;
-import ui10.decoration.css.CSSDecorator;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -21,7 +20,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static ui10.layout.Layouts.VerticalAlignment.TOP;
 import static ui10.layout.Layouts.vertically;
 
 public class TableView<T> extends Pane {
@@ -149,7 +147,8 @@ public class TableView<T> extends Pane {
                 TableRow row = new TableRow();
                 row.index = i - 1;
                 row.attributes().add(new IndexInSiblings(i++));
-                initChild(row);
+                // ???
+                row.initParent(this);
                 placer.accept(row, new Rectangle(0, y, size.width(), rowHeight));
             }
         }

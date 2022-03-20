@@ -1,21 +1,51 @@
 package ui10.base;
 
+import ui10.binding2.ChangeEvent;
+import ui10.binding2.Property;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 
-import java.util.List;
-import java.util.Objects;
+import javax.print.attribute.standard.JobKOctets;
+import java.util.*;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
-public abstract class RenderableElement extends Element {
+public non-sealed abstract class RenderableElement extends Element {
 
     public RendererData rendererData;
+
+    // ez most két helyről is be van állítva (initLogicalParent és Pane::onShapeApplied), utóbbit ki kéne szedni
     public RenderableElement parent;
     public UIContext uiContext;
 
     protected Shape shape;
     protected List<LayoutContext1.LayoutDependency<?, ?>> layoutDependencies;
+
+    Map<Property<?>, Object> transientAncestorsProperties = Map.of();
+    Set<Property<?>> transientDescendantInterestedProperties = new HashSet<>();
+
+    @Override
+    void initLogicalParent(Element logicalParent) {
+        Map<Property<?>, Object> map = new HashMap<>();
+        Element e = logicalParent;
+        while (e instanceof TransientElement t) {
+            map.putAll(t.props);
+            e = t.logicalParent;
+        }
+        transientAncestorsProperties = map;
+        parent = (RenderableElement) e;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    <T> T getPropertyFromParent(Property<T> prop) {
+        if (transientAncestorsProperties != null && transientAncestorsProperties.containsKey(prop))
+            return (T) transientAncestorsProperties.get(prop);
+
+        if (parent == null)
+            return prop.defaultValue;
+        return parent.getProperty(prop);
+    }
 
     @Override
     public void enumerateStaticChildren(Consumer<Element> consumer) {
@@ -31,6 +61,13 @@ public abstract class RenderableElement extends Element {
             rendererData.invalidateRendererData();
 
         onShapeApplied(shape);
+    }
+
+    void dispatchPropertyChange(ChangeEvent changeEvent) {
+        onPropertyChange(changeEvent);
+    }
+
+    protected void onPropertyChange(ChangeEvent changeEvent) {
     }
 
     protected void onShapeApplied(Shape shape) {
@@ -80,5 +117,12 @@ public abstract class RenderableElement extends Element {
 
     public static RenderableElement of(Element node) {
         return node instanceof RenderableElement r ? r : Pane.of(node);
+    }
+
+    @Override
+    public <T> void setProperty(Property<T> prop, T value) {
+        super.setProperty(prop, value);
+        if (initialized)
+            dispatchPropertyChange(new ChangeEvent(prop, value));
     }
 }

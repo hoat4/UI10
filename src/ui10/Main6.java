@@ -1,18 +1,18 @@
 package ui10;
 
 import ui10.base.Element;
+import ui10.base.Pane;
 import ui10.controls.Button;
 import ui10.controls.Label;
-import ui10.controls.TableView;
 import ui10.controls.TextField;
+import ui10.decoration.Fill;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
 import ui10.decoration.css.CSSScanner;
-import ui10.geom.Fraction;
 import ui10.geom.Insets;
 import ui10.graphics.ColorFill;
+import ui10.graphics.TextNode;
 import ui10.image.Colors;
-import ui10.layout.FlowLayout;
 import ui10.layout.Layouts;
 import ui10.shell.awt.AWTDesktop;
 import ui10.window.Window;
@@ -28,7 +28,7 @@ import static ui10.layout.Layouts.*;
 
 public class Main6 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         // System.out.println(Colors.WHITE.derive(-.09));
 
         AWTDesktop desktop = new AWTDesktop();
@@ -43,10 +43,10 @@ public class Main6 {
         List<String> list = List.of("Hello", "world!");
 
         Element content = withClass("root",
-                new TableView<>(List.of(
-                        new TableView.TableColumn<>("Col1", s -> s),
-                        new TableView.TableColumn<>("Col2", s -> String.valueOf(s.length()))
-                ), list)
+                //new TableView<>(List.of(
+                //        new TableView.TableColumn<>("Col1", s -> s),
+                //        new TableView.TableColumn<>("Col2", s -> String.valueOf(s.length()))
+                //), list) : null
 
                 //firstContent()
                 //centered(new FontTest())
@@ -58,10 +58,10 @@ public class Main6 {
                 //new FlowLayout(List.of(new Label("asdfasdfasdfasdfasdfasdfasdfasdfasdf "),
                 //                      new Label("fdsafdsafdsafdsafdsafdsafdsa"), new Label(" asdf")))
 
-                //centered(withClass("main", grid(2,
-                //        new Label("\u0628\u0623\u062a"), tf,
-                //        new Button("\uD83D\uDC4C"), button
-                //)))
+                centered(withClass("main", grid(2,
+                        new Label("\u0628\u0623\u062a"), tf,
+                        new Button("\uD83D\uDC4C"), button
+                )))
 
                 //centered(roundRectangle(10, stack(
                 //         Layouts.padding(new ColorFill(Colors.RED), new Insets(25)), new ColorFill(Colors.GREEN)
@@ -77,7 +77,8 @@ public class Main6 {
             return;
         }
 
-        content = new CSSDecorator(content, css);
+        Pane contentWrapper = Pane.of(content);
+        content = new CSSDecorator(contentWrapper, css);
 
         /*Window window = Window.of(centered(withSize(
                 new Opacity(new ColorFill(Colors.RED), Fraction.of(.1, 100)),
@@ -85,6 +86,9 @@ public class Main6 {
         )));*/
         Window window = Window.of(content);
         desktop.windows.add(window);
+
+        Thread.sleep(2000);
+        contentWrapper.setProperty(TextNode.TEXT_FILL_PROPERTY, new Fill.ColorFill(Colors.RED));
     }
 
 

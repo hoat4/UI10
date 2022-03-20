@@ -3,6 +3,7 @@ package ui10.layout;
 import ui10.base.Element;
 import ui10.base.LayoutContext1;
 import ui10.base.LayoutContext2;
+import ui10.base.TransientElement;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class FlowLayout extends Element implements Flowable {
+public class FlowLayout extends TransientElement implements Flowable {
 
     public final List<Element> items;
 

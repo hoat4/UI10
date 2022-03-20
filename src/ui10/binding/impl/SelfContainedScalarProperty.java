@@ -167,6 +167,6 @@ public class SelfContainedScalarProperty<T> implements ScalarProperty<T>, Consum
 
     @Override
     public String toString() {
-        return name + "=" + get();
+        return name + "=" + transformedValue;
     }
 }

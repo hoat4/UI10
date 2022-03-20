@@ -1,5 +1,6 @@
 package ui10.base;
 
+import ui10.binding2.ChangeEvent;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -14,10 +15,28 @@ public abstract class Pane extends RenderableElement {
     private final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
 
-    public BiConsumer<Pane, Element> decorator;
     public FocusContext focusContext;
 
     protected void validate() {
+    }
+
+    @Override
+    void dispatchPropertyChange(ChangeEvent changeEvent) {
+        onPropertyChange(changeEvent);
+
+        List<RenderableElement> prevChildren = List.copyOf(children);
+
+        if (shape != null && transientDescendantInterestedProperties.contains(changeEvent.property()))
+            onShapeApplied(shape);
+
+        for (RenderableElement e : children)
+            if (prevChildren.contains(e) && !e.props.containsKey(changeEvent.property())
+                    && !e.transientAncestorsProperties.containsKey(changeEvent))
+                // subscriptionst is figyelembe kéne venni
+                e.dispatchPropertyChange(changeEvent);
+    }
+
+    protected void onPropertyChange(ChangeEvent changeEvent) {
     }
 
     protected abstract Element content();
@@ -29,8 +48,7 @@ public abstract class Pane extends RenderableElement {
         }
 
         Element content = Objects.requireNonNull(content(), () -> "null content in " + this);
-        if (decorator != null)
-            decorator.accept(this, content);
+        content.initParent(this);
         return content;
     }
 

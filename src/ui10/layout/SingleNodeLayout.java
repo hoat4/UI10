@@ -1,12 +1,13 @@
 package ui10.layout;
 
+import ui10.base.TransientElement;
 import ui10.geom.shape.Shape;
 import ui10.base.Element;
 import ui10.base.LayoutContext2;
 
 import java.util.function.Consumer;
 
-public abstract class SingleNodeLayout extends Element {
+public abstract class SingleNodeLayout extends TransientElement {
 
     protected final Element content;
 
