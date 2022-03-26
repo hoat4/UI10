@@ -13,7 +13,7 @@ import ui10.layout.BoxConstraints;
 import java.util.*;
 import java.util.function.Consumer;
 
-public sealed abstract class Element permits TransientElement, RenderableElement {
+public sealed abstract class Element permits TransientElement, EnduringElement {
 
     protected Element replacement;
 
@@ -70,7 +70,7 @@ public sealed abstract class Element permits TransientElement, RenderableElement
         initLogicalParent(parent);
 
         DecorationContext decorationContext = new DecorationContext();
-        CSSDecorator d = parent.getProperty(CSSDecorator.DECORATOR_PROPERTY);
+        CSSDecorator d = decorator();
         if (d != null)
             d.applySelf(this, decorationContext);
         initFromProps();
@@ -88,7 +88,11 @@ public sealed abstract class Element permits TransientElement, RenderableElement
         while (e instanceof TransientElement t)
             e = t.logicalParent;
         if (e != null)
-            ((RenderableElement) e).transientDescendantInterestedProperties.addAll(subscriptions());
+            ((EnduringElement) e).transientDescendantInterestedProperties.addAll(subscriptions());
+    }
+
+    protected CSSDecorator decorator() {
+        return getProperty(CSSDecorator.DECORATOR_PROPERTY);
     }
 
     protected Set<Property<?>> subscriptions() {

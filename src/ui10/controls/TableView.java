@@ -24,7 +24,7 @@ import static ui10.layout.Layouts.vertically;
 
 public class TableView<T> extends Pane {
 
-    public static final Property<Integer> ROW_HEIGHT_PROPERTY = new Property<>();
+    public static final Property<Integer> ROW_HEIGHT_PROPERTY = new Property<>(true);
 
     // ha nem lehet szerkeszteni, lehetne TableColumn<? super T> is
     private final List<? extends TableColumn<T>> columns;

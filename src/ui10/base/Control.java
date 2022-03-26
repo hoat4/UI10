@@ -1,6 +1,7 @@
 package ui10.base;
 
 import ui10.binding.ScalarProperty;
+import ui10.binding2.Property;
 import ui10.geom.Point;
 import ui10.input.InputEvent;
 import ui10.input.keyboard.KeyTypeEvent;
@@ -19,6 +20,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public abstract class Control extends Pane {
 
+    public static final Property<Boolean> FOCUSED_PROPERTY = new Property<>(true);
+
     public final ScalarProperty<Cursor> cursor = ScalarProperty.create("Control.cursor");
 
     public final void dispatchInputEvent(InputEvent event, EventContext context, boolean capture) {
@@ -36,7 +39,7 @@ public abstract class Control extends Pane {
                             m.invoke(this, event, context);
                         } catch (ReflectiveOperationException e) {
                             throw new RuntimeException("can't invoke event handler " +
-                                    m.getDeclaringClass().getSimpleName() + "." + m.getName() + ": " + e);
+                                    m.getDeclaringClass().getSimpleName() + "." + m.getName() + ": " + e, e);
                         }
                     }
                 }
@@ -56,7 +59,7 @@ public abstract class Control extends Pane {
                                 m.invoke(this);
                             } catch (ReflectiveOperationException e) {
                                 throw new RuntimeException("can't invoke event handler " +
-                                        m.getDeclaringClass().getSimpleName() + "." + m.getName() + ": " + e);
+                                        m.getDeclaringClass().getSimpleName() + "." + m.getName() + ": " + e, e);
                             }
                         }
                     }
@@ -74,6 +77,29 @@ public abstract class Control extends Pane {
 
     protected Point relativePos(RenderableElement e) {
         return e.origin().subtract(origin());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getProperty(Property<T> prop) {
+        if (prop.equals(FOCUSED_PROPERTY))
+            return (T) (Boolean) (focusContext != null && focusContext.focusedControl.get() == this);
+        else
+            return super.getProperty(prop);
+    }
+
+    @Override
+    public <T> void setProperty(Property<T> prop, T value) {
+        if (prop.equals(FOCUSED_PROPERTY)) {
+            if (focusContext == null) // ilyenkor mit kéne csinálni?
+                throw new IllegalStateException("no focus context");
+
+            if ((boolean) value)
+                focusContext.focusedControl.set(this);
+            else if (focusContext.focusedControl.get() == this)
+                focusContext.focusedControl.set(null);
+        } else
+            super.setProperty(prop, value);
     }
 
     @Target(METHOD)

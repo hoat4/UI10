@@ -5,18 +5,13 @@ public class Property<T> {
     public final T defaultValue;
     public final boolean inheritable;
 
-    public Property() {
-        this.defaultValue = null;
-        this.inheritable = true;
+    public Property(boolean inheritable) {
+        this(inheritable, null);
     }
 
-    public Property(T defaultValue) {
-        this.defaultValue = defaultValue;
-        this.inheritable = true;
-    }
-
-    public Property(T defaultValue, boolean inheritable) {
+    public Property(boolean inheritable, T defaultValue) {
         this.defaultValue = defaultValue;
         this.inheritable = inheritable;
     }
+
 }

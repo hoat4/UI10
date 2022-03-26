@@ -39,11 +39,6 @@ public abstract class Pane extends RenderableElement {
                 e.dispatchPropertyChangeImpl(changeEvent);
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> void elHelper(ExternalListener<?> l, ElementEvent evt){
-        if (l.prop().equals(evt.property()))
-            l.consumer().accept(evt);
-    }
 
     protected void onPropertyChange(ElementEvent changeEvent) {
     }
@@ -76,14 +71,12 @@ public abstract class Pane extends RenderableElement {
     }
 
     @Override
-    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         return context.preferredSize(getContent(), constraints);
     }
 
     @Override
     protected void onShapeApplied(Shape shape) {
-        for (RenderableElement child : children)
-            child.parent = null;
         children.clear();
 
         // inter-container layout dependencies are not supported currently
@@ -91,9 +84,12 @@ public abstract class Pane extends RenderableElement {
 
             @Override
             public void accept(RenderableElement e) {
+                if (e.parentRenderable() == null)
+                    // this should not occur, but currently does because decoration
+                    e.parent = Pane.this;
+                else if (e.parentRenderable() != Pane.this)
+                    throw new IllegalStateException("not a child of " + Pane.this + ": " + e);
                 children.add(e);
-                e.parent = Pane.this;
-                e.uiContext = uiContext;
                 if (e instanceof Pane p)
                     p.focusContext = focusContext;
             }

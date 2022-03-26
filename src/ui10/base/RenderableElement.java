@@ -3,6 +3,7 @@ package ui10.base;
 import ui10.binding2.ChangeEvent;
 import ui10.binding2.ElementEvent;
 import ui10.binding2.Property;
+import ui10.decoration.css.CSSDecorator;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 
@@ -10,42 +11,12 @@ import java.util.*;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
-public non-sealed abstract class RenderableElement extends Element {
+public non-sealed abstract class RenderableElement extends EnduringElement {
 
     public RendererData rendererData;
 
-    // ez most két helyről is be van állítva (initLogicalParent és Pane::onShapeApplied), utóbbit ki kéne szedni
-    public RenderableElement parent;
-    public UIContext uiContext;
-
     protected Shape shape;
     protected List<LayoutContext1.LayoutDependency<?, ?>> layoutDependencies;
-
-    Map<Property<?>, Object> transientAncestorsProperties = Map.of();
-    Set<Property<?>> transientDescendantInterestedProperties = new HashSet<>();
-
-    @Override
-    void initLogicalParent(Element logicalParent) {
-        Map<Property<?>, Object> map = new HashMap<>();
-        Element e = logicalParent;
-        while (e instanceof TransientElement t) {
-            map.putAll(t.props);
-            e = t.logicalParent;
-        }
-        transientAncestorsProperties = map;
-        parent = (RenderableElement) e;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    <T> T getPropertyFromParent(Property<T> prop) {
-        if (transientAncestorsProperties != null && transientAncestorsProperties.containsKey(prop))
-            return (T) transientAncestorsProperties.get(prop);
-
-        if (parent == null)
-            return prop.defaultValue;
-        return parent.getProperty(prop);
-    }
 
     @Override
     protected void enumerateStaticChildren(Consumer<Element> consumer) {
@@ -64,8 +35,13 @@ public non-sealed abstract class RenderableElement extends Element {
     }
 
     public void dispatchElementEvent(ElementEvent event) {
-        if (initialized || !(event instanceof ChangeEvent<?>))
+        if (initialized || !(event instanceof ChangeEvent<?>)) {
             dispatchPropertyChangeImpl(event);
+
+            CSSDecorator d = decorator();
+            if (d != null)
+                d.elementEvent(this, event);
+        }
     }
 
     void dispatchPropertyChangeImpl(ElementEvent changeEvent) {
@@ -91,9 +67,15 @@ public non-sealed abstract class RenderableElement extends Element {
     public void invalidate() {
         if (rendererData != null)
             rendererData.invalidateRendererData();
-        if (uiContext == null)
+        if (uiContext() == null)
             return;
-        uiContext.requestLayout(new UIContext.LayoutTask(this, this::revalidate));
+        // lehet hogy kéne még valami feltételt szabni (pl. van-e már shape)
+        uiContext().requestLayout(new UIContext.LayoutTask(this, this::revalidate));
+    }
+
+    @Override
+    public void invalidateDecoration() {
+        invalidate();
     }
 
     private void revalidate() {
@@ -107,7 +89,7 @@ public non-sealed abstract class RenderableElement extends Element {
         for (LayoutContext1.LayoutDependency<?, ?> dep : layoutDependencies) {
             if (ctx.isInvalidated(this, dep)) {
                 Objects.requireNonNull(parent, this::toString);
-                parent.invalidate();
+                parentRenderable().invalidate(); // itt parent vagy parentRenderable kell?
                 return;
             }
         }
@@ -122,11 +104,5 @@ public non-sealed abstract class RenderableElement extends Element {
 
     public static RenderableElement of(Element node) {
         return node instanceof RenderableElement r ? r : Pane.of(node);
-    }
-
-    @Override
-    public <T> void setProperty(Property<T> prop, T value) {
-        super.setProperty(prop, value);
-        dispatchElementEvent(new ChangeEvent(prop, value));
     }
 }

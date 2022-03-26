@@ -7,11 +7,9 @@ import ui10.decoration.css.CSSClass;
 import ui10.graphics.TextNode;
 import ui10.layout.Layouts;
 
-import java.util.Objects;
-
 public class Label extends Control  {
 
-    public static final Property<TextAlign> TEXT_ALIGN_PROPERTY = new Property<>();
+    public static final Property<TextAlign> TEXT_ALIGN_PROPERTY = new Property<>(true);
 
     private TextNode textNode = new TextNode();
 

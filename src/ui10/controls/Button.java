@@ -1,15 +1,11 @@
 package ui10.controls;
 
-import ui10.base.Control;
-import ui10.base.Element;
-import ui10.base.EventContext;
-import ui10.base.Pane;
+import ui10.base.*;
 import ui10.binding.Observable;
 import ui10.binding2.ActionEvent;
 import ui10.binding2.ChangeEvent;
 import ui10.binding2.ElementEvent;
 import ui10.binding2.Property;
-import ui10.decoration.css.CSSPseudoClass;
 import ui10.graphics.TextNode;
 import ui10.input.pointer.MouseEvent;
 import ui10.layout.Layouts;
@@ -20,9 +16,9 @@ import static ui10.decoration.css.CSSClass.withClass;
 
 public class Button extends ControlModel {
 
-    public static final Property<String> TEXT_PROPERTY = new Property<>();
-    public static final Property<Boolean> PRESSED_PROPERTY = new Property<>();
-    public static final Property<Boolean> ACTION_EVENT = new Property<>();
+    public static final Property<String> TEXT_PROPERTY = new Property<>(false, "");
+    public static final Property<Boolean> PRESSED_PROPERTY = new Property<>(false, false);
+    public static final Property<Boolean> ACTION_EVENT = new Property<>(true);
 
     public Button() {
         this("");
@@ -67,6 +63,11 @@ public class Button extends ControlModel {
         }
 
         @Override
+        public String elementName() {
+            return "ButtonView";
+        }
+
+        @Override
         protected Element content() {
             return Layouts.centered(textNode); // ezt CSS-ből kéne
         }
@@ -84,16 +85,11 @@ public class Button extends ControlModel {
 
         @Override
         protected void handleModelEvent(ElementEvent evt) {
-            if (evt.property().equals(Button.PRESSED_PROPERTY)) {
-                model.invalidate(); // ???
+            if (evt instanceof ChangeEvent ce && ce.property().equals(Button.PRESSED_PROPERTY)) {
+                System.out.println(model.pressed());
 
-                if (model.pressed())
-                    // this is wrong to have CSS attributes on "model", but I don't know yet what to do with it
-                    model.attributes().add(new CSSPseudoClass("active"));
-                else {
-                    model.attributes().remove(new CSSPseudoClass("active"));
+                if (!model.pressed())
                     model.dispatchElementEvent(new ActionEvent(Button.ACTION_EVENT));
-                }
             }
         }
 

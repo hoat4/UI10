@@ -6,9 +6,12 @@ import ui10.base.*;
 
 import java.awt.*;
 
+import ui10.geom.Size;
+import ui10.geom.shape.Shape;
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.pointer.MouseEvent;
 import ui10.base.LayoutContext2;
+import ui10.layout.BoxConstraints;
 import ui10.shell.renderer.java2d.J2DRenderer;
 import ui10.shell.renderer.java2d.J2DUtil;
 import ui10.window.Cursor;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class AWTWindowImpl extends Frame implements RendererData {
 
@@ -43,7 +47,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
         //renderer = new AwtSwRenderer();
         renderer = new J2DRenderer();
         renderer.awtWindow = this;
-        window.uiContext = renderer.uiContext;
+        window.setProperty(EnduringElement.UI_CONTEXT_PROPERTY, renderer.uiContext);
         renderer.initRoot(window);
         window.focusContext = new FocusContext();
     }
@@ -158,7 +162,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
         renderer.uiContext.eventLoop().runLater(() -> {
             Control focusedControl = window.focusContext.focusedControl.get();
             List<Control> hierarchy = new ArrayList<>();
-            for (RenderableElement re = focusedControl; re != null; re = re.parent) {
+            for (RenderableElement re = focusedControl; re != null; re = re.parentRenderable()) {
                 if (re instanceof Control c)
                     hierarchy.add(0, c);
             }

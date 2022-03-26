@@ -4,8 +4,6 @@ import ui10.base.Element;
 import ui10.base.LayoutContext1;
 import ui10.base.LayoutContext2;
 import ui10.base.RenderableElement;
-import ui10.binding2.ChangeEvent;
-import ui10.binding2.ElementEvent;
 import ui10.binding2.Property;
 import ui10.decoration.DecorationContext;
 import ui10.decoration.Fill;
@@ -21,12 +19,11 @@ import java.util.function.Consumer;
 
 public class TextNode extends RenderableElement {
 
-    public static final Property<Integer> FONT_SIZE_PROPERTY = new Property<>();
-    public static final Property<Fill> TEXT_FILL_PROPERTY = new Property<>();
-    public static final Property<FontWeight> FONT_WEIGHT_PROPERTY = new Property<>();
+    public static final Property<Integer> FONT_SIZE_PROPERTY = new Property<>(true);
+    public static final Property<Fill> TEXT_FILL_PROPERTY = new Property<>(true);
+    public static final Property<FontWeight> FONT_WEIGHT_PROPERTY = new Property<>(true);
+    public static final Property<String> TEXT_PROPERTY = new Property<>(true, "");
 
-
-    private String text = "";
     public TextLayout textLayout;
 
     private Fill fill;
@@ -36,13 +33,7 @@ public class TextNode extends RenderableElement {
     }
 
     public TextNode(String text) {
-        this.text = text;
-    }
-
-    @Override
-    protected void onPropertyChange(ElementEvent changeEvent) {
-        System.out.println(changeEvent);
-        invalidate();
+        text(text);
     }
 
     @Override
@@ -51,16 +42,13 @@ public class TextNode extends RenderableElement {
     }
 
     public String text() {
-        return text;
+        return getProperty(TEXT_PROPERTY);
     }
 
     public TextNode text(String text) {
         if (text == null)
             text = "";
-        if (!Objects.equals(text, this.text)) {
-            this.text = text;
-            invalidate();
-        }
+        setProperty(TEXT_PROPERTY, text);
         return this;
     }
 
@@ -90,7 +78,7 @@ public class TextNode extends RenderableElement {
     @Override
     protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         // TODO mit csináljunk, ha nem stimmel?
-        return constraints.clamp(textStyle().textSize(text).size());
+        return constraints.clamp(textStyle().textSize(text()).size());
     }
 
     @Override

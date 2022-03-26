@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 
 public class Grid extends RectangularLayout {
 
-    public static final Property<Integer> GAP_PROPERTY = new Property<>();
+    public static final Property<Integer> GAP_PROPERTY = new Property<>(true);
 
     public final List<? extends List<? extends Element>> rows;
 

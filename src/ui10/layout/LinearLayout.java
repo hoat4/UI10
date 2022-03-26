@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 // ez most csak a GROW_FACTOR miatt publikus
 public class LinearLayout extends RectangularLayout {
 
-    public static final Property<Fraction> GROW_FACTOR = new Property<>(Fraction.WHOLE, false);
+    public static final Property<Fraction> GROW_FACTOR = new Property<>(false, Fraction.WHOLE);
 
     private final Axis primaryAxis;
     private final List<? extends Element> children;

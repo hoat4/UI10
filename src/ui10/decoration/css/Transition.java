@@ -1,5 +1,7 @@
 package ui10.decoration.css;
 
+import ui10.base.Element;
+import ui10.base.EnduringElement;
 import ui10.geom.Fraction;
 import ui10.base.Attribute;
 import ui10.base.Pane;
@@ -9,7 +11,7 @@ import java.util.concurrent.ScheduledFuture;
 
 public class Transition<T> extends Attribute {
 
-    public final Pane pane;
+    public final EnduringElement element;
     public final TransitionSpec<T> spec;
     private T begin;
     private Fraction progress;
@@ -17,15 +19,14 @@ public class Transition<T> extends Attribute {
 
     public ScheduledFuture<?> activeAnimation;
 
-    public Transition(Pane pane, TransitionSpec<T> spec, T begin) {
-        this.pane = pane;
+    public Transition(EnduringElement element, TransitionSpec<T> spec, T begin) {
+        this.element = element;
         this.spec = spec;
         this.begin = begin;
     }
 
     public void progress(Fraction fraction) {
         this.progress = fraction;
-        pane.invalidate();
     }
 
     public Fraction progress() {
@@ -57,7 +58,7 @@ public class Transition<T> extends Attribute {
     @Override
     public String toString() {
         return "Transition{" +
-                "pane=" + pane +
+                "pane=" + element +
                 ", spec=" + spec +
                 ", begin=" + begin +
                 ", progress=" + progress +

@@ -64,7 +64,7 @@ public class UIContextImpl implements UIContext {
             if (e2 == e1)
                 return true;
             else
-                e2 = e2.parent;
+                e2 = e2.parentRenderable();
         return false;
     }
 }

@@ -1,5 +1,8 @@
 package ui10.decoration.css;
 
+import ui10.base.*;
+import ui10.binding2.ElementEvent;
+import ui10.binding2.Property;
 import ui10.controls.Label;
 import ui10.controls.TableView;
 import ui10.font.TextStyle;
@@ -9,10 +12,6 @@ import ui10.graphics.FontWeight;
 import ui10.layout.Grid;
 import ui10.layout.LinearLayout;
 import ui10.shell.renderer.java2d.AWTTextStyle;
-import ui10.base.Attribute;
-import ui10.base.Element;
-import ui10.base.Pane;
-import ui10.base.RenderableElement;
 import ui10.decoration.Border;
 import ui10.decoration.DecorationContext;
 import ui10.graphics.TextNode;
@@ -99,13 +98,13 @@ public class Rule {
 
     @SuppressWarnings("Convert2MethodRef")
     public void apply1(Element e, DecorationContext context) {
-        apply1(CSSProperty.fontSize, len-> e.setProperty(TextNode.FONT_SIZE_PROPERTY, context.length(len)));
-        apply1(CSSProperty.textColor, color-> e.setProperty(TextNode.TEXT_FILL_PROPERTY, color));
-        apply1(CSSProperty.fontWeight, weight-> e.setProperty(TextNode.FONT_WEIGHT_PROPERTY, weight));
-        apply1(CSSProperty.textAlign, textAlign-> e.setProperty(Label.TEXT_ALIGN_PROPERTY, textAlign));
+        apply1(CSSProperty.fontSize, len -> e.setProperty(TextNode.FONT_SIZE_PROPERTY, context.length(len)));
+        apply1(CSSProperty.textColor, color -> e.setProperty(TextNode.TEXT_FILL_PROPERTY, color));
+        apply1(CSSProperty.fontWeight, weight -> e.setProperty(TextNode.FONT_WEIGHT_PROPERTY, weight));
+        apply1(CSSProperty.textAlign, textAlign -> e.setProperty(Label.TEXT_ALIGN_PROPERTY, textAlign));
         apply1(CSSProperty.gap, gap -> e.setProperty(Grid.GAP_PROPERTY, context.length(gap)));
-        apply1(CSSProperty.rowHeight, h-> e.setProperty(TableView.ROW_HEIGHT_PROPERTY, context.length(h)));
-        apply1(CSSProperty.flexGrow, h-> e.setProperty(LinearLayout.GROW_FACTOR, h));
+        apply1(CSSProperty.rowHeight, h -> e.setProperty(TableView.ROW_HEIGHT_PROPERTY, context.length(h)));
+        apply1(CSSProperty.flexGrow, h -> e.setProperty(LinearLayout.GROW_FACTOR, h));
     }
 
     private <T> Element prop2(CSSProperty<T> prop, Element e, BiFunction<Element, T, Element> f) {
@@ -159,7 +158,7 @@ public class Rule {
         if (l == null) // ilyenkor törölni kéne
             return;
 
-        if (!(e instanceof RenderableElement))
+        if (!(e instanceof EnduringElement))
             throw new IllegalArgumentException("transition on transient element: " + e);
 
         for (TransitionSpec<?> t : l)
@@ -178,7 +177,7 @@ public class Rule {
         T currentValue = (T) map.get(transitionSpec.property());
 
         if (transition == null) {
-            transition = new Transition<>((Pane) e, transitionSpec, currentValue);
+            transition = new Transition<>((EnduringElement) e, transitionSpec, currentValue);
             e.attributes().add(transition);
         }
 
@@ -190,10 +189,11 @@ public class Rule {
             if (t.activeAnimation != null)
                 t.activeAnimation.cancel(false);
 
-            RenderableElement r = (RenderableElement) e;
-            transition.activeAnimation = r.uiContext.eventLoop().beginAnimation(transition.spec.duration(), f -> {
+            EnduringElement r = (EnduringElement) e;
+            transition.activeAnimation = r.uiContext().eventLoop().beginAnimation(transition.spec.duration(), f -> {
+                System.out.println(f);
                 t.progress(f);
-                r.invalidate();
+                r.invalidateDecoration();
             });
         }
     }

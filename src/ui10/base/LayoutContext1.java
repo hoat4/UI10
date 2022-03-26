@@ -24,6 +24,8 @@ public class LayoutContext1 {
             O output = protocol.preferredSize(e, constraints, this);
 
             Objects.requireNonNull(output, e::toString);
+
+            // itt lehet hogy inkább EnduringElement kéne
             if (e instanceof RenderableElement)
                 addLayoutDependency((RenderableElement) e, new LayoutDependency<>(constraints, output, protocol));
             return output;

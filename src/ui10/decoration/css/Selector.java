@@ -2,6 +2,7 @@ package ui10.decoration.css;
 
 import ui10.base.Control;
 import ui10.base.Element;
+import ui10.controls.Button;
 import ui10.decoration.IndexInSiblings;
 
 import java.util.List;
@@ -30,12 +31,10 @@ public interface Selector {
             if (e.attributes().contains(new CSSPseudoClass(pseudoClassName)))
                 return true;
 
-            return switch (pseudoClassName) {
-                case "root" -> e == cssDecorator.content;
-                case "focus" -> e instanceof Control c && c.focusContext != null
-                        && c.focusContext.focusedControl.get() == c;
-                default -> false;
-            };
+            for (PseudoClassProvider p : cssDecorator.pseudoClassProviders)
+                if (p.name().equals(pseudoClassName))
+                    return p.predicate().test(e);
+            return false;
         }
     }
 
