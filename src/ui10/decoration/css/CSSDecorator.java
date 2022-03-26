@@ -72,19 +72,21 @@ public class CSSDecorator extends TransientElement {
     }
 
     public void applyReplacements(Element element, DecorationContext context, Element logicalParent) {
-        Rule rule;
+        List<Rule> rules;
         if (logicalParent instanceof ControlView<?> v)
-            rule = ruleOf(v.model);
+            rules = List.of(ruleOf(v.model), ruleOf(v));
         else if (logicalParent instanceof Pane p)
-            rule = ruleOf(p);
+            rules = List.of(ruleOf(p));
         else if (logicalParent instanceof ControlView<?> v)
             return;
         else if (element instanceof Pane || element instanceof ControlModel)
             return;
         else
-            rule = ruleOf(element);
+            rules = List.of(ruleOf(element));
 
-        Element e = rule.apply2(element, context);
+        Element e = element;
+        for (Rule rule : rules)
+            e = rule.apply2(e, context);
 
         if (e != element)
             element.replacement(e);

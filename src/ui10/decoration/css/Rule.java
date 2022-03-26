@@ -5,6 +5,7 @@ import ui10.binding2.ElementEvent;
 import ui10.binding2.Property;
 import ui10.controls.Label;
 import ui10.controls.TableView;
+import ui10.decoration.BorderSpec;
 import ui10.font.TextStyle;
 import ui10.geom.Insets;
 import ui10.geom.Size;
@@ -55,7 +56,18 @@ public class Rule {
             case "border-radius" -> put(CSSProperty.cornerRadius, parser.parseLength());
             case "min-width" -> put(CSSProperty.minWidth, parser.parseLength());
             case "min-height" -> put(CSSProperty.minHeight, parser.parseLength());
-            case "border" -> put(CSSProperty.border, parser.parseBorder());
+            case "border" -> {
+                BorderSpec b = parser.parseBorder();
+                // így megfelel az öröklődés CSS specnek?
+                put(CSSProperty.borderTop, b);
+                put(CSSProperty.borderRight, b);
+                put(CSSProperty.borderBottom, b);
+                put(CSSProperty.borderLeft, b);
+            }
+            case "border-top" -> put(CSSProperty.borderTop, parser.parseBorder());
+            case "border-right" -> put(CSSProperty.borderRight, parser.parseBorder());
+            case "border-bottom" -> put(CSSProperty.borderBottom, parser.parseBorder());
+            case "border-left" -> put(CSSProperty.borderLeft, parser.parseBorder());
             case "font-size" -> put(CSSProperty.fontSize, parser.parseLength());
             case "transition" -> put(CSSProperty.transition, parser.parseTransitionList());
             case "gap" -> put(CSSProperty.gap, parser.parseLength());
@@ -64,6 +76,7 @@ public class Rule {
             case "flex-grow" -> put(CSSProperty.flexGrow, parser.parseNumberAsFraction());
 
             case "row-height" -> put(CSSProperty.rowHeight, parser.parseLength());
+            case "cell-separator" -> put(CSSProperty.cellSeparator, parser.parseFill());
 
             default -> throw new UnsupportedOperationException("unknown CSS property: " + name);
         }
@@ -103,8 +116,10 @@ public class Rule {
         apply1(CSSProperty.fontWeight, weight -> e.setProperty(TextNode.FONT_WEIGHT_PROPERTY, weight));
         apply1(CSSProperty.textAlign, textAlign -> e.setProperty(Label.TEXT_ALIGN_PROPERTY, textAlign));
         apply1(CSSProperty.gap, gap -> e.setProperty(Grid.GAP_PROPERTY, context.length(gap)));
-        apply1(CSSProperty.rowHeight, h -> e.setProperty(TableView.ROW_HEIGHT_PROPERTY, context.length(h)));
         apply1(CSSProperty.flexGrow, h -> e.setProperty(LinearLayout.GROW_FACTOR, h));
+
+        apply1(CSSProperty.rowHeight, h -> e.setProperty(TableView.ROW_HEIGHT_PROPERTY, context.length(h)));
+        apply1(CSSProperty.cellSeparator, f -> e.setProperty(TableView.CELL_SEPARATOR_PROPERTY, f));
     }
 
     private <T> Element prop2(CSSProperty<T> prop, Element e, BiFunction<Element, T, Element> f) {
@@ -128,8 +143,16 @@ public class Rule {
                 CSSProperty.paddingBottom, CSSProperty.paddingLeft), elem, (e, padding) -> makePadding(e, padding, context));
 
         elem = prop2(CSSProperty.background, elem, (e, background) -> stack(background.makeElement(context), e));
-        elem = prop2(CSSProperty.border, elem, (e, border) ->
-                new Border(new Insets(context.length(border.len())), border.fill().makeElement(context), e));
+
+        elem = prop2(CSSProperty.borderTop, elem, (e, border) ->
+                new Border(Insets.atTop(context.length(border.len())), border.fill().makeElement(context), e));
+        elem = prop2(CSSProperty.borderRight, elem, (e, border) ->
+                new Border(Insets.atRight(context.length(border.len())), border.fill().makeElement(context), e));
+        elem = prop2(CSSProperty.borderBottom, elem, (e, border) ->
+                new Border(Insets.atBottom(context.length(border.len())), border.fill().makeElement(context), e));
+        elem = prop2(CSSProperty.borderLeft, elem, (e, border) ->
+                new Border(Insets.atLeft(context.length(border.len())), border.fill().makeElement(context), e));
+
         elem = prop2(CSSProperty.cornerRadius, elem, (e, cornerRadius) ->
                 roundRectangle(context.length(cornerRadius), e));
 

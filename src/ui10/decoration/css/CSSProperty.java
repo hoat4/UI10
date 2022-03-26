@@ -34,7 +34,12 @@ public class CSSProperty<T> {
     static final CSSProperty<Length> cornerRadius = new CSSProperty<>("border-radius", Interpolators.LENGTH);
     static final CSSProperty<Length> minWidth = new CSSProperty<>("min-width", Interpolators.LENGTH);
     static final CSSProperty<Length> minHeight = new CSSProperty<>("min-height", Interpolators.LENGTH);
-    static final CSSProperty<BorderSpec> border = new CSSProperty<>("border", null);
+
+    // kéne vmi "composite property"
+    static final CSSProperty<BorderSpec> borderTop = new CSSProperty<>("border", null);
+    static final CSSProperty<BorderSpec> borderRight = new CSSProperty<>("border", null);
+    static final CSSProperty<BorderSpec> borderBottom = new CSSProperty<>("border", null);
+    static final CSSProperty<BorderSpec> borderLeft = new CSSProperty<>("border", null);
 
     public static final CSSProperty<Length> gap = new CSSProperty<>("gap", Interpolators.LENGTH);
     static final CSSProperty<Fraction> flexGrow = new CSSProperty<>("flex-grow", Interpolators.FRACTION);
@@ -46,6 +51,7 @@ public class CSSProperty<T> {
 
     // NON-STANDARD
     static final CSSProperty<Length> rowHeight = new CSSProperty<>("row-height", Interpolators.LENGTH);
+    static final CSSProperty<Fill> cellSeparator = new CSSProperty<>("cell-separator", Interpolators.FILL);
 
     private final String name;
 

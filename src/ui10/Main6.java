@@ -4,6 +4,7 @@ import ui10.base.Element;
 import ui10.base.Pane;
 import ui10.controls.Button;
 import ui10.controls.Label;
+import ui10.controls.Table;
 import ui10.controls.TextField;
 import ui10.decoration.Fill;
 import ui10.decoration.css.CSSDecorator;
@@ -43,10 +44,10 @@ public class Main6 {
         List<String> list = List.of("Hello", "world!");
 
         Element content = withClass("root",
-                //new TableView<>(List.of(
-                //        new TableView.TableColumn<>("Col1", s -> s),
-                //        new TableView.TableColumn<>("Col2", s -> String.valueOf(s.length()))
-                //), list) : null
+                padding(new Table<>(List.of(
+                        new Table.TableColumn<>("Col1", s -> s),
+                        new Table.TableColumn<>("Col2", s -> String.valueOf(s.length()))
+                ), list), new Insets(50))
 
                 //firstContent()
                 //centered(new FontTest())
@@ -58,10 +59,10 @@ public class Main6 {
                 //new FlowLayout(List.of(new Label("asdfasdfasdfasdfasdfasdfasdfasdfasdf "),
                 //                      new Label("fdsafdsafdsafdsafdsafdsafdsa"), new Label(" asdf")))
 
-                centered(withClass("main", grid(2,
-                        new Label("\u0628\u0623\u062a"), tf,
-                        new Button("\uD83D\uDC4C"), button
-                )))
+                //centered(withClass("main", grid(2,
+                //        new Label("\u0628\u0623\u062a"), tf,
+                //        new Button("\uD83D\uDC4C"), button
+                //)))
 
                 //centered(roundRectangle(10, stack(
                 //         Layouts.padding(new ColorFill(Colors.RED), new Insets(25)), new ColorFill(Colors.GREEN)

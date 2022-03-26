@@ -38,4 +38,20 @@ public record Insets(int top, int right, int bottom, int left) {
             return new RoundedRectangle(r.rectangle().withInnerInsets(this), r.radius()); // radiust csökkenteni kéne
         return shape.intoBounds(shape.bounds().withInnerInsets(this)); // ez nem jó, torzít
     }
+
+    public static Insets atTop(int top) {
+        return new Insets(top, 0, 0, 0);
+    }
+
+    public static Insets atBottom(int bottom) {
+        return new Insets(0, 0, bottom, 0);
+    }
+
+    public static Insets atRight(int right) {
+        return new Insets(0, right, 0, 0);
+    }
+
+    public static Insets atLeft(int left) {
+        return new Insets(0, 0, 0, left);
+    }
 }

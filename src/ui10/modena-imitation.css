@@ -28,9 +28,22 @@ Button {
 
 Label { text-align: left; font-size: 16px; }
 
-Table { border: 1px solid #C8C8C8; row-height: 32px; }
-TableHeader { background: linear-gradient(to bottom, #EFEFEF, #D9D9D9); flex-grow: 0;}
-TableColumnHeader { font-weight: bold; padding: 5px 6px; font-size: 12px; text-align: center; }
-TableBody { background: #faa;}
+Table { border: 1px solid #C8C8C8; }
+TableView { row-height: 32px; }
+TableHeader {
+    background: linear-gradient(to bottom, #EFEFEF, #D9D9D9);
+    flex-grow: 0;
+    cell-separator: #C8C8C8;
+    border-bottom: 1px solid #C8C8C8;
+}
+TableColumnHeader {
+    font-weight: bold;
+    padding: 5px 6px;
+    font-size: 12px;
+    text-align: center;
+    border: 1px solid linear-gradient(to bottom, #FDFDFD, #E1E1E1);
+}
+TableBody { background: #faa; cell-separator: #EDEDED; }
 TableRow:nth-child(2n+1) { background: #FFFFFF;}
 TableRow:nth-child(2n) { background: #F9F9F9; }
+.default-table-cell { padding: 5px; font-size: 12px;}
