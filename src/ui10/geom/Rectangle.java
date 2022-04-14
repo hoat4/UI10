@@ -182,8 +182,9 @@ public class Rectangle extends Shape {
     @Override
     public void scan(Rectangle clip, Consumer<ScanLine> consumer) {
         Rectangle r = intersectionWith(clip);
-        for (int y = 0; y < r.height(); y++)
-            consumer.accept(new ScanLine(r.topLeft().add(0, y), r.width()));
+        if (r != null)
+            for (int y = 0; y < r.height(); y++)
+                consumer.accept(new ScanLine(r.topLeft().add(0, y), r.width()));
     }
 
     @Override

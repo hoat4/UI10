@@ -25,7 +25,7 @@ import static ui10.layout.Layouts.horizontally;
 
 public class TextField extends Control  {
 
-    public final ScalarProperty<String> text = ScalarProperty.createWithDefault("TextField.text", "szöveg");
+    public final ScalarProperty<String> text = ScalarProperty.createWithDefault("TextField.text", "");
     public final ScalarProperty<Integer> caretPosition = ScalarProperty.createWithDefault("TextField.caretPosition", 0);
     public final ScalarProperty<Selection> selection = ScalarProperty.create("TextField.selection");
 

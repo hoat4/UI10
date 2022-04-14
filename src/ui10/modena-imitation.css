@@ -7,7 +7,7 @@ TextField {
     border: 1px solid linear-gradient(to bottom, #CDCDCD, #B8B8B8);
     background: linear-gradient(from 0px 0px to 0px 5px, #EEE, #fff);
     border-radius: 3px;
-    font-size: 16px;
+    font-size: 13px;
 }
 .text { color: #323232; }
 .selection { background: #0096C9; color: #fff; }
@@ -16,17 +16,16 @@ Button {
     border: 1px solid #B6B6B6;
     border-radius: 5px;
     background: linear-gradient(to bottom, #EFEFEF, #D9D9D9);
-    padding: 1px 10px 4px 10px;
-
+    padding: 5px 10px 6px 10px;
     transition: background 100ms;
 }
-.button-text { font-size: 20px; color: #000; }
+.button-text { font-size: 13px; color: #323232; }
 :active { background: linear-gradient(to bottom, #E2E2E2, #CDCDCD); }
 /*:focus {border: 5px solid #f00;}*/
 
 .main { gap: 10px; }
 
-Label { text-align: left; font-size: 16px; color: #323232; }
+Label { text-align: left; font-size: 13px; color: #323232; }
 
 Table { border: 1px solid #C8C8C8; }
 TableView { row-height: 32px; }

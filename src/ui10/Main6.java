@@ -11,6 +11,7 @@ import ui10.geom.Insets;
 import ui10.graphics.ColorFill;
 import ui10.graphics.TextNode;
 import ui10.image.Colors;
+import ui10.layout.Grid;
 import ui10.layout.Layouts;
 import ui10.shell.awt.AWTDesktop;
 import ui10.window.Window;
@@ -31,8 +32,9 @@ public class Main6 {
 
         AWTDesktop desktop = new AWTDesktop();
         TextField tf = new TextField();
+        tf.text.set("szövegmező");
 
-        Button button = new Button("fi");
+        Button button = new Button("Gomb");
         button.onAction().subscribe(__ -> System.out.println("Hello world!"));
 
         //button.attributes().add(new GrowFactor(Fraction.of(0)));
@@ -44,17 +46,23 @@ public class Main6 {
                 new Table.TableColumn<>("Col1", s -> s),
                 new Table.TableColumn<>("Col2", s -> String.valueOf(s.length()))
         ), list), new Insets(50));
+        Tabs.title(tableView, "Táblázat");
+
+        Element vbox = vertically(
+                new Label("label"),
+                button,
+                tf
+        );
+        vbox.setProperty(Grid.GAP_PROPERTY, 10);
+        Element buttonTab = centered(vbox);
+        Tabs.title(buttonTab, "Egyik tab");
 
         Element content = withClass("root",
 
                 //tableView
                 new TabbedPane(List.of(
-                        new Label("szöveg") {{
-                            Tabs.title(this, "Egyik");
-                        }},
-                        new Label("teszt2") {{
-                            Tabs.title(this, "Másik");
-                        }}
+                        buttonTab,
+                        tableView
                 ))
 
                 //firstContent()
@@ -97,7 +105,8 @@ public class Main6 {
         desktop.windows.add(window);
 
         Thread.sleep(2000);
-        contentWrapper.setProperty(TextNode.TEXT_FILL_PROPERTY, new Fill.ColorFill(Colors.RED));
+        // contentWrapper.setProperty(TextNode.TEXT_FILL_PROPERTY, new Fill.ColorFill(Colors.RED));
+        // TODO ennek újra kéne dekorálnia a textnode-okat, amelyikhez eljut az új érték
     }
 
 
