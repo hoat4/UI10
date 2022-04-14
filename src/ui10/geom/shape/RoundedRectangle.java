@@ -15,28 +15,45 @@ import static ui10.geom.Rectangle.Corner.*;
 public class RoundedRectangle extends CompositeShape {
 
     private final Rectangle rectangle;
-    private final int radius;
+    public final int topLeftRadius;
+    public final int topRightRadius;
+    public final int bottomLeftRadius;
+    public final int bottomRightRadius;
 
     public RoundedRectangle(Rectangle rectangle, int radius) {
-        super(List.of(
-                new RoundedCorner(Rectangle.cornerAt(TOP_LEFT, rectangle.topLeft(), new Size(radius, radius)), TOP_LEFT),
-                new RoundedCorner(Rectangle.cornerAt(TOP_RIGHT, rectangle.topRight(), new Size(radius, radius)), TOP_RIGHT),
-                new RoundedCorner(Rectangle.cornerAt(BOTTOM_RIGHT, rectangle.bottomRight(), new Size(radius, radius)), BOTTOM_RIGHT),
-                new RoundedCorner(Rectangle.cornerAt(BOTTOM_LEFT, rectangle.bottomLeft(), new Size(radius, radius)), BOTTOM_LEFT),
-                Rectangle.of(rectangle.topLeft().add(0, radius), rectangle.bottomRight().subtract(0, radius)),
-                Rectangle.of(rectangle.topLeft().add(radius, 0), rectangle.topRight().add(-radius, radius)),
-                Rectangle.of(rectangle.bottomLeft().add(radius, -radius), rectangle.bottomRight().add(-radius, 0))
-        ));
+        this(rectangle, radius, radius, radius, radius);
+    }
+
+    public RoundedRectangle(Rectangle rectangle, int topLeftRadius, int topRightRadius, int bottomLeftRadius, int bottomRightRadius) {
+        super(makeShapes(rectangle, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius));
         this.rectangle = rectangle;
-        this.radius = radius;
+        this.topLeftRadius = topLeftRadius;
+        this.topRightRadius = topRightRadius;
+        this.bottomLeftRadius = bottomLeftRadius;
+        this.bottomRightRadius = bottomRightRadius;
+    }
+
+    private static List<Shape> makeShapes(Rectangle rectangle, int topLeftRadius, int topRightRadius, int bottomLeftRadius, int bottomRightRadius) {
+        int top = Math.max(topLeftRadius, topRightRadius);
+        int bottom = Math.max(bottomLeftRadius, bottomRightRadius);
+
+        return List.of(
+                new RoundedCorner(Rectangle.cornerAt(TOP_LEFT, rectangle.topLeft(), new Size(topLeftRadius, topLeftRadius)), TOP_LEFT),
+                new RoundedCorner(Rectangle.cornerAt(TOP_RIGHT, rectangle.topRight(), new Size(topRightRadius, topRightRadius)), TOP_RIGHT),
+                new RoundedCorner(Rectangle.cornerAt(BOTTOM_RIGHT, rectangle.bottomRight(), new Size(bottomLeftRadius, bottomLeftRadius)), BOTTOM_RIGHT),
+                new RoundedCorner(Rectangle.cornerAt(BOTTOM_LEFT, rectangle.bottomLeft(), new Size(bottomRightRadius, bottomRightRadius)), BOTTOM_LEFT),
+
+                Rectangle.of(rectangle.topLeft().add(0, top), rectangle.bottomRight().subtract(0, bottom)),
+                Rectangle.of(rectangle.topLeft().add(topLeftRadius, 0), rectangle.topRight().add(-topRightRadius, top)),
+                Rectangle.of(rectangle.bottomLeft().add(bottomLeftRadius, -bottom), rectangle.bottomRight().add(-bottomRightRadius, 0))
+
+                // TODO ha a felső vagy alsó részen az egyik corner kisebb mint a másik és a másik nem 0, akkor kimarad
+                //      az egyik corner alatt egy kis hely, azt pótolni kéne
+        );
     }
 
     public Rectangle rectangle() {
         return rectangle;
-    }
-
-    public int radius() {
-        return radius;
     }
 
     @Override
@@ -47,29 +64,29 @@ public class RoundedRectangle extends CompositeShape {
     @Override
     public List<BézierPath> outlines() {
         BézierPath.Builder b = BézierPath.builder();
-        b.moveTo(rectangle.topLeft().add(radius, 0));
-        b.lineTo(rectangle.topRight().add(-radius, 0));
-        b.quadCurveTo(rectangle.topRight().add(0, radius), rectangle.topRight());
-        b.lineTo(rectangle.bottomRight().add(0, -radius));
-        b.quadCurveTo(rectangle.bottomRight().add(-radius, 0), rectangle.bottomRight());
-        b.lineTo(rectangle.bottomLeft().add(radius, 0));
-        b.quadCurveTo(rectangle.bottomLeft().add(0, -radius), rectangle.bottomLeft());
-        b.lineTo(rectangle.topLeft().add(0, radius));
-        b.quadCurveTo(rectangle.topLeft().add(radius, 0), rectangle.topLeft());
+        b.moveTo(rectangle.topLeft().add(topLeftRadius, 0));
+        b.lineTo(rectangle.topRight().add(-topRightRadius, 0));
+        b.quadCurveTo(rectangle.topRight().add(0, topRightRadius), rectangle.topRight());
+        b.lineTo(rectangle.bottomRight().add(0, -bottomRightRadius));
+        b.quadCurveTo(rectangle.bottomRight().add(-bottomRightRadius, 0), rectangle.bottomRight());
+        b.lineTo(rectangle.bottomLeft().add(bottomLeftRadius, 0));
+        b.quadCurveTo(rectangle.bottomLeft().add(0, -bottomLeftRadius), rectangle.bottomLeft());
+        b.lineTo(rectangle.topLeft().add(0, topLeftRadius));
+        b.quadCurveTo(rectangle.topLeft().add(topLeftRadius, 0), rectangle.topLeft());
         b.close();
         return List.of(b.build());
     }
 
     @Override
     public Shape translate(Point point) {
-        return new RoundedRectangle(rectangle.translate(point), radius);
+        return new RoundedRectangle(rectangle.translate(point), topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius);
     }
 
     @Override
     public String toString() {
         return "RoundedRectangle{" +
                 "rectangle=" + rectangle +
-                ", radius=" + radius +
+                ", radius=" + topLeftRadius+"/"+topRightRadius+"/"+bottomLeftRadius+"/"+bottomRightRadius +
                 '}';
     }
 

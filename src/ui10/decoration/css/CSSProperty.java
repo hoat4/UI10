@@ -31,15 +31,18 @@ public class CSSProperty<T> {
 
     // background-color, background-image?
     static final CSSProperty<Fill> background = new CSSProperty<>("background", Interpolators.FILL);
-    static final CSSProperty<Length> cornerRadius = new CSSProperty<>("border-radius", Interpolators.LENGTH);
+    static final CSSProperty<Length> topLeftCornerRadius = new CSSProperty<>("border-top-left-radius", Interpolators.LENGTH);
+    static final CSSProperty<Length> topRightCornerRadius = new CSSProperty<>("border-top-right-radius", Interpolators.LENGTH);
+    static final CSSProperty<Length> bottomLeftCornerRadius = new CSSProperty<>("border-bottom-left-radius", Interpolators.LENGTH);
+    static final CSSProperty<Length> bottomRightCornerRadius = new CSSProperty<>("border-bottom-right-radius", Interpolators.LENGTH);
     static final CSSProperty<Length> minWidth = new CSSProperty<>("min-width", Interpolators.LENGTH);
     static final CSSProperty<Length> minHeight = new CSSProperty<>("min-height", Interpolators.LENGTH);
 
     // kéne vmi "composite property"
-    static final CSSProperty<BorderSpec> borderTop = new CSSProperty<>("border", null);
-    static final CSSProperty<BorderSpec> borderRight = new CSSProperty<>("border", null);
-    static final CSSProperty<BorderSpec> borderBottom = new CSSProperty<>("border", null);
-    static final CSSProperty<BorderSpec> borderLeft = new CSSProperty<>("border", null);
+    static final CSSProperty<BorderSpec> borderTop = new CSSProperty<>("border-top", null);
+    static final CSSProperty<BorderSpec> borderRight = new CSSProperty<>("border-right", null);
+    static final CSSProperty<BorderSpec> borderBottom = new CSSProperty<>("border-bottom", null);
+    static final CSSProperty<BorderSpec> borderLeft = new CSSProperty<>("border-left", null);
 
     public static final CSSProperty<Length> gap = new CSSProperty<>("gap", Interpolators.LENGTH);
     static final CSSProperty<Fraction> flexGrow = new CSSProperty<>("flex-grow", Interpolators.FRACTION);

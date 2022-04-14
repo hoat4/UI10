@@ -72,7 +72,12 @@ public class CompositeShape extends Shape {
 
     @Override
     public Shape intersectionWith(Shape other) {
-        return op(shape -> shape.intersectionWith(other));
+        return op(shape -> {
+            Shape s = shape.intersectionWith(other);
+            if (s != null && s.bounds().isEmpty())
+                throw new RuntimeException(shape+"->"+s);
+            return s;
+        });
     }
 
     @Override

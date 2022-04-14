@@ -66,8 +66,9 @@ public sealed abstract class EnduringElement extends Element permits RenderableE
 
     @Override
     public <T> void setProperty(Property<T> prop, T value) {
+        T prevValue = getProperty(prop);
         super.setProperty(prop, value);
-        dispatchElementEvent(new ChangeEvent(prop, value));
+        dispatchElementEvent(new ChangeEvent(prop, prevValue, value));
     }
 
 

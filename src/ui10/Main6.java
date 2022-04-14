@@ -2,10 +2,7 @@ package ui10;
 
 import ui10.base.Element;
 import ui10.base.Pane;
-import ui10.controls.Button;
-import ui10.controls.Label;
-import ui10.controls.Table;
-import ui10.controls.TextField;
+import ui10.controls.*;
 import ui10.decoration.Fill;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
@@ -43,11 +40,22 @@ public class Main6 {
 
         List<String> list = List.of("Hello", "world!");
 
+        Element tableView = padding(new Table<>(List.of(
+                new Table.TableColumn<>("Col1", s -> s),
+                new Table.TableColumn<>("Col2", s -> String.valueOf(s.length()))
+        ), list), new Insets(50));
+
         Element content = withClass("root",
-                padding(new Table<>(List.of(
-                        new Table.TableColumn<>("Col1", s -> s),
-                        new Table.TableColumn<>("Col2", s -> String.valueOf(s.length()))
-                ), list), new Insets(50))
+
+                //tableView
+                new TabbedPane(List.of(
+                        new Label("szöveg") {{
+                            Tabs.title(this, "Egyik");
+                        }},
+                        new Label("teszt2") {{
+                            Tabs.title(this, "Másik");
+                        }}
+                ))
 
                 //firstContent()
                 //centered(new FontTest())

@@ -119,9 +119,10 @@ public class ShapeOperations {
     }
 
     public static Shape intersection(Shape a, Shape b) {
-        if (a.bounds().intersectionWith(b.bounds()) == null)
+        Rectangle boundsIntersection = a.bounds().intersectionWith(b.bounds());
+        if (boundsIntersection == null)
             return null;
-        throw new UnsupportedOperationException(a + ", " + b);
+        throw new UnsupportedOperationException(a + ", " + b+" (bounds intersection: "+boundsIntersection+")");
     }
 
     public static Shape subtract(Shape a, Shape b) {

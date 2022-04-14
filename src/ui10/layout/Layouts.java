@@ -165,27 +165,42 @@ public class Layouts {
     }
 
     public static Element roundRectangle(int radius, Element content) {
-        return new RoundRectLayout(content, radius);
+        return new RoundRectLayout(content, radius, radius, radius, radius);
+    }
+
+    public static Element roundRectangle(int topLeftRadius, int topRightRadius, int bottomLeftRadius, int bottomRightRadius,
+                                         Element content) {
+        return new RoundRectLayout(content, topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius);
     }
 
     private static class RoundRectLayout extends SingleNodeLayout {
 
-        private final int radius;
+        private final int topLeftRadius;
+        private final int topRightRadius;
+        private final int bottomLeftRadius;
+        private final int bottomRightRadius;
 
-        public RoundRectLayout(Element content, int radius) {
+        public RoundRectLayout(Element content, int topLeftRadius, int topRightRadius, int bottomLeftRadius, int bottomRightRadius) {
             super(content);
-            this.radius = radius;
+            this.topLeftRadius = topLeftRadius;
+            this.topRightRadius = topRightRadius;
+            this.bottomLeftRadius = bottomLeftRadius;
+            this.bottomRightRadius = bottomRightRadius;
         }
 
         @Override
         public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-            Size minSize = Size.max(constraints.min(), new Size(radius * 2, radius * 2));
+            Size minSize = Size.max(constraints.min(), new Size(
+                    Math.max(topLeftRadius, bottomLeftRadius) + Math.max(topRightRadius, bottomRightRadius),
+                    Math.max(topLeftRadius, topRightRadius) + Math.max(bottomLeftRadius, bottomRightRadius)
+            ));
             return context.preferredSize(content, constraints.withMinimum(minSize));
         }
 
         @Override
         protected Shape computeContentShape(Shape containerShape, LayoutContext2 context) {
-            return new RoundedRectangle(containerShape.bounds(), radius);
+            return new RoundedRectangle(containerShape.bounds(),
+                    topLeftRadius, topRightRadius, bottomRightRadius, bottomRightRadius);
         }
     }
 

@@ -26,7 +26,7 @@ Button {
 
 .main { gap: 10px; }
 
-Label { text-align: left; font-size: 16px; }
+Label { text-align: left; font-size: 16px; color: #323232; }
 
 Table { border: 1px solid #C8C8C8; }
 TableView { row-height: 32px; }
@@ -47,3 +47,38 @@ TableBody { background: #faa; cell-separator: #EDEDED; }
 TableRow:nth-child(2n+1) { background: #FFFFFF;}
 TableRow:nth-child(2n) { background: #F9F9F9; }
 .default-table-cell { padding: 5px; font-size: 12px;}
+
+.tab-header-area { flex-grow: 0; }
+.tab-header-area-background {
+    border: 1px solid #CFCFCF;
+    border-bottom: 1px solid #B5B5B5;
+    background: linear-gradient(to bottom, #D3D3D3, #DCDCDC 6px);
+}
+.tab-buttons {
+    padding: 7px 7px 0px 7px;
+    gap: 2px;
+}
+TabButton {
+    border: 1px solid #B5B5B5;
+    background: linear-gradient(to bottom, #EFEFEF, #D9D9D9);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+TabButton:hover { background: linear-gradient(to bottom, #F9F9F9, #E4E4E4); }
+TabButton:active { background: #F4F4F4; border-bottom: none; } /* majd kéne neki külön pseudo-class, mondjuk :selected */
+
+.tab-button-inner {
+    border: 1px solid linear-gradient(to bottom, #FDFDFD, #E1E1E1);
+    border-bottom: none;
+    padding: 5px 8px 5px 8px;
+}
+/*
+TabButton:hover > .tab-button-inner {
+    border: 1px solid linear-gradient(to bottom, #FEFEFE, #ECECEC);
+    border-bottom: none;
+}
+*/
+
+.tab-button-label {
+    font-size: 12px;
+}

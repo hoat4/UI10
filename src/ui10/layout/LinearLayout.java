@@ -43,7 +43,7 @@ public class LinearLayout extends RectangularLayout {
         for (int i = 0; i < children.size(); i++) {
             Size s = l.childrenSizes.get(i);
             placer.accept(children.get(i), new Rectangle(Point.of(primaryAxis, x, 0), s));
-            x += s.value(primaryAxis);
+            x += s.value(primaryAxis) + l.gap;
         }
     }
 
@@ -61,6 +61,7 @@ public class LinearLayout extends RectangularLayout {
                     }
                 }).toList());
 
+        l.gap = getProperty(Grid.GAP_PROPERTY);
         l.layout();
         return l;
     }

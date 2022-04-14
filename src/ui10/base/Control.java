@@ -20,7 +20,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 public abstract class Control extends Pane {
 
-    public static final Property<Boolean> FOCUSED_PROPERTY = new Property<>(true);
+    public static final Property<Boolean> FOCUSED_PROPERTY = new Property<>(false);
+    public static final Property<Boolean> HOVERED_PROPERTY = new Property<>(false); // TODO
 
     public final ScalarProperty<Cursor> cursor = ScalarProperty.create("Control.cursor");
 
@@ -68,11 +69,11 @@ public abstract class Control extends Pane {
     }
 
     public void onFocusGain() {
-        invalidatePane();
+        invalidateContent();
     }
 
     public void onFocusLost() {
-        invalidatePane();
+        invalidateContent();
     }
 
     protected Point relativePos(RenderableElement e) {

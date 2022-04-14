@@ -53,7 +53,17 @@ public class Rule {
                     CSSProperty.marginBottom, CSSProperty.marginLeft);
             case "padding" -> parseInsets(parser, CSSProperty.paddingTop, CSSProperty.paddingRight,
                     CSSProperty.paddingBottom, CSSProperty.paddingLeft);
-            case "border-radius" -> put(CSSProperty.cornerRadius, parser.parseLength());
+            case "border-radius" -> {
+                Length l = parser.parseLength();
+                put(CSSProperty.topLeftCornerRadius, l);
+                put(CSSProperty.topRightCornerRadius, l);
+                put(CSSProperty.bottomLeftCornerRadius, l);
+                put(CSSProperty.bottomRightCornerRadius, l);
+            }
+            case "border-top-left-radius" -> put(CSSProperty.topLeftCornerRadius, parser.parseLength());
+            case "border-top-right-radius" -> put(CSSProperty.topRightCornerRadius, parser.parseLength());
+            case "border-bottom-left-radius" -> put(CSSProperty.bottomLeftCornerRadius, parser.parseLength());
+            case "border-bottom-right-radius" -> put(CSSProperty.bottomRightCornerRadius, parser.parseLength());
             case "min-width" -> put(CSSProperty.minWidth, parser.parseLength());
             case "min-height" -> put(CSSProperty.minHeight, parser.parseLength());
             case "border" -> {
@@ -153,8 +163,9 @@ public class Rule {
         elem = prop2(CSSProperty.borderLeft, elem, (e, border) ->
                 new Border(Insets.atLeft(context.length(border.len())), border.fill().makeElement(context), e));
 
-        elem = prop2(CSSProperty.cornerRadius, elem, (e, cornerRadius) ->
-                roundRectangle(context.length(cornerRadius), e));
+        elem = prop2(List.of(CSSProperty.topLeftCornerRadius, CSSProperty.topRightCornerRadius,
+                        CSSProperty.bottomLeftCornerRadius, CSSProperty.bottomRightCornerRadius),
+                elem, (e, radiuses) -> makeRoundRect(e, radiuses, context));
 
         elem = prop2(List.of(CSSProperty.minWidth, CSSProperty.minHeight), elem, (e, minSizes) -> minSize(e, new Size(
                 minSizes.get(0) == null ? 0 : context.length(minSizes.get(0)), // min-width
@@ -174,6 +185,16 @@ public class Rule {
                 lengths.get(2) == null ? 0 : context.length(lengths.get(2)), // bottom
                 lengths.get(3) == null ? 0 : context.length(lengths.get(3))  // left
         ));
+    }
+
+    private Element makeRoundRect(Element element, List<Length> radiuses, DecorationContext context) {
+        return roundRectangle(
+                radiuses.get(0) == null ? 0 : context.length(radiuses.get(0)), // top left
+                radiuses.get(1) == null ? 0 : context.length(radiuses.get(1)), // top right
+                radiuses.get(2) == null ? 0 : context.length(radiuses.get(2)), // bottom left
+                radiuses.get(3) == null ? 0 : context.length(radiuses.get(3)),  // bottom right
+                element
+        );
     }
 
     public void applyTransitionsOf(Element e) {

@@ -38,9 +38,9 @@ public class TextField extends Control  {
 
     {
         attributes().add(new CSSClass("text-field"));
-        text.subscribe(e -> invalidatePane());
-        caretPosition.subscribe(e -> invalidatePane());
-        selection.subscribe(e -> invalidatePane());
+        text.subscribe(e -> invalidateContent());
+        caretPosition.subscribe(e -> invalidateContent());
+        selection.subscribe(e -> invalidateContent());
         cursor.set(Cursor.TEXT);
     }
 

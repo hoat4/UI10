@@ -65,7 +65,7 @@ public abstract class Pane extends RenderableElement {
     /**
      * Invalidates layout and content.
      */
-    protected void invalidatePane() {
+    protected void invalidateContent() {
         valid = false;
         invalidate();
     }

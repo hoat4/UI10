@@ -35,7 +35,8 @@ public record Insets(int top, int right, int bottom, int left) {
 
     public Shape removeFrom(Shape shape) {
         if (shape instanceof RoundedRectangle r)
-            return new RoundedRectangle(r.rectangle().withInnerInsets(this), r.radius()); // radiust csökkenteni kéne
+            return new RoundedRectangle(r.rectangle().withInnerInsets(this),
+                    r.topLeftRadius, r.topRightRadius, r.bottomLeftRadius, r.bottomRightRadius); // radiust csökkenteni kéne
         return shape.intoBounds(shape.bounds().withInnerInsets(this)); // ez nem jó, torzít
     }
 

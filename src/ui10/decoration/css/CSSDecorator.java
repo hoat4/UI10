@@ -39,6 +39,7 @@ public class CSSDecorator extends TransientElement {
     private void init() {
         pseudoClassProviders.add(new PseudoClassProvider("root", List.of(), e -> e == content));
         pseudoClassProviders.add(new PseudoClassProvider("focus", Control.FOCUSED_PROPERTY));
+        pseudoClassProviders.add(new PseudoClassProvider("hover", Control.HOVERED_PROPERTY));
         pseudoClassProviders.add(new PseudoClassProvider("active", Button.PRESSED_PROPERTY));
 
     }
@@ -76,7 +77,7 @@ public class CSSDecorator extends TransientElement {
         if (logicalParent instanceof ControlView<?> v)
             rules = List.of(ruleOf(v.model), ruleOf(v));
         else if (logicalParent instanceof Pane p)
-            rules = List.of(ruleOf(p));
+            rules = List.of(ruleOf(element), ruleOf(p));
         else if (logicalParent instanceof ControlView<?> v)
             return;
         else if (element instanceof Pane || element instanceof ControlModel)

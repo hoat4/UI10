@@ -7,6 +7,7 @@ import ui10.decoration.PointSpec;
 import ui10.geom.Fraction;
 import ui10.graphics.FontWeight;
 import ui10.image.Color;
+import ui10.image.Colors;
 import ui10.image.RGBColor;
 
 import java.time.Duration;
@@ -94,7 +95,7 @@ public class CSSParser {
                 scanner.take();
                 scanner.skipWhitespaces();
             }
-            Selector childSelector = parseAttributeSelector();
+            Selector childSelector = parseSelector();
             selector = direct
                     ? new Selector.ChildSelector(selector, childSelector)
                     : new Selector.DescendantSelector(selector, childSelector);
@@ -241,6 +242,13 @@ public class CSSParser {
     }
 
     public BorderSpec parseBorder() {
+        String a = scanner.tryReadIdentifier();
+        if (a != null)
+            if (a.equals("none"))
+                return new BorderSpec(Length.zero(), new Fill.ColorFill(Colors.TRANSPARENT));
+            else
+                throw scanner.new CSSParseException("unexpected token: "+a);
+
         Length len = parseLength();
         scanner.skipWhitespaces();
         scanner.expectIdentifier("solid");
@@ -367,7 +375,12 @@ public class CSSParser {
     public Length parseLength() {
         NumberWithUnit n = parseNumberWithUnit();
         return switch (n.unit) {
-            case NULL -> throw scanner.new CSSParseException("expected length unit");
+            case NULL -> {
+                if (n.n == 0)
+                    yield Length.zero();
+                else
+                    throw scanner.new CSSParseException("expected length unit");
+            }
             case PX -> new Length(n.val(), 0, 0);
             case PERCENT -> new Length(0, 0, n.val());
         };

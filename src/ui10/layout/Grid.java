@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 
 public class Grid extends RectangularLayout {
 
-    public static final Property<Integer> GAP_PROPERTY = new Property<>(true);
+    public static final Property<Integer> GAP_PROPERTY = new Property<>(true, 0);
 
     public final List<? extends List<? extends Element>> rows;
 
@@ -24,8 +24,7 @@ public class Grid extends RectangularLayout {
 
     @Override
     public void initFromProps() {
-        Integer i = getProperty(GAP_PROPERTY);
-        gap = i == null ? 0 : i;
+        gap = getProperty(GAP_PROPERTY);
     }
 
     @Override

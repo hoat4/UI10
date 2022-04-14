@@ -31,8 +31,6 @@ public abstract class Shape {
 
     // nullable
     public Shape intersectionWith(Shape other) {
-        if (this instanceof Rectangle)
-            return other.intersectionWith(this); // TODO
         return ShapeOperations.intersection(this, other);
     }
 

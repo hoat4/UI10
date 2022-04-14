@@ -1,6 +1,5 @@
 package ui10.geom;
 
-import jdk.incubator.foreign.MemoryAccess;
 import ui10.geom.shape.BézierPath;
 import ui10.geom.shape.Shape;
 
@@ -70,10 +69,12 @@ public class Rectangle extends Shape {
                 a.bottom() <= b.top() || b.bottom() <= a.top())
             return null;
 
-        return of(
+        Rectangle r = of(
                 Point.max(a.topLeft, b.topLeft),
                 Point.min(a.bottomRight(), b.bottomRight())
         );
+        assert !r.size.isZero();
+        return r;
     }
 
     public static Rectangle cornerAt(Corner corner, Point p, Size size) {
@@ -199,19 +200,17 @@ public class Rectangle extends Shape {
     @Override
     public Shape intersectionWith(Shape other) {
         if (size.isZero())
-            return this;
+            return null;
 
         if (!(other instanceof Rectangle))
-            return super.intersectionWith(other);
+            return other.intersectionWith(this);
 
         return intersection(this, (Rectangle) other);
     }
 
+    // nullable a result
     public Rectangle intersectionWith(Rectangle other) {
-        if (size.isZero())
-            return this;
-
-        return intersection(this, (Rectangle) other);
+        return intersection(this, other);
     }
 
     public Point center() {
