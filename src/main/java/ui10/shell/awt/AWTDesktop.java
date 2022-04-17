@@ -1,7 +1,9 @@
 package ui10.shell.awt;
 
+import ui10.base.LayoutContext1;
 import ui10.binding.ObservableList;
 import ui10.geom.Size;
+import ui10.layout.BoxConstraints;
 import ui10.window.Desktop;
 import ui10.window.Window;
 
@@ -12,7 +14,9 @@ public class AWTDesktop extends Desktop {
     }
 
     private void showWindow(Window window) {
-        Size size = new Size(640, 480);
+        Size size = new LayoutContext1().preferredSize(window,
+                new BoxConstraints(Size.ZERO, new Size(Size.INFINITY, Size.INFINITY)));
+        //Size size = new Size(640, 480);
         int scale = 1;
         size = size.multiply(scale);
 

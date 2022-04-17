@@ -18,6 +18,7 @@ Button {
     background: linear-gradient(to bottom, #EFEFEF, #D9D9D9);
     padding: 5px 10px 6px 10px;
     transition: background 100ms;
+    min-width: 80px; /* ez csak akkor kéne, ha van text van rajta, nem csak ikon */
 }
 .button-text { font-size: 13px; color: #323232; }
 :active { background: linear-gradient(to bottom, #E2E2E2, #CDCDCD); }
@@ -81,3 +82,6 @@ TabButton:hover > .tab-button-inner {
 .tab-button-label {
     font-size: 12px;
 }
+
+.dialog-main { padding: 10px;}
+.dialog-button-bar { padding: 10px; flex-grow: 0; }

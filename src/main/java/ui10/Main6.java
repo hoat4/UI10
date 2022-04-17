@@ -3,6 +3,7 @@ package ui10;
 import ui10.base.Element;
 import ui10.base.Container;
 import ui10.controls.*;
+import ui10.controls.dialog.Dialogs;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
 import ui10.decoration.css.CSSScanner;
@@ -14,6 +15,7 @@ import ui10.layout.Layouts;
 import ui10.shell.awt.AWTDesktop;
 import ui10.shell.awt.AWTWindowImpl;
 import ui10.shell.awt.UIContextImpl;
+import ui10.window.Desktop;
 import ui10.window.Window;
 
 import java.io.IOException;
@@ -33,6 +35,14 @@ public class Main6 {
     public static int counter;
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
+
+        Desktop.THREAD_LOCAL.set(new AWTDesktop());
+
+        if (true) {
+            Dialogs.showMessage("Hello world!");
+            return;
+        }
+
         // System.out.println(Colors.WHITE.derive(-.09));
 
         AWTDesktop desktop = new AWTDesktop();

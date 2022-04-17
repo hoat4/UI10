@@ -1,0 +1,63 @@
+contentIcon bal oldalt lenne, de néha van hogy aláwrappelődik tartalom, pl. Windows Run dialogű
+more details (expandos)?
+footer gombsor alatt vagy mellett?
+gombsort hogy? Property<List<...>>?
+
+komplexebb esetek: file, print, newproject, font
+file dialognál berakják footerbe a gombokat, bár az lehet hogy már customnak tekinthető
+több footer: Do you want to open this file?
+footer más platformokon?
+details nyitás gnome-on gombsor felett van, nem helyettesíti a tartalmat hanem alányitja
+pl: https://askubuntu.com/questions/49149/how-to-open-the-run-application-dialog-from-a-terminal
+de új gnome-ban is van  ilyen
+details gombsorgombként: https://www.eclipse.org/forums/index.php/t/294743/
+
+footer hova kerüljön, ha nincs Details? nem látok rá példát
+mégis van egy, itt a gombsortól balra van "More..." link: https://www.journeybytes.com/get-old-windows-xp-style-copy-dialog-in/
+de azt gondolnám hogy inkább alá kéne
+legyen külön footer, és valami gombsor extra
+itt kérdőjelt raknak: https://forums.rptools.net/viewtopic.php?t=25483
+bár lehet hogy gombsorgomb a kérdőjel
+de alatta van másik, tehát gombsorextra is kell (valamint: filechoosernél "Show hidden files and directories:
+kérdőjel meg néha gombsortól balra, néha jobbra van
+lehet hogyha van gombsorextra akkor kérdőjel jobbra kell, ha nincs, akkor balra
+help van Qt-n is, Winre emlékeztet a laf: https://doc.qt.io/archives/3.3/designer-manual-13.html
+itt még egy érdekesség: file chooser embeddelve, de gombsor azon kívül
+gombsor külön jobb és bal oldali gombok: https://doc.qt.io/archives/3.3/designer-manual-13.html
+ugyanitt: vertikális gombsor, dialógus szélén. felső része tartalmat piszálja, alsó része dialógt zárja.
+horiz gombsornál baloldalt vagy helpgomb van, vagy tartalompiszkáló gomb.
+footerfelső extra: https://www.reddit.com/r/kde/comments/d99cf2/change_file_picker_dialog_to_dolphin/
+gombsor fent, de nincs cím: https://www.ubuntubuzz.com/2012/07/gnome-os-design-sneak-peak.html
+kérdőjel gombsor baloldalt Windowson, nem macosx-en: https://developer.arm.com/documentation/102021/2021-1/Set-up-your-target-for-debug/Configure-the-Terminal-views
+ez swt?
+fototer valszeg lecserélhető customra, és akkor belerakhatja gombsort is elementként
+
+contenttext content felett? https://pythondialog.sourceforge.io/
+illetve végülis ControlsFX commandline példa is ilyen
+bár akkor nem tudom, hogy commandlinks tartalom vagy külön
+de textinputnál is ez van
+de akkor mikor van label content mellett vagy alatt?
+több choicelista: https://d4.alternativeto.net/w-PwONQniuPZ9-0lzmTXDlvgQoE0Xpwp_cs87oLGJm0/rs:fill:400:225:0/g:ce:0:0/YWJzOi8vZGlzdC9zL3R1cmJvLXZpc2lvbl8yNTI5MzZfZnVsbC5wbmc.jp
+commandlinks ugyanaz mint choicelista?
+
+többsoros content szöveg: https://www.wikihow.com/images/thumb/5/59/Install-Windows-ME-Step-13.jpg/v4-460px-Install-Windows-ME-Step-13.jpg.webp
+bár itt lehet hogy content az egész, mert progressbar alatt is van szöveg
+mondjuk valójában az alatti a progressbárhoz tartozik, szóval itt valszeg contentszöveg és content is van
+viszont van hogy contentetext is progresst jelzi: https://www.askvg.com/how-to-enable-disable-animations-in-copy-move-delete-dialog-boxes-under-windows-vista/
+
+itt meg footer nincs elválasztva, de van egy felső extrája, viszont content meg be van keretezve: https://doc.qt.io/qt-5/qerrormessage.html
+
+setup: heading és content mindkettőjénél balra oszlop
+filechooser is hasonló?
+
+heading elválasztva vagy nem?
+
+win régi color chooser: a teljes DialogPane-től jobbra még egy rész
+illetve itt is, itt baloldalt tree van: https://sergeybelous.com/Options%20Dialog.html
+win11 colorchooserben már normális gombsor van (lent)
+
+KDE illetve Gnome3: gombsor címtől jobbra és balra
+DialogPane? pl. ha wizardban van
+
+headingikon és contentikon lehet mindkettő? általában nem, kivéve pl. secudiity dialog: https://www.google.com/search?q=windows+dialogs&tbm=isch&sxsrf=APq-WBsYK-sSdksALG4wB_hkfqLSguSsVQ:1650149414439&source=lnms&sa=X&ved=2ahUKEwid7bHN1Zn3AhUJ-qQKHRJQCjEQ_AUoAnoECAEQBA&biw=1890&bih=1235&dpr=1.1#imgrc=NRvRDeEd2GvcYM
+bár lehet hogy itt csk a content része az ikon.

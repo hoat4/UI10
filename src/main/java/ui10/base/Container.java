@@ -46,10 +46,11 @@ public abstract class Container extends RenderableElement {
     private Element getContent() {
         if (!valid) {
             validate();
-            valid = true;
 
             cachedContent = Objects.requireNonNull(content(), () -> "null content in " + this);
             cachedContent.initParent(this);
+
+            valid = true;
         }
 
         return cachedContent;
