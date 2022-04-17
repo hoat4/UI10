@@ -1,15 +1,13 @@
 package ui10;
 
 import ui10.base.Element;
-import ui10.base.Pane;
+import ui10.base.Container;
 import ui10.controls.*;
-import ui10.decoration.Fill;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
 import ui10.decoration.css.CSSScanner;
 import ui10.geom.Insets;
 import ui10.graphics.ColorFill;
-import ui10.graphics.TextNode;
 import ui10.image.Colors;
 import ui10.layout.Grid;
 import ui10.layout.Layouts;
@@ -139,7 +137,7 @@ public class Main6 {
             return null;
         }
 
-        Pane contentWrapper = Pane.of(content);
+        Container contentWrapper = Container.of(content);
         content = new CSSDecorator(contentWrapper, css);
 
         /*Window window = Window.of(centered(withSize(

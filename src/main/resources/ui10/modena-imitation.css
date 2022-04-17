@@ -64,7 +64,7 @@ TabButton {
     border-top-right-radius: 3px;
 }
 TabButton:hover { background: linear-gradient(to bottom, #F9F9F9, #E4E4E4); }
-TabButton:active { background: #F4F4F4; border-bottom: none; } /* majd kéne neki külön pseudo-class, mondjuk :selected */
+TabButton:active { background: #F4F4F4; border-bottom: 1px solid #F4F4F4; } /* majd kéne neki külön pseudo-class, mondjuk :selected */
 
 .tab-button-inner {
     border: 1px solid linear-gradient(to bottom, #FDFDFD, #E1E1E1);

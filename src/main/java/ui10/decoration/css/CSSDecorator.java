@@ -11,7 +11,6 @@ import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -77,11 +76,11 @@ public class CSSDecorator extends TransientElement {
         List<Rule> rules;
         if (logicalParent instanceof ControlView<?> v)
             rules = List.of(ruleOf(v.model), ruleOf(v));
-        else if (logicalParent instanceof Pane p)
+        else if (logicalParent instanceof Container p)
             rules = List.of(ruleOf(element), ruleOf(p));
         else if (logicalParent instanceof ControlView<?> v)
             return;
-        else if (element instanceof Pane || element instanceof ControlModel)
+        else if (element instanceof Container || element instanceof ControlModel)
             return;
         else
             rules = List.of(ruleOf(element));

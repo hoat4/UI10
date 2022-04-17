@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public abstract class Control extends Pane {
+public abstract class Control extends Container {
 
     public static final Property<Boolean> FOCUSED_PROPERTY = new Property<>(false);
     public static final Property<Boolean> HOVERED_PROPERTY = new Property<>(false); // TODO

@@ -3,7 +3,7 @@ package ui10.shell.renderer.java2d;
 import ui10.input.pointer.MouseEvent;
 import ui10.base.Control;
 import ui10.base.EventContext;
-import ui10.base.Pane;
+import ui10.base.Container;
 import ui10.base.RenderableElement;
 
 import java.awt.Graphics2D;
@@ -11,11 +11,11 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PaneItem extends Item<Pane> {
+public class PaneItem extends Item<Container> {
 
     private final List<Item<?>> children = new ArrayList<>();
 
-    public PaneItem(J2DRenderer renderer, Pane node) {
+    public PaneItem(J2DRenderer renderer, Container node) {
         super(renderer, node);
     }
 

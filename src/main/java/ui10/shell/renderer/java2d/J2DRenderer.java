@@ -3,20 +3,17 @@ package ui10.shell.renderer.java2d;
 import ui10.base.Control;
 import ui10.base.EventContext;
 import ui10.graphics.Opacity;
-import ui10.base.Pane;
+import ui10.base.Container;
 import ui10.base.RenderableElement;
 import ui10.graphics.ColorFill;
 import ui10.graphics.LinearGradient;
 import ui10.graphics.TextNode;
 import ui10.input.pointer.MouseEvent;
 import ui10.shell.awt.AWTRenderer;
-import ui10.shell.awt.UIContextImpl;
 
 import java.awt.*;
-import java.awt.image.BufferStrategy;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 public class J2DRenderer extends AWTRenderer {
 
@@ -52,7 +49,7 @@ public class J2DRenderer extends AWTRenderer {
     public <N extends RenderableElement> Item<N> makeItem(N n) {
         if (n instanceof ColorFill f)
             return (Item<N>) new ColorFillImpl(this, f);
-        else if (n instanceof Pane d)
+        else if (n instanceof Container d)
             return (Item<N>) new PaneItem(this, d);
         else if (n instanceof TextNode t)
             return (Item<N>) new TextItem(this, t);

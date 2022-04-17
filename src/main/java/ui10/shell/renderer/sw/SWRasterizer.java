@@ -2,13 +2,11 @@ package ui10.shell.renderer.sw;
 
 import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.MemorySegment;
-import ui10.base.Pane;
+import ui10.base.Container;
 import ui10.base.RenderableElement;
 import ui10.geom.Fraction;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
-import ui10.geom.Size;
-import ui10.geom.shape.CompositeShape;
 import ui10.geom.shape.Shape;
 import ui10.graphics.ColorFill;
 import ui10.graphics.LinearGradient;
@@ -40,7 +38,7 @@ public class SWRasterizer {
         // MemoryAccess.setIntAtIndex(buffer, coord(Point.ORIGO), 0xFF880000);
 
         switch (e) {
-            case Pane p -> {
+            case Container p -> {
                 for (RenderableElement element : p.renderableElements())
                     renderElement(element);
             }

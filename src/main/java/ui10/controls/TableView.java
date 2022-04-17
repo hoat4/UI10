@@ -7,14 +7,11 @@ import ui10.controls.Table.TableColumn;
 import ui10.decoration.DecorationContext;
 import ui10.decoration.Fill;
 import ui10.decoration.IndexInSiblings;
-import ui10.geom.Fraction;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 import ui10.layout.Layouts;
 import ui10.layout.RectangularLayout;
-import ui10.layout.Wrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +72,7 @@ public class TableView<T> extends ControlView<Table<T>> {
         return colWidths;
     }
 
-    private class TableHeader extends Pane {
+    private class TableHeader extends Container {
 
         private final List<TableColumnHeader> colHeaders = new ArrayList<>();
 
@@ -172,7 +169,7 @@ public class TableView<T> extends ControlView<Table<T>> {
             return TableBody.this.getProperty(CELL_SEPARATOR_PROPERTY);
         }
 
-        private class TableRow extends Pane {
+        private class TableRow extends Container {
 
             int index;
 

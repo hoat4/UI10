@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Pane extends RenderableElement {
+public abstract class Container extends RenderableElement {
 
     private final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
@@ -83,21 +83,21 @@ public abstract class Pane extends RenderableElement {
             public void accept(RenderableElement e) {
                 if (e.parentRenderable() == null)
                     // this should not occur, but currently does because decoration
-                    e.parent = Pane.this;
-                else if (e.parentRenderable() != Pane.this)
-                    throw new IllegalStateException("not a child of " + Pane.this + ": " + e);
+                    e.parent = Container.this;
+                else if (e.parentRenderable() != Container.this)
+                    throw new IllegalStateException("not a child of " + Container.this + ": " + e);
                 children.add(e);
-                if (e instanceof Pane p)
+                if (e instanceof Container p)
                     p.focusContext = focusContext;
             }
         }.placeElement(getContent(), shape);
     }
 
-    public static Pane of(Element node) {
-        if (node instanceof Pane p)
+    public static Container of(Element node) {
+        if (node instanceof Container p)
             return p;
         else
-            return new Pane() {
+            return new Container() {
                 @Override
                 public Element content() {
                     return node;
@@ -105,7 +105,7 @@ public abstract class Pane extends RenderableElement {
 
                 @Override
                 public String toString() {
-                    return "Pane[" + node + "]";
+                    return "Container[" + node + "]";
                 }
             };
     }

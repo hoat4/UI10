@@ -2,7 +2,6 @@ package ui10.base;
 
 import ui10.binding2.ChangeEvent;
 import ui10.binding2.ElementEvent;
-import ui10.binding2.Property;
 import ui10.decoration.css.CSSDecorator;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
@@ -103,6 +102,6 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
     }
 
     public static RenderableElement of(Element node) {
-        return node instanceof RenderableElement r ? r : Pane.of(node);
+        return node instanceof RenderableElement r ? r : Container.of(node);
     }
 }
