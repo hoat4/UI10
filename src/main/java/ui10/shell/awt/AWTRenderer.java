@@ -12,9 +12,13 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class AWTRenderer {
 
-    public final UIContextImpl uiContext = new UIContextImpl(this);
+    public final UIContextImpl uiContext;
 
     java.awt.Window awtWindow;
+
+    public AWTRenderer(AWTDesktop desktop) {
+        this.uiContext = new UIContextImpl(desktop, this);
+    }
 
     void draw() {
         long layoutBegin = System.nanoTime();

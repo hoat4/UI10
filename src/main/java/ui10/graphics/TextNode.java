@@ -88,7 +88,7 @@ public class TextNode extends RenderableElement {
         Fill tf = getProperty(TEXT_FILL_PROPERTY);
         Objects.requireNonNull(tf);
         if (!Objects.equals(fill, tf)) {
-            fillElem = tf.makeElement(new DecorationContext()); // TODO
+            fillElem = tf.makeElement(new DecorationContext(this));
             fill = tf;
         }
         return fillElem;

@@ -383,16 +383,18 @@ public class CSSParser {
             }
             case PX -> new Length(n.val(), 0, 0);
             case PERCENT -> new Length(0, 0, n.val());
+            case EM -> new Length(0, n.val(), 0);
         };
     }
 
     public NumberWithUnit parseNumberWithUnit() {
         String l = scanner.readPossibleChars("0123456789-.");
         double d = Double.parseDouble(l);
-        String unitString = scanner.readPossibleCharsOrEmpty("px%");
+        String unitString = scanner.readPossibleCharsOrEmpty("px%em");
         Unit unit = switch (unitString) {
             case "px" -> Unit.PX;
             case "%" -> Unit.PERCENT;
+            case "em" -> Unit.EM;
             case "" -> Unit.NULL;
             default -> throw scanner.new CSSParseException("unknown length unit: '" + unitString + "'");
         };

@@ -19,6 +19,10 @@ public class AwtSwRenderer extends AWTRenderer{
 
     private final SWRasterizer swRasterizer = new SWRasterizer();
 
+    public AwtSwRenderer(AWTDesktop desktop) {
+        super(desktop);
+    }
+
     @Override
     protected void initRoot(RenderableElement root) {
         swRasterizer.initRoot(root);

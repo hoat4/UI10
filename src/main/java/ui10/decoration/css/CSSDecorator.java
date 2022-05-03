@@ -41,7 +41,6 @@ public class CSSDecorator extends TransientElement {
         pseudoClassProviders.add(new PseudoClassProvider("focus", Control.FOCUSED_PROPERTY));
         pseudoClassProviders.add(new PseudoClassProvider("hover", Control.HOVERED_PROPERTY));
         pseudoClassProviders.add(new PseudoClassProvider("active", Button.PRESSED_PROPERTY));
-
     }
 
     @Override

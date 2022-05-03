@@ -159,7 +159,7 @@ public class TableView<T> extends ControlView<Table<T>> {
                 row.initParent(this);
                 placer.accept(row, new Rectangle(0, y, size.width(), rowHeight));
 
-                placer.accept(cellSeparator().makeElement(new DecorationContext()), // ???
+                placer.accept(cellSeparator().makeElement(new DecorationContext(this)),
                         new Rectangle(0, y + rowHeight, size.width(), SEPARATOR_THICKNESS));
             }
         }
@@ -257,7 +257,7 @@ public class TableView<T> extends ControlView<Table<T>> {
                 x += w;
 
                 if (i != cells.size() - 1)
-                    placer.accept(borderFill.makeElement(new DecorationContext()), // ???
+                    placer.accept(borderFill.makeElement(new DecorationContext(this)),
                             new Rectangle(x, 0, SEPARATOR_THICKNESS, size.height()));
                 x += SEPARATOR_THICKNESS;
             }

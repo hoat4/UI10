@@ -6,6 +6,7 @@ import ui10.binding2.ActionEvent;
 import ui10.binding2.ChangeEvent;
 import ui10.binding2.ElementEvent;
 import ui10.binding2.Property;
+import ui10.decoration.css.CSSClass;
 import ui10.graphics.TextNode;
 import ui10.input.pointer.MouseEvent;
 import ui10.layout.Layouts;
@@ -19,6 +20,7 @@ public class Button extends ControlModel {
     public static final Property<String> TEXT_PROPERTY = new Property<>(false, "");
     public static final Property<Boolean> PRESSED_PROPERTY = new Property<>(false, false);
     public static final Property<Boolean> ACTION_EVENT = new Property<>(true);
+    public static final Property<Boolean> DEFAULT_PROPERTY = new Property<>(false);
 
     public Button() {
         this("");
@@ -37,6 +39,14 @@ public class Button extends ControlModel {
         setProperty(PRESSED_PROPERTY, pressed);
     }
 
+    public boolean defaultButton() {
+        return getProperty(DEFAULT_PROPERTY);
+    }
+
+    public void defaultButton(boolean defaultButton) {
+        setProperty(DEFAULT_PROPERTY, defaultButton);
+    }
+
     public String text() {
         return getProperty(TEXT_PROPERTY);
     }
@@ -47,6 +57,17 @@ public class Button extends ControlModel {
 
     public Observable<ActionEvent> onAction() {
         return (Observable<ActionEvent>) observable(ACTION_EVENT);
+    }
+
+    @Override
+    public <T> void setProperty(Property<T> prop, T value) {
+        if (prop.equals(DEFAULT_PROPERTY)) {
+            if ((boolean) value)
+                setProperty(new CSSClass("default-button"), null);
+            else
+                removeProperty(new CSSClass("default-button"));
+        }
+        super.setProperty(prop, value);
     }
 
     @Override
@@ -95,7 +116,7 @@ public class Button extends ControlModel {
 
         @EventHandler
         private void onMousePress(MouseEvent.MousePressEvent event, EventContext eventContext) {
-            focusContext.focusedControl.set(this);
+            focusContext().focusedControl.set(this);
             model.pressed(true);
         }
 

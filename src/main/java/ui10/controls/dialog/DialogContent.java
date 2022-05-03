@@ -2,6 +2,7 @@ package ui10.controls.dialog;
 
 import ui10.base.Element;
 import ui10.binding3.Model;
+import ui10.controls.Action;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +23,7 @@ public interface DialogContent extends Model {
         return null;
     }
 
+
     // lehet text helyett description, contentText is a neve
     // ez az inputok fölött vna
     String text();
@@ -32,6 +34,8 @@ public interface DialogContent extends Model {
     }
 
     List<DialogAction> actions();
+
+    Action defaultAction();
 
     default Element content() { // text alá kerül. bár input dialognál meg mellé.
         return null;

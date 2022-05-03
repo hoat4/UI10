@@ -17,6 +17,9 @@ public class EventLoop {
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(UIThread::new);
 
     public void runLater(Runnable runnable) {
+        if (executorService.isShutdown())
+            throw new IllegalStateException();
+
         executorService.execute(() -> {
             try {
                 runnable.run();
@@ -27,10 +30,21 @@ public class EventLoop {
     }
 
     public ScheduledFuture<?> beginAnimation(Duration duration, Consumer<Fraction> f) {
+        if (executorService.isShutdown())
+            throw new IllegalStateException();
+
         Animation animation = new Animation(duration, f);
         animation.scheduledFuture = executorService.scheduleAtFixedRate(animation,
                 0, 16, TimeUnit.MILLISECONDS);
         return animation.scheduledFuture;
+    }
+
+    public void stop() {
+        executorService.shutdown();
+    }
+
+    public boolean isStopped() {
+        return executorService.isShutdown();
     }
 
     private static class Animation implements Runnable {

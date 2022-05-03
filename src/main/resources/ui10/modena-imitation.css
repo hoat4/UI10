@@ -1,6 +1,7 @@
 :root {
     background: #F4F4F4;
-    color: #000;
+    color: #323232;
+    font-size: 12px;
 }
 TextField {
     padding: 5px;
@@ -9,24 +10,36 @@ TextField {
     border-radius: 3px;
     font-size: 13px;
 }
-.text { color: #323232; }
 .selection { background: #0096C9; color: #fff; }
 
 Button {
     border: 1px solid #B6B6B6;
     border-radius: 5px;
     background: linear-gradient(to bottom, #EFEFEF, #D9D9D9);
-    padding: 5px 10px 6px 10px;
-    transition: background 100ms;
+    font-size: 1em;
+    padding: .3em 1em .3em 1em;
+    transition: background 75ms;
     min-width: 80px; /* ez csak akkor kéne, ha van text van rajta, nem csak ikon */
 }
-.button-text { font-size: 13px; color: #323232; }
-:active { background: linear-gradient(to bottom, #E2E2E2, #CDCDCD); }
+Button:active { background: linear-gradient(to bottom, #E2E2E2, #CDCDCD); }
+.default-button {
+    background: linear-gradient(to bottom, #B1DAEE, #9DC6DA);
+    /* inner border: linear-gradient(to bottom, #B1DAEE, #A5D1E4);*/
+    border: 1px solid #83A6B6;
+}
+.default-button:hover {
+    background: linear-gradient(to bottom, #D3EBF5, #BBD5E0);
+    /* inner border: linear-gradient(to bottom, #F7FCFD, #C4DEEA); */
+    border: 1px solid #9CB2BC;
+}
+.default-button:active {
+    background: linear-gradient(to bottom, #A6CFE0, #87B9CD); /* bordert nem látom rendesen highlight miatt */
+}
 /*:focus {border: 5px solid #f00;}*/
 
 .main { gap: 10px; }
 
-Label { text-align: left; font-size: 13px; color: #323232; }
+Label { text-align: left; color: #323232; }
 
 Table { border: 1px solid #C8C8C8; }
 TableView { row-height: 32px; }
@@ -83,5 +96,8 @@ TabButton:hover > .tab-button-inner {
     font-size: 12px;
 }
 
-.dialog-main { padding: 10px;}
+.dialog-main { padding: 10px; }
 .dialog-button-bar { padding: 10px; flex-grow: 0; }
+
+/* nem világos a classnévből hogy ez az ablakra vagy a dialogview-ra vonatkozik */
+.dialog { min-width: 300px; }

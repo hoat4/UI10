@@ -20,6 +20,7 @@ public class Transition<T>  {
         this.element = element;
         this.spec = spec;
         this.begin = begin;
+        this.end = begin;
     }
 
     public void progress(Fraction fraction) {

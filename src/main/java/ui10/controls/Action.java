@@ -1,4 +1,4 @@
-package ui10.controls.dialog;
+package ui10.controls;
 
 import ui10.base.Element;
 import ui10.binding2.ElementEvent;
@@ -9,6 +9,8 @@ import ui10.input.keyboard.KeyCombination;
 import java.util.function.Consumer;
 
 public interface Action extends Model {
+
+    void perform();
 
     String text();
 
@@ -27,4 +29,5 @@ public interface Action extends Model {
     default KeyCombination accelerator() {
         return null;
     }
+
 }

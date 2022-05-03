@@ -11,7 +11,7 @@ import java.util.List;
 
 public class UIContextImpl implements UIContext {
 
-    private final EventLoop eventLoop = new EventLoop();
+    private final EventLoop eventLoop;
 
     private final List<LayoutTask> layoutTasks = new ArrayList<>();
 
@@ -19,7 +19,8 @@ public class UIContextImpl implements UIContext {
 
     private int inLayout =-1;
 
-    public UIContextImpl(AWTRenderer renderer) {
+    public UIContextImpl(AWTDesktop desktop, AWTRenderer renderer) {
+        this.eventLoop = desktop.eventLoop();
         this.renderer = renderer;
     }
 

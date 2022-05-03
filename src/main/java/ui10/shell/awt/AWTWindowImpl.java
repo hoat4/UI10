@@ -1,17 +1,14 @@
 package ui10.shell.awt;
 
+import ui10.base.Container;
 import ui10.geom.Point;
-import ui10.base.EventLoop;
 import ui10.base.*;
 
 import java.awt.*;
 
-import ui10.geom.Size;
-import ui10.geom.shape.Shape;
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.pointer.MouseEvent;
 import ui10.base.LayoutContext2;
-import ui10.layout.BoxConstraints;
 import ui10.shell.renderer.java2d.J2DRenderer;
 import ui10.shell.renderer.java2d.J2DUtil;
 import ui10.window.Cursor;
@@ -23,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 public class AWTWindowImpl extends Frame implements RendererData {
 
@@ -45,11 +41,10 @@ public class AWTWindowImpl extends Frame implements RendererData {
         createBufferStrategy(2);
 
         //renderer = new AwtSwRenderer();
-        renderer = new J2DRenderer();
+        renderer = new J2DRenderer(desktop);
         renderer.awtWindow = this;
         window.setProperty(EnduringElement.UI_CONTEXT_PROPERTY, renderer.uiContext);
         renderer.initRoot(window);
-        window.focusContext = new FocusContext();
     }
 
     public void applySize() {
@@ -136,6 +131,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
             EventContext eventContext = new EventContext();
             if (!renderer.captureMouseEvent(e, eventContext, l)) {
                 setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+                window.focusContext().hoveredControl.set(null);
                 return;
             }
             Cursor cursor = Cursor.POINTER;
@@ -143,10 +139,14 @@ public class AWTWindowImpl extends Frame implements RendererData {
                 if (control.cursor.get() != null)
                     cursor = control.cursor.get();
             }
-            setCursor(switch(cursor) {
+            setCursor(switch (cursor) {
                 case POINTER -> java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR);
                 case TEXT -> java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.TEXT_CURSOR);
             });
+
+            // de mit csinálunk, ha a a controlnak vagy vmelyik ancestorának külön FocusContextje van?
+            window.focusContext().hoveredControl.set(l.get(l.size() - 1));
+
             for (int i = l.size() - 1; i >= 0; i--) {
                 if (eventContext.stopPropagation)
                     break;
@@ -160,7 +160,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
     private void dispatchKeyEvent(KeyTypeEvent e) {
         renderer.uiContext.eventLoop().runLater(() -> {
-            Control focusedControl = window.focusContext.focusedControl.get();
+            Control focusedControl = window.focusContext().focusedControl.get();
             List<Control> hierarchy = new ArrayList<>();
             for (RenderableElement re = focusedControl; re != null; re = re.parentRenderable()) {
                 if (re instanceof Control c)

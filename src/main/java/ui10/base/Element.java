@@ -67,7 +67,7 @@ public sealed abstract class Element permits TransientElement, EnduringElement {
 
         initLogicalParent(parent);
 
-        DecorationContext decorationContext = new DecorationContext();
+        DecorationContext decorationContext = new DecorationContext(this);
         CSSDecorator d = decorator();
         if (d != null)
             d.applySelf(this, decorationContext);
@@ -149,6 +149,19 @@ public sealed abstract class Element permits TransientElement, EnduringElement {
         props = Arrays.copyOf(props, i * 3);
         props[i] = prop;
         props[i + 1] = value;
+    }
+
+    public <T> void removeProperty(Property<T> prop) {
+        for (int i = 0; i < props.length; i += 2) {
+            if (props[i] == null || props[i].equals(prop)) {
+                System.arraycopy(props, i + 2, props, i, props.length - i);
+                props[props.length - 2] = null;
+                props[props.length - 1] = null;
+                return;
+            }
+        }
+
+        throw new RuntimeException("property not set: " + prop);
     }
 
     public <T> Observable<? extends ElementEvent> observable(Property<T> prop) {

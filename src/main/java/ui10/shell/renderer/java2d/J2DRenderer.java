@@ -9,6 +9,7 @@ import ui10.graphics.ColorFill;
 import ui10.graphics.LinearGradient;
 import ui10.graphics.TextNode;
 import ui10.input.pointer.MouseEvent;
+import ui10.shell.awt.AWTDesktop;
 import ui10.shell.awt.AWTRenderer;
 
 import java.awt.*;
@@ -18,6 +19,10 @@ import java.util.Map;
 public class J2DRenderer extends AWTRenderer {
 
     Item<?> root;
+
+    public J2DRenderer(AWTDesktop desktop) {
+        super(desktop);
+    }
 
     @Override
     protected void initRoot(RenderableElement root) {

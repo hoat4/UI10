@@ -82,8 +82,6 @@ public class DecorBox extends TransientElement {
         ));
     }
 
-
-
     private int len(int propIndex) {
         Length l = (Length) rule.dcbProps[propIndex];
         return l == null ? 0 : decorContext.length(l);

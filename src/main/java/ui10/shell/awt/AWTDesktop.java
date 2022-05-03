@@ -1,5 +1,8 @@
 package ui10.shell.awt;
 
+import ui10.base.Container;
+import ui10.base.EventLoop;
+import ui10.base.FocusContext;
 import ui10.base.LayoutContext1;
 import ui10.binding.ObservableList;
 import ui10.geom.Size;
@@ -8,6 +11,8 @@ import ui10.window.Desktop;
 import ui10.window.Window;
 
 public class AWTDesktop extends Desktop {
+
+    private final EventLoop eventLoop = new EventLoop();
 
     {
         windows.subscribe(ObservableList.simpleListSubscriber(this::showWindow, this::hideWindow));
@@ -35,7 +40,15 @@ public class AWTDesktop extends Desktop {
     }
 
     private void hideWindow(Window window) {
-        ((AWTWindowImpl) window.rendererData).dispose();
+        AWTWindowImpl w = (AWTWindowImpl) window.rendererData;
+        w.dispose();
         window.rendererData = null;
+
+        if (windows.isEmpty())
+            eventLoop.stop();
+    }
+
+    public EventLoop eventLoop() {
+        return eventLoop;
     }
 }

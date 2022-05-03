@@ -113,7 +113,7 @@ public class TextField extends Control  {
 
     @EventHandler
     private void onMousePress(MouseEvent.MousePressEvent event, EventContext context) {
-        focusContext.focusedControl.set(this);
+        focusContext().focusedControl.set(this);
         int newPos = pickTextPos(event.point().subtract(relativePos(textNode)));
         caretPosition.set(newPos);
         this.selectionBegin = newPos;

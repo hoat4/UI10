@@ -1,10 +1,10 @@
 package ui10.decoration.css;
 
 import ui10.base.*;
-import ui10.binding2.Property;
 import ui10.controls.Label;
 import ui10.controls.TableView;
 import ui10.decoration.BorderSpec;
+import ui10.geom.Fraction;
 import ui10.geom.Insets;
 import ui10.layout.Grid;
 import ui10.layout.LinearLayout;
@@ -220,7 +220,7 @@ public class Rule {
         if (l == null) // ilyenkor törölni kéne
             return;
 
-        if (!(e instanceof EnduringElement))
+        if (!(e instanceof EnduringElement ee))
             throw new IllegalArgumentException("transition on transient element: " + e);
 
         for (TransitionSpec<?> t : l)
@@ -248,11 +248,15 @@ public class Rule {
                 t.activeAnimation.cancel(false);
 
             EnduringElement r = (EnduringElement) e;
-            transition.activeAnimation = r.uiContext().eventLoop().beginAnimation(transition.spec.duration(), f -> {
-                System.out.println(f);
-                t.progress(f);
-                r.invalidateDecoration();
-            });
+            if (r.uiContext() == null) {
+                t.progress(Fraction.WHOLE);
+            } else {
+                transition.activeAnimation = r.uiContext().eventLoop().beginAnimation(transition.spec.duration(), f -> {
+                    System.out.println(f);
+                    t.progress(f);
+                    r.invalidateDecoration();
+                });
+            }
         }
     }
 }

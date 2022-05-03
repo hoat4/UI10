@@ -1,6 +1,7 @@
 package ui10.base;
 
 import ui10.binding2.ElementEvent;
+import ui10.binding2.Property;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -11,10 +12,10 @@ import java.util.Objects;
 
 public abstract class Container extends RenderableElement {
 
+    public static final Property<FocusContext> FOCUS_CONTEXT_PROPERTY = new Property<>(true);
+
     private final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
-
-    public FocusContext focusContext;
 
     protected void validate() {
     }
@@ -88,8 +89,6 @@ public abstract class Container extends RenderableElement {
                 else if (e.parentRenderable() != Container.this)
                     throw new IllegalStateException("not a child of " + Container.this + ": " + e);
                 children.add(e);
-                if (e instanceof Container p)
-                    p.focusContext = focusContext;
             }
         }.placeElement(getContent(), shape);
     }
@@ -109,5 +108,9 @@ public abstract class Container extends RenderableElement {
                     return "Container[" + node + "]";
                 }
             };
+    }
+
+    public FocusContext focusContext() {
+        return getProperty(FOCUS_CONTEXT_PROPERTY);
     }
 }

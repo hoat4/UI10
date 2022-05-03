@@ -21,7 +21,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public abstract class Control extends Container {
 
     public static final Property<Boolean> FOCUSED_PROPERTY = new Property<>(false);
-    public static final Property<Boolean> HOVERED_PROPERTY = new Property<>(false); // TODO
+    public static final Property<Boolean> HOVERED_PROPERTY = new Property<>(false) {
+        @Override
+        public String toString() {
+            return "hover";
+        }
+    };
 
     public final ScalarProperty<Cursor> cursor = ScalarProperty.create("Control.cursor");
 
@@ -84,7 +89,7 @@ public abstract class Control extends Container {
     @Override
     public <T> T getProperty(Property<T> prop) {
         if (prop.equals(FOCUSED_PROPERTY))
-            return (T) (Boolean) (focusContext != null && focusContext.focusedControl.get() == this);
+            return (T) (Boolean) (focusContext() != null && focusContext().focusedControl.get() == this);
         else
             return super.getProperty(prop);
     }
@@ -92,13 +97,16 @@ public abstract class Control extends Container {
     @Override
     public <T> void setProperty(Property<T> prop, T value) {
         if (prop.equals(FOCUSED_PROPERTY)) {
-            if (focusContext == null) // ilyenkor mit kéne csinálni?
+            if (focusContext() == null) // ilyenkor mit kéne csinálni?
                 throw new IllegalStateException("no focus context");
 
             if ((boolean) value)
-                focusContext.focusedControl.set(this);
-            else if (focusContext.focusedControl.get() == this)
-                focusContext.focusedControl.set(null);
+                focusContext().focusedControl.set(this);
+            else if (focusContext().focusedControl.get() == this)
+                focusContext().focusedControl.set(null);
+        } else if (prop.equals(HOVERED_PROPERTY)) {
+            invalidate();
+            super.setProperty(prop, value);
         } else
             super.setProperty(prop, value);
     }
