@@ -1,9 +1,6 @@
 package ui10.shell.awt;
 
-import ui10.base.Container;
-import ui10.base.EventLoop;
-import ui10.base.FocusContext;
-import ui10.base.LayoutContext1;
+import ui10.base.*;
 import ui10.binding.ObservableList;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
@@ -13,15 +10,16 @@ import ui10.window.Window;
 public class AWTDesktop extends Desktop {
 
     private final EventLoop eventLoop = new EventLoop();
+    public ViewProvider viewProvider;
 
     {
         windows.subscribe(ObservableList.simpleListSubscriber(this::showWindow, this::hideWindow));
     }
 
     private void showWindow(Window window) {
-        Size size = new LayoutContext1().preferredSize(window,
-                new BoxConstraints(Size.ZERO, new Size(Size.INFINITY, Size.INFINITY)));
-        //Size size = new Size(640, 480);
+        //Size size = new LayoutContext1().preferredSize(window,
+        //        new BoxConstraints(Size.ZERO, new Size(Size.INFINITY, Size.INFINITY)));
+        Size size = new Size(640, 480);
         int scale = 1;
         size = size.multiply(scale);
 

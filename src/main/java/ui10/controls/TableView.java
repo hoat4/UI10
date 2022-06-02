@@ -1,3 +1,4 @@
+/*
 package ui10.controls;
 
 import ui10.base.*;
@@ -264,3 +265,4 @@ public class TableView<T> extends ControlView<Table<T>> {
         }
     }
 }
+*/

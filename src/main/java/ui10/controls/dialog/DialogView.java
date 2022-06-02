@@ -2,7 +2,7 @@ package ui10.controls.dialog;
 
 import ui10.base.Container;
 import ui10.base.Element;
-import ui10.controls.ButtonView2;
+import ui10.control4.controls.ButtonModel;
 import ui10.controls.Label;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class DialogView extends Container {
     Element buttonBar() {
         List<Element> buttons = new ArrayList<>();
         for (DialogContent.DialogAction action : content.actions()) {
-            buttons.add(new ButtonView2(action));
+            buttons.add(new ButtonModel.OfAction(action));
         }
         return withClass("dialog-button-bar",
                 halign(HorizontalAlignment.RIGHT, horizontally(buttons))

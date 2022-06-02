@@ -13,7 +13,7 @@ compileJava {
 }
 
 run {
-    jvmArgs(['--enable-preview'])
+    jvmArgs(['--enable-preview', '-ea'])
 }
 
 tasks.withType(JavaCompile) {

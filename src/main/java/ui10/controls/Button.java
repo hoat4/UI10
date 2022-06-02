@@ -1,3 +1,4 @@
+/*
 package ui10.controls;
 
 import ui10.base.*;
@@ -19,7 +20,7 @@ public class Button extends ControlModel {
 
     public static final Property<String> TEXT_PROPERTY = new Property<>(false, "");
     public static final Property<Boolean> PRESSED_PROPERTY = new Property<>(false, false);
-    public static final Property<Boolean> ACTION_EVENT = new Property<>(true);
+    public static final Property<Boolean> ACTION_EVENT = new Property<>(false);
     public static final Property<Boolean> DEFAULT_PROPERTY = new Property<>(false);
 
     public Button() {
@@ -93,6 +94,19 @@ public class Button extends ControlModel {
             return Layouts.centered(textNode); // ezt CSS-ből kéne
         }
 
+        /*
+        @Watch("model.text")
+        void onTextChange() {
+            textNode.text(model.text());
+        }
+
+        @Watch("model.pressed")
+        void onPressChange() {
+            if (!model.pressed())
+                model.dispatchElementEvent(new ActionEvent(Button.ACTION_EVENT));
+        }
+ */
+/*
         @Override
         protected void initFromProps() {
             super.initFromProps();
@@ -127,3 +141,4 @@ public class Button extends ControlModel {
 
     }
 }
+*/

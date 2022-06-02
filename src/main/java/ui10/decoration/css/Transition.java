@@ -48,7 +48,7 @@ public class Transition<T>  {
     }
 
     public T value() {
-        if (end == null)
+        if (end == null || progress == null)
             return begin;
         return spec.property().interpolator.interpolate(begin, end, progress);
     }

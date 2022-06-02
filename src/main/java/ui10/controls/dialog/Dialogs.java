@@ -45,7 +45,7 @@ public class Dialogs {
             return;
         }
 
-        e = new CSSDecorator(e, css);
+        //e = new CSSDecorator(e, css);
 
         Window w = Window.of(e);
         w.focusContext.defaultAction.set(content.defaultAction());
@@ -64,7 +64,7 @@ public class Dialogs {
         private DialogAction okAction = new DialogAction() {
 
             @Override
-            public void perform() {
+            public void performAction() {
                 desktop.windows.remove(window);
             }
 
@@ -121,7 +121,7 @@ public class Dialogs {
         private DialogAction okAction = new DialogAction() {
 
             @Override
-            public void perform() {
+            public void performAction() {
                 desktop.windows.remove(window);
             }
 

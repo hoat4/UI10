@@ -1,7 +1,6 @@
 package ui10.shell.renderer.java2d;
 
 import ui10.input.pointer.MouseEvent;
-import ui10.base.EventLoop;
 import ui10.base.*;
 
 import javax.imageio.ImageIO;

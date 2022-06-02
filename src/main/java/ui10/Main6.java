@@ -1,8 +1,9 @@
 package ui10;
 
-import ui10.base.Element;
 import ui10.base.Container;
-import ui10.controls.*;
+import ui10.base.Element;
+import ui10.base.ViewProvider;
+import ui10.control4.controls.*;
 import ui10.controls.dialog.Dialogs;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
@@ -10,8 +11,8 @@ import ui10.decoration.css.CSSScanner;
 import ui10.geom.Insets;
 import ui10.graphics.ColorFill;
 import ui10.image.Colors;
-import ui10.layout.Grid;
 import ui10.layout.Layouts;
+import ui10.layout.LinearLayout;
 import ui10.shell.awt.AWTDesktop;
 import ui10.shell.awt.AWTWindowImpl;
 import ui10.shell.awt.UIContextImpl;
@@ -21,12 +22,10 @@ import ui10.window.Window;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static ui10.decoration.css.CSSClass.withClass;
 import static ui10.layout.Layouts.*;
 
 public class Main6 {
@@ -38,7 +37,7 @@ public class Main6 {
 
         Desktop.THREAD_LOCAL.set(new AWTDesktop());
 
-        if (true) {
+        if (false) {
             Dialogs.showMessage("Hello world!");
             return;
         }
@@ -46,7 +45,7 @@ public class Main6 {
         // System.out.println(Colors.WHITE.derive(-.09));
 
         AWTDesktop desktop = new AWTDesktop();
-        Window window = makeSampleWindow();
+        Window window = makeSampleWindow(desktop);
         if (window == null)
             return;
 
@@ -83,34 +82,83 @@ public class Main6 {
         // TODO ennek újra kéne dekorálnia a textnode-okat, amelyikhez eljut az új érték
     }
 
-    private static Window makeSampleWindow() {
-        TextField tf = new TextField();
-        tf.text.set("szövegmező");
+    private static Window makeSampleWindow(AWTDesktop desktop) {
+        CSSParser css;
+        try (Reader r = new InputStreamReader(Main6.class.getResourceAsStream("modena-imitation.css"))) {
+            css = new CSSParser(new CSSScanner(r));
+            css.parseCSS();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-        Button button = new Button("Gomb");
-        button.onAction().subscribe(__ -> System.out.println("Hello world!"));
+        TextField tf = new TextField();
+        tf.text("szövegmező");
+
+        ButtonModel newButton = new ButtonModel() {
+
+            @Override
+            public String text() {
+                return "Gomb";
+            }
+
+            @Override
+            public void performAction() {
+                System.out.println("Hello world!");
+            }
+        };
 
         //button.attributes().add(new GrowFactor(Fraction.of(0)));
         //tf.attributes().add(new GrowFactor(Fraction.of(0)));
 
         List<String> list = List.of("Hello", "world!");
 
-        Element tableView = padding(new Table<>(List.of(
-                new Table.TableColumn<>("Col1", s -> s),
-                new Table.TableColumn<>("Col2", s -> String.valueOf(s.length()))
-        ), list), new Insets(50));
+        class SampleTable extends Table<String>{
+
+            @Override
+            public List<Column<String, ?>> columns() {
+                return List.of(
+                        new Table.Column<>("Col1", s -> s),
+                        new Table.Column<>("Col2", s -> String.valueOf(s.length()))
+                );
+            }
+
+            @Override
+            public List<String> data() {
+                return list;
+            }
+        }
+
+        Element tableView = padding(new SampleTable(), new Insets(50));
         Tabs.title(tableView, "Táblázat");
 
-        Element vbox = vertically(
-                new Label("label"),
-                button,
+        LabelModel lm = new LabelModel() {
+            @Override
+            public String text() {
+                return "label";
+            }
+        };
+        lm.setView(new LabelImpl(lm));
+
+        LinearLayout vbox = vertically(
+                lm,
+                newButton,
                 tf
         );
-        vbox.setProperty(Grid.GAP_PROPERTY, 10);
+        vbox.gap = 10; // mértékegység?
         Element buttonTab = centered(vbox);
         Tabs.title(buttonTab, "Egyik tab");
 
-        Element content = withClass("root",
+        buttonTab = Container.of(buttonTab);
+
+        CSSDecorator css1 = new CSSDecorator(buttonTab, css);
+        desktop.viewProvider = new ViewProvider(css1);
+        //desktop.viewProvider.initRoot(buttonTab);
+        Element content = buttonTab;
+        return Window.of(content);
+
+        /*
+        content = withClass("root",
 
                 //tableView
                 tabbedPane = new TabbedPane(List.of(
@@ -138,23 +186,14 @@ public class Main6 {
                 //)))
         );
 
-        CSSParser css;
-        try (Reader r = new InputStreamReader(Main6.class.getResourceAsStream("modena-imitation.css"))) {
-            css = new CSSParser(new CSSScanner(r));
-            css.parseCSS();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
 
-        Container contentWrapper = Container.of(content);
-        content = new CSSDecorator(contentWrapper, css);
+        //Container contentWrapper = Container.of(content);
+        //content = new CSSDecorator(contentWrapper, css);
 
         /*Window window = Window.of(centered(withSize(
                 new Opacity(new ColorFill(Colors.RED), Fraction.of(.1, 100)),
                 new Size(100, 100)
         )));*/
-        return Window.of(content);
     }
 
 
@@ -170,7 +209,7 @@ public class Main6 {
                 new Insets(50)
         );
     }
-
+/*
 
     private static Element roundedRects() {
         Element content = centered(
@@ -191,5 +230,5 @@ public class Main6 {
 
         return new CSSDecorator(content, css);
     }
-
+*/
 }

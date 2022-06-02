@@ -10,6 +10,7 @@ import ui10.graphics.LinearGradient;
 import ui10.layout.Layouts;
 
 import java.util.List;
+import java.util.Objects;
 
 import static ui10.layout.Layouts.withOpacity;
 
@@ -63,6 +64,7 @@ public interface Fill {
         private final Fraction t;
 
         public InterpolatedFill(Fill a, Fill b, Fraction t) {
+            Objects.requireNonNull(t);
             this.a = a;
             this.b = b;
             this.t = t;

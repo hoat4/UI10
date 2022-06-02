@@ -16,6 +16,7 @@ public class LinearLayout extends RectangularLayout {
 
     private final Axis primaryAxis;
     private final List<? extends Element> children;
+    public int gap; // TODO Length-nek kéne lennie
 
     public LinearLayout(Axis primaryAxis, List<? extends Element> children) {
         this.primaryAxis = primaryAxis;
@@ -57,11 +58,12 @@ public class LinearLayout extends RectangularLayout {
 
                     @Override
                     public Fraction growFactor() {
-                        return e.getProperty(GROW_FACTOR);
+                        return Fraction.WHOLE;
+                        // TODO return e.getProperty(GROW_FACTOR);
                     }
                 }).toList());
 
-        l.gap = getProperty(Grid.GAP_PROPERTY);
+        l.gap = gap;
         l.layout();
         return l;
     }

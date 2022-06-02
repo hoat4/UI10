@@ -11,15 +11,5 @@ public non-sealed abstract class TransientElement extends Element {
         this.logicalParent = logicalParent;
     }
 
-    @Override
-    <T> T getPropertyFromParent(Property<T> prop) {
-        if (logicalParent == null)
-            return prop.defaultValue;
-        return logicalParent.getProperty(prop);
-    }
-
-    @Override
-    boolean hasPropertyInParent(Property<?> prop) {
-        return logicalParent != null && logicalParent.hasProperty(prop);
-    }
+    // context metódus?
 }

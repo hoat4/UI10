@@ -1,3 +1,4 @@
+/*
 package ui10.controls;
 
 import ui10.base.*;
@@ -84,3 +85,4 @@ public class TabbedPaneView extends ControlView<TabbedPane> {
     }
 
 }
+*/

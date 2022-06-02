@@ -1,22 +1,26 @@
 package ui10.decoration.css;
 
-import ui10.base.*;
+import ui10.base.Element;
+import ui10.base.EnduringElement;
 import ui10.controls.Label;
-import ui10.controls.TableView;
 import ui10.decoration.BorderSpec;
+import ui10.decoration.DecorationContext;
 import ui10.geom.Fraction;
 import ui10.geom.Insets;
+import ui10.graphics.TextNode;
 import ui10.layout.Grid;
 import ui10.layout.LinearLayout;
-import ui10.decoration.DecorationContext;
-import ui10.graphics.TextNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static ui10.layout.Layouts.*;
+import static ui10.layout.Layouts.padding;
+import static ui10.layout.Layouts.roundRectangle;
 
 public class Rule {
 
@@ -47,6 +51,13 @@ public class Rule {
         props = Arrays.copyOf(props, i * 3);
         props[i] = prop;
         props[i + 1] = value;
+    }
+
+    Object getPropertyByName(String name) {
+        for (int i = 0; i < props.length; i += 2)
+            if (name.equals(props[i]))
+                return props[i + 1];
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -162,6 +173,7 @@ public class Rule {
 
     @SuppressWarnings("Convert2MethodRef")
     public void apply1(Element e, DecorationContext context) {
+        /*
         apply1(CSSProperty.fontSize, len -> e.setProperty(TextNode.FONT_SIZE_PROPERTY, context.length(len)));
         apply1(CSSProperty.textColor, color -> e.setProperty(TextNode.TEXT_FILL_PROPERTY, color));
         apply1(CSSProperty.fontWeight, weight -> e.setProperty(TextNode.FONT_WEIGHT_PROPERTY, weight));
@@ -171,6 +183,8 @@ public class Rule {
 
         apply1(CSSProperty.rowHeight, h -> e.setProperty(TableView.ROW_HEIGHT_PROPERTY, context.length(h)));
         apply1(CSSProperty.cellSeparator, f -> e.setProperty(TableView.CELL_SEPARATOR_PROPERTY, f));
+
+         */
     }
 
     private <T> Element prop2(CSSProperty<T> prop, Element e, BiFunction<Element, T, Element> f) {
@@ -214,7 +228,7 @@ public class Rule {
                 element
         );
     }
-
+/*
     public void applyTransitionsOf(Element e) {
         List<TransitionSpec<?>> l = get(CSSProperty.transition);
         if (l == null) // ilyenkor törölni kéne
@@ -226,6 +240,7 @@ public class Rule {
         for (TransitionSpec<?> t : l)
             handleTransitionSpec(e, t);
     }
+
 
     @SuppressWarnings("unchecked")
     private <T> void handleTransitionSpec(Element e, TransitionSpec<T> transitionSpec) {
@@ -259,4 +274,6 @@ public class Rule {
             }
         }
     }
+
+ */
 }

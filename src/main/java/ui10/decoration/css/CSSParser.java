@@ -1,5 +1,7 @@
 package ui10.decoration.css;
 
+import ui10.Main6;
+import ui10.control4.controls.TextField;
 import ui10.controls.Label;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.Fill;

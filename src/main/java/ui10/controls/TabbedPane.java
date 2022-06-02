@@ -1,3 +1,4 @@
+/*
 package ui10.controls;
 
 import ui10.base.ControlModel;
@@ -27,3 +28,4 @@ public class TabbedPane extends ControlModel {
         setProperty(ACTIVE_TAB_PROPERTY, tab);
     }
 }
+*/

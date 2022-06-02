@@ -34,20 +34,6 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
     }
 
     public void dispatchElementEvent(ElementEvent event) {
-        if (initialized || !(event instanceof ChangeEvent<?>)) {
-            dispatchPropertyChangeImpl(event);
-
-            CSSDecorator d = decorator();
-            if (d != null)
-                d.elementEvent(this, event);
-        }
-    }
-
-    void dispatchPropertyChangeImpl(ElementEvent changeEvent) {
-        onPropertyChange(changeEvent);
-    }
-
-    protected void onPropertyChange(ElementEvent changeEvent) {
     }
 
     protected void onShapeApplied(Shape shape) {

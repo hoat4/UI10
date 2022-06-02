@@ -268,7 +268,7 @@ public class Layouts {
         return new LinearLayout(Axis.VERTICAL, List.copyOf(elements));
     }
 
-    public static Element vertically(Element... elements) {
+    public static LinearLayout vertically(Element... elements) {
         return new LinearLayout(Axis.VERTICAL, List.of(elements));
     }
 

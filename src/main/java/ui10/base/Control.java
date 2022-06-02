@@ -85,32 +85,6 @@ public abstract class Control extends Container {
         return e.origin().subtract(origin());
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T getProperty(Property<T> prop) {
-        if (prop.equals(FOCUSED_PROPERTY))
-            return (T) (Boolean) (focusContext() != null && focusContext().focusedControl.get() == this);
-        else
-            return super.getProperty(prop);
-    }
-
-    @Override
-    public <T> void setProperty(Property<T> prop, T value) {
-        if (prop.equals(FOCUSED_PROPERTY)) {
-            if (focusContext() == null) // ilyenkor mit kéne csinálni?
-                throw new IllegalStateException("no focus context");
-
-            if ((boolean) value)
-                focusContext().focusedControl.set(this);
-            else if (focusContext().focusedControl.get() == this)
-                focusContext().focusedControl.set(null);
-        } else if (prop.equals(HOVERED_PROPERTY)) {
-            invalidate();
-            super.setProperty(prop, value);
-        } else
-            super.setProperty(prop, value);
-    }
-
     @Target(METHOD)
     @Retention(RUNTIME)
     public @interface EventHandler {

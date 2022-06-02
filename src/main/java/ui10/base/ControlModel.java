@@ -1,3 +1,4 @@
+/*
 package ui10.base;
 
 import ui10.binding2.ChangeEvent;
@@ -25,15 +26,16 @@ public non-sealed class ControlModel extends EnduringElement {
         if (initialized) { // view inicializáltságát nem kéne figyelembe venni?
             if (subscriptions().contains(event.property()))
                 view.handleModelEvent(event);
-            for (ExternalListener<?> el : externalListeners)
-                elHelper(el, event);
+            //for (ExternalListener<?> el : externalListeners)
+            //    elHelper(el, event);
+
             // descendantokat is értesítsük?
         }
 
         if (initialized || !(event instanceof ChangeEvent<?>)) {
-            CSSDecorator d = decorator();
-            if (d != null)
-                d.elementEvent(this, event);
+//            CSSDecorator d = decorator();
+//            if (d != null)
+//                d.elementEvent(this, event);
         }
     }
 
@@ -58,3 +60,4 @@ public non-sealed class ControlModel extends EnduringElement {
         view.invalidate();
     }
 }
+*/

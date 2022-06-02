@@ -1,6 +1,7 @@
 package ui10.decoration.css;
 
-import ui10.controls.Label;
+import ui10.control4.controls.LabelImpl;
+import ui10.control4.controls.LabelModel;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.Fill;
 import ui10.decoration.Interpolator;
@@ -75,7 +76,7 @@ public class CSSProperty<T> {
     public static final CSSProperty<Length> gap = new CSSProperty<>("gap", Interpolators.LENGTH, -1);
     static final CSSProperty<Fraction> flexGrow = new CSSProperty<>("flex-grow", Interpolators.FRACTION, -1);
 
-    public static final CSSProperty<Label.TextAlign> textAlign = new CSSProperty<>("text-align", null, -1);
+    public static final CSSProperty<LabelImpl.TextAlign> textAlign = new CSSProperty<>("text-align", null, -1);
     public static final CSSProperty<FontWeight> fontWeight = new CSSProperty<>("font-weight", null, -1);
 
     static final CSSProperty<List<TransitionSpec<?>>> transition = new CSSProperty<>("transition", null, -1);

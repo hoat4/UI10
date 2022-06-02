@@ -12,32 +12,10 @@ import java.util.Objects;
 
 public abstract class Container extends RenderableElement {
 
-    public static final Property<FocusContext> FOCUS_CONTEXT_PROPERTY = new Property<>(true);
-
     private final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
 
     protected void validate() {
-    }
-
-    @Override
-    void dispatchPropertyChangeImpl(ElementEvent changeEvent) {
-        if (subscriptions().contains(changeEvent.property()))
-            onPropertyChange(changeEvent);
-        for (ExternalListener<?> el : externalListeners)
-            elHelper(el, changeEvent);
-
-        List<RenderableElement> prevChildren = List.copyOf(children);
-
-        for (RenderableElement e : children)
-            if (prevChildren.contains(e) && !e.hasPropertyInSelf(changeEvent.property())
-                    && !e.hasPropertyInTransientAncestor(changeEvent.property()))
-                // subscriptionst is figyelembe kéne venni, de az összes descendantét valahogy
-                e.dispatchPropertyChangeImpl(changeEvent);
-    }
-
-
-    protected void onPropertyChange(ElementEvent changeEvent) {
     }
 
     protected abstract Element content();
@@ -108,9 +86,5 @@ public abstract class Container extends RenderableElement {
                     return "Container[" + node + "]";
                 }
             };
-    }
-
-    public FocusContext focusContext() {
-        return getProperty(FOCUS_CONTEXT_PROPERTY);
     }
 }

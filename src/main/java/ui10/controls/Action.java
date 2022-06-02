@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public interface Action extends Model {
 
-    void perform();
+    void performAction();
 
     String text();
 
@@ -30,4 +30,16 @@ public interface Action extends Model {
         return null;
     }
 
+    interface ActionModelListener {
+
+        void textChanged();
+
+        void enabledChanged();
+
+        void descriptionChanged();
+
+        void iconChanged();
+
+        void acceleratorChanged();
+    }
 }

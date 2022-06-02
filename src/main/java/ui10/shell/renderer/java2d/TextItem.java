@@ -2,17 +2,18 @@ package ui10.shell.renderer.java2d;
 
 import ui10.base.Element;
 import ui10.base.RenderableElement;
+import ui10.control4.controls.TextElement;
 import ui10.graphics.TextNode;
 
 import java.awt.Graphics2D;
 import java.util.Objects;
 
-public class TextItem extends Item<TextNode> {
+public class TextItem extends Item<TextElement> {
 
     private Element prevFill;
     private Item<?> fill;
 
-    public TextItem(J2DRenderer renderer, TextNode node) {
+    public TextItem(J2DRenderer renderer, TextElement node) {
         super(renderer, node);
     }
 

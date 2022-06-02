@@ -2,7 +2,6 @@ package ui10.base;
 
 import ui10.binding.ScalarProperty;
 import ui10.controls.Action;
-import ui10.controls.Button;
 
 public class FocusContext {
 
@@ -18,11 +17,14 @@ public class FocusContext {
             if (e.newValue() != null)
                 e.newValue().onFocusGain();
         });
+        /*
         hoveredControl.subscribe(e->{
             if (e.oldValue() != null)
                 e.oldValue().setProperty(Control.HOVERED_PROPERTY, false);
             if (e.newValue() != null)
                 e.newValue().setProperty(Control.HOVERED_PROPERTY, true);
         });
+
+         */
     }
 }

@@ -3,6 +3,7 @@ package ui10.shell.awt;
 import ui10.base.EventLoop;
 import ui10.base.RenderableElement;
 import ui10.base.UIContext;
+import ui10.base.ViewProvider;
 import ui10.shell.renderer.java2d.J2DRenderer;
 
 import java.util.ArrayList;
@@ -15,18 +16,25 @@ public class UIContextImpl implements UIContext {
 
     private final List<LayoutTask> layoutTasks = new ArrayList<>();
 
+    private final AWTDesktop desktop;
     private final AWTRenderer renderer;
 
     private int inLayout =-1;
 
     public UIContextImpl(AWTDesktop desktop, AWTRenderer renderer) {
         this.eventLoop = desktop.eventLoop();
+        this.desktop = desktop;
         this.renderer = renderer;
     }
 
     @Override
     public EventLoop eventLoop() {
         return eventLoop;
+    }
+
+    @Override
+    public ViewProvider viewProvider() {
+        return desktop.viewProvider;
     }
 
     @Override
