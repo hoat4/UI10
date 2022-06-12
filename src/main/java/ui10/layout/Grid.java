@@ -12,19 +12,12 @@ import java.util.stream.IntStream;
 
 public class Grid extends RectangularLayout {
 
-    public static final Property<Integer> GAP_PROPERTY = new Property<>(true, 0);
-
     public final List<? extends List<? extends Element>> rows;
 
-    private int gap = 0;
+    public int gap = 0;
 
     public Grid(List<? extends List<? extends Element>> rows) {
         this.rows = rows;
-    }
-
-    @Override
-    public void initFromProps() {
-        gap = getProperty(GAP_PROPERTY);
     }
 
     @Override
@@ -75,11 +68,6 @@ public class Grid extends RectangularLayout {
 
         int[] rowHeights = l.childrenSizes.stream().mapToInt(Size::height).toArray();
         return new GridLayout(colWidths, rowHeights, new Size(width, height));
-    }
-
-    @Override
-    public String elementName() {
-        return null; // not a real control, only a layout
     }
 
     private class Column implements FlexLayout.FlexElement {

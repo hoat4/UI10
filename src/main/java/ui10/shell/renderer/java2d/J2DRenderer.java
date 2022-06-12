@@ -1,32 +1,30 @@
 package ui10.shell.renderer.java2d;
 
-import ui10.base.Control;
+import ui10.base.EnduringElement;
 import ui10.base.EventContext;
-import ui10.graphics.Opacity;
-import ui10.base.Container;
-import ui10.base.RenderableElement;
-import ui10.graphics.ColorFill;
-import ui10.graphics.LinearGradient;
-import ui10.graphics.TextNode;
+import ui10.base.InputHandler;
+import ui10.base.ViewProvider;
 import ui10.input.pointer.MouseEvent;
 import ui10.shell.awt.AWTDesktop;
 import ui10.shell.awt.AWTRenderer;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.util.List;
 import java.util.Map;
 
 public class J2DRenderer extends AWTRenderer {
 
-    Item<?> root;
+    J2DRenderableElement<?> root;
 
     public J2DRenderer(AWTDesktop desktop) {
         super(desktop);
     }
 
     @Override
-    protected void initRoot(RenderableElement root) {
-        this.root = makeItem(root);
+    protected void initRoot(EnduringElement root) {
+        this.root = (J2DRenderableElement<?>) root.renderableElement();
     }
 
     @Override
@@ -46,23 +44,12 @@ public class J2DRenderer extends AWTRenderer {
     }
 
     @Override
-    protected boolean captureMouseEvent(MouseEvent e, EventContext eventContext, List<Control> destinationList) {
+    protected boolean captureMouseEvent(MouseEvent e, EventContext eventContext, List<InputHandler> destinationList) {
         return root.captureMouseEvent(e, destinationList, eventContext);
     }
 
-    @SuppressWarnings("unchecked")
-    public <N extends RenderableElement> Item<N> makeItem(N n) {
-        if (n instanceof ColorFill f)
-            return (Item<N>) new ColorFillImpl(this, f);
-        else if (n instanceof Container d)
-            return (Item<N>) new PaneItem(this, d);
-        else if (n instanceof TextNode t)
-            return (Item<N>) new TextItem(this, t);
-        else if (n instanceof LinearGradient l)
-            return (Item<N>) new LinearGradientImpl(this, l);
-        else if (n instanceof Opacity o)
-            return (Item<N>) new OpacityItem(this, o);
-        else
-            throw new UnsupportedOperationException(n.toString());
+    @Override
+    public ViewProvider createViewProvider() {
+        return new J2DViewProvider(this);
     }
 }

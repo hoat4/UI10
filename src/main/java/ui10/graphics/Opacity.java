@@ -1,42 +1,28 @@
 package ui10.graphics;
 
-import ui10.geom.Fraction;
-import ui10.geom.Size;
-import ui10.geom.shape.Shape;
-import ui10.layout.BoxConstraints;
 import ui10.base.Element;
+import ui10.base.ElementModel;
+import ui10.base.EnduringElement;
 import ui10.base.RenderableElement;
-import ui10.base.LayoutContext1;
-import ui10.base.LayoutContext2;
+import ui10.geom.Fraction;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
-public class Opacity extends RenderableElement {
+public class Opacity extends ElementModel<Opacity.OpacityElementListener> {
 
-    public final RenderableElement content;
+    public final EnduringElement content;
     public final Fraction fraction;
 
-    public Opacity(Element content, Fraction fraction) {
+    public Opacity(EnduringElement content, Fraction fraction) {
         Objects.requireNonNull(content, "content");
         Objects.requireNonNull(fraction, "fraction");
 
-        this.content = RenderableElement.of(content);
+        this.content = content;
         this.fraction = fraction;
     }
 
-    @Override
-    public void enumerateStaticChildren(Consumer<Element> consumer) {
-        consumer.accept(content);
-    }
+    public interface OpacityElementListener extends ElementModelListener {
 
-    @Override
-    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return context.preferredSize(content, constraints);
-    }
-
-    @Override
-    protected void onShapeApplied(Shape shape) {
-        LayoutContext2.ignoring().placeElement(content, shape);
+        void opacityChanged();
     }
 }

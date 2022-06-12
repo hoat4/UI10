@@ -1,19 +1,14 @@
 package ui10.graphics;
 
+import ui10.base.ElementModel;
 import ui10.geom.Point;
-import ui10.geom.Size;
-import ui10.geom.shape.Shape;
 import ui10.image.Color;
-import ui10.layout.BoxConstraints;
-import ui10.base.RenderableElement;
-import ui10.base.LayoutContext1;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static ui10.geom.Point.ORIGO;
-
-public class LinearGradient extends RenderableElement {
+// TODO listener
+public class LinearGradient extends ElementModel<ElementModel.ElementModelListener> {
 
     private Point start, end;
     public final List<Stop> stops = new ArrayList<>();
@@ -36,14 +31,9 @@ public class LinearGradient extends RenderableElement {
         return this;
     }
 
-    @Override
-    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return constraints.min();
-    }
-
     public record Stop(Color color, int pos) {
     }
-
+/*
     public static LinearGradient vertical(Color from, Color to) {
         return new LinearGradient() {
             @Override
@@ -57,4 +47,5 @@ public class LinearGradient extends RenderableElement {
             }
         };
     }
+ */
 }

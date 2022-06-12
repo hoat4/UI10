@@ -34,7 +34,7 @@ public interface Fill {
         public Element makeElement(DecorationContext context) {
             return new LinearGradient() {
                 @Override
-                protected void onShapeApplied(Shape shape) {
+                protected void preShapeChange(Shape shape) {
                     context.parentSize = shape.bounds().size();
 
                     try {

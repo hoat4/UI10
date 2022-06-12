@@ -6,7 +6,5 @@ public interface UIContext {
 
     void requestLayout(LayoutTask task);
 
-    ViewProvider viewProvider();
-
-    record LayoutTask(RenderableElement element, Runnable task) {}
+    record LayoutTask(EnduringElement element, Runnable task) {}
 }

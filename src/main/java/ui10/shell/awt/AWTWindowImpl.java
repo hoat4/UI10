@@ -1,19 +1,14 @@
 package ui10.shell.awt;
 
-import ui10.base.Container;
-import ui10.geom.Point;
 import ui10.base.*;
-
-import java.awt.*;
-
+import ui10.geom.Point;
 import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.pointer.MouseEvent;
-import ui10.base.LayoutContext2;
 import ui10.shell.renderer.java2d.J2DRenderer;
 import ui10.shell.renderer.java2d.J2DUtil;
 import ui10.window.Cursor;
-import ui10.window.Window;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -21,14 +16,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class AWTWindowImpl extends Frame implements RendererData {
+public class AWTWindowImpl extends Frame {
 
     public final AWTRenderer renderer;
-    private final Window window;
+    private final EnduringElement window;
     private final AWTDesktop desktop;
     private final int scale;
 
-    public AWTWindowImpl(Window window, AWTDesktop desktop, int scale) throws HeadlessException {
+    public AWTWindowImpl(EnduringElement window, AWTDesktop desktop, int scale) throws HeadlessException {
         this.window = window;
         this.desktop = desktop;
         this.scale = scale;
@@ -43,8 +38,6 @@ public class AWTWindowImpl extends Frame implements RendererData {
         //renderer = new AwtSwRenderer();
         renderer = new J2DRenderer(desktop);
         renderer.awtWindow = this;
-        window.uiContext = renderer.uiContext;
-        renderer.initRoot(window);
     }
 
     public void applySize() {
@@ -52,7 +45,7 @@ public class AWTWindowImpl extends Frame implements RendererData {
             Rectangle rect = new Rectangle(
                     (getWidth() - getInsets().left - getInsets().right) / scale,
                     (getHeight() - getInsets().top - getInsets().bottom) / scale);
-            new LayoutContext2() {
+            new LayoutContext2(window) {
                 @Override
                 public void accept(RenderableElement element) {
                 }
@@ -60,10 +53,6 @@ public class AWTWindowImpl extends Frame implements RendererData {
         }));
     }
 
-    @Override
-    public void invalidateRendererData() {
-        renderer.requestRepaint();
-    }
 
     @Override
     public void paint(Graphics g1) {
@@ -127,15 +116,16 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
     private void dispatchMouseEvent(MouseEvent e) {
         renderer.uiContext.eventLoop().runLater(() -> {
-            List<Control> l = new ArrayList<>();
+            List<InputHandler> l = new ArrayList<>();
             EventContext eventContext = new EventContext();
             if (!renderer.captureMouseEvent(e, eventContext, l)) {
                 setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
                 window.focusContext().hoveredControl.set(null);
                 return;
             }
+            /*
             Cursor cursor = Cursor.POINTER;
-            for (Control control : l) {
+            for (InputHandler control : l) {
                 if (control.cursor.get() != null)
                     cursor = control.cursor.get();
             }
@@ -146,36 +136,36 @@ public class AWTWindowImpl extends Frame implements RendererData {
 
             // de mit csinálunk, ha a a controlnak vagy vmelyik ancestorának külön FocusContextje van?
             window.focusContext().hoveredControl.set(l.get(l.size() - 1));
-
+*/
             for (int i = l.size() - 1; i >= 0; i--) {
                 if (eventContext.stopPropagation)
                     break;
 
-                Control control = l.get(i);
-                MouseEvent translatedEvent = e.subtract(control.origin());
-                control.dispatchInputEvent(translatedEvent, eventContext, false);
+                InputHandler control = l.get(i);
+                MouseEvent translatedEvent = e.subtract(((EnduringElement)control).origin());
+                InputHandler.dispatchInputEvent(translatedEvent, control, eventContext, false);
             }
         });
     }
 
     private void dispatchKeyEvent(KeyTypeEvent e) {
         renderer.uiContext.eventLoop().runLater(() -> {
-            Control focusedControl = window.focusContext().focusedControl.get();
-            List<Control> hierarchy = new ArrayList<>();
-            for (RenderableElement re = focusedControl; re != null; re = re.parentRenderable()) {
-                if (re instanceof Control c)
-                    hierarchy.add(0, c);
+            EnduringElement focusedControl = window.focusContext().focusedControl.get();
+            List<EnduringElement> hierarchy = new ArrayList<>();
+            for (EnduringElement re = focusedControl; re != null; re = re.parentRenderable()) {
+                if (re instanceof InputHandler)
+                    hierarchy.add(0, re);
             }
 
             EventContext eventContext = new EventContext();
-            for (Control c : hierarchy) {
-                c.dispatchInputEvent(e, eventContext, true);
+            for (EnduringElement c : hierarchy) {
+                InputHandler.dispatchInputEvent(e, (InputHandler) c, eventContext, true);
                 if (eventContext.stopPropagation)
                     return;
             }
             Collections.reverse(hierarchy);
-            for (Control c : hierarchy) {
-                c.dispatchInputEvent(e, eventContext, false);
+            for (EnduringElement c : hierarchy) {
+                InputHandler.dispatchInputEvent(e, (InputHandler) c, eventContext, false);
                 if (eventContext.stopPropagation)
                     return;
             }

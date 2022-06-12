@@ -1,32 +1,35 @@
+
+/*
 package ui10;
 
 import ui10.base.Container;
 import ui10.base.Element;
-import ui10.base.ViewProvider;
-import ui10.control4.controls.*;
+import ui10.controls.Button;
+import ui10.controls.Label;
+import ui10.controls.TabbedPane;
+import ui10.controls.TextField;
 import ui10.controls.dialog.Dialogs;
+import ui10.decoration.DecorationProvider;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
 import ui10.decoration.css.CSSScanner;
+import ui10.decoration.views.DecorableControlViewProvider;
+import ui10.decoration.views.DecorableLabelView;
 import ui10.geom.Insets;
 import ui10.graphics.ColorFill;
 import ui10.image.Colors;
 import ui10.layout.Layouts;
 import ui10.layout.LinearLayout;
 import ui10.shell.awt.AWTDesktop;
-import ui10.shell.awt.AWTWindowImpl;
-import ui10.shell.awt.UIContextImpl;
 import ui10.window.Desktop;
-import ui10.window.Window;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static ui10.layout.Layouts.*;
+import static ui10.layout.Layouts.centered;
+import static ui10.layout.Layouts.vertically;
 
 public class Main6 {
 
@@ -53,6 +56,7 @@ public class Main6 {
 
         Thread.sleep(1500);
 
+        /*
         while (1 == "ab".length()) {
             UIContextImpl uiContext = ((AWTWindowImpl) window.rendererData).renderer.uiContext;
             CompletableFuture<Void> cf = new CompletableFuture<>();
@@ -65,6 +69,8 @@ public class Main6 {
             });
             cf.get();
         }
+
+         */
 
             /*
         while (true) {
@@ -80,6 +86,7 @@ public class Main6 {
 
         // contentWrapper.setProperty(TextNode.TEXT_FILL_PROPERTY, new Fill.ColorFill(Colors.RED));
         // TODO ennek újra kéne dekorálnia a textnode-okat, amelyikhez eljut az új érték
+/*
     }
 
     private static Window makeSampleWindow(AWTDesktop desktop) {
@@ -95,50 +102,26 @@ public class Main6 {
         TextField tf = new TextField();
         tf.text("szövegmező");
 
-        ButtonModel newButton = new ButtonModel() {
-
-            @Override
-            public String text() {
-                return "Gomb";
-            }
-
-            @Override
-            public void performAction() {
-                System.out.println("Hello world!");
-            }
-        };
-
+        Button newButton = new Button();
+        newButton.text("Gomb");
+        newButton.action(() -> System.out.println("Hello world!"));
+/*
         //button.attributes().add(new GrowFactor(Fraction.of(0)));
         //tf.attributes().add(new GrowFactor(Fraction.of(0)));
 
         List<String> list = List.of("Hello", "world!");
 
-        class SampleTable extends Table<String>{
+        Table<String> table = new Table<>(List.of(
+                new Table.Column<>("Col1", s -> s),
+                new Table.Column<>("Col2", s -> String.valueOf(s.length()))
+        ), list);
 
-            @Override
-            public List<Column<String, ?>> columns() {
-                return List.of(
-                        new Table.Column<>("Col1", s -> s),
-                        new Table.Column<>("Col2", s -> String.valueOf(s.length()))
-                );
-            }
-
-            @Override
-            public List<String> data() {
-                return list;
-            }
-        }
-
-        Element tableView = padding(new SampleTable(), new Insets(50));
+        Element tableView = padding(table, new Insets(50));
         Tabs.title(tableView, "Táblázat");
 
-        LabelModel lm = new LabelModel() {
-            @Override
-            public String text() {
-                return "label";
-            }
-        };
-        lm.setView(new LabelImpl(lm));
+        Label lm = new Label();
+        lm.text("label");
+        lm.setView(new DecorableLabelView(lm));
 
         LinearLayout vbox = vertically(
                 lm,
@@ -147,12 +130,13 @@ public class Main6 {
         );
         vbox.gap = 10; // mértékegység?
         Element buttonTab = centered(vbox);
-        Tabs.title(buttonTab, "Egyik tab");
+        //Tabs.title(buttonTab, "Egyik tab");
 
         buttonTab = Container.of(buttonTab);
 
-        CSSDecorator css1 = new CSSDecorator(buttonTab, css);
-        desktop.viewProvider = new ViewProvider(css1);
+        CSSDecorator css1 = new CSSDecorator(css);
+        desktop.viewProviderChain.viewProviders.add(new DecorableControlViewProvider(css1));
+        desktop.decorationProvider = new DecorationProvider(css1);
         //desktop.viewProvider.initRoot(buttonTab);
         Element content = buttonTab;
         return Window.of(content);
@@ -193,7 +177,7 @@ public class Main6 {
         /*Window window = Window.of(centered(withSize(
                 new Opacity(new ColorFill(Colors.RED), Fraction.of(.1, 100)),
                 new Size(100, 100)
-        )));*/
+        )));
     }
 
 
@@ -230,5 +214,6 @@ public class Main6 {
 
         return new CSSDecorator(content, css);
     }
-*/
 }
+
+ */

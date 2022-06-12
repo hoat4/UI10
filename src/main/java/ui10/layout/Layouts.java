@@ -1,21 +1,15 @@
 package ui10.layout;
 
-import ui10.base.TransientElement;
+import ui10.base.*;
 import ui10.geom.*;
 import ui10.geom.shape.RoundedRectangle;
 import ui10.geom.shape.Shape;
-import ui10.base.Element;
-import ui10.base.LayoutContext1;
-import ui10.base.LayoutContext2;
-import ui10.decoration.css.CSSClass;
 import ui10.graphics.Opacity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-
-import static ui10.geom.Point.ORIGO;
 
 // TODO absolutePositioned layout pointra és rectangle-re
 public class Layouts {
@@ -59,11 +53,6 @@ public class Layouts {
         protected Shape computeContentShape(Shape containerShape, LayoutContext2 context) {
             return containerShape;
         }
-    }
-
-    // ez legyen inkább CSSClass-ban?
-    public static Element wrapWithClass(String className, Element element) {
-        return CSSClass.withClass(className, wrap(element));
     }
 
     public static Element centered(Element n) {
@@ -237,7 +226,9 @@ public class Layouts {
     }
 
     public static Element withOpacity(Element e, Fraction opacity) {
-        return new Opacity(e, opacity);
+        // TODO ennek nem csak EnduringElementnek szabadna lennie
+        //      vagy de?
+        return new Opacity((EnduringElement) e, opacity);
     }
 
     public static Element withSize(Element e, Size size) { // paramétersorrend ne fordítva legyen?
@@ -264,7 +255,7 @@ public class Layouts {
         }
     }
 
-    public static Element vertically(List<? extends Element> elements) {
+    public static LinearLayout vertically(List<? extends Element> elements) {
         return new LinearLayout(Axis.VERTICAL, List.copyOf(elements));
     }
 
@@ -272,11 +263,11 @@ public class Layouts {
         return new LinearLayout(Axis.VERTICAL, List.of(elements));
     }
 
-    public static Element horizontally(List<? extends Element> elements) {
+    public static LinearLayout horizontally(List<? extends Element> elements) {
         return new LinearLayout(Axis.HORIZONTAL, List.copyOf(elements));
     }
 
-    public static Element horizontally(Element... elements) {
+    public static LinearLayout horizontally(Element... elements) {
         return new LinearLayout(Axis.HORIZONTAL, List.of(elements));
     }
 

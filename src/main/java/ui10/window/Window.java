@@ -1,34 +1,18 @@
 package ui10.window;
 
-import ui10.base.Element;
-import ui10.base.Container;
-import ui10.base.FocusContext;
-import ui10.base.UIContext;
-import ui10.binding2.Property;
+import ui10.base.ElementExtra;
+import ui10.base.EnduringElement;
 
-public abstract class Window extends Container {
+public class Window extends ElementExtra {
 
-    public final FocusContext focusContext = new FocusContext();
-
-    public UIContext uiContext;
-
-    public static Window of(Element node) {
-        return new Window() {
-            @Override
-            public Element content() {
-                return node;
-            }
-        };
+    public static Window of(EnduringElement element) {
+        return element.extra(Window.class);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T context(Class<T> clazz) {
-        if (clazz == UIContext.class)
-            return (T) uiContext;
-        else if (clazz == FocusContext.class)
-            return (T) focusContext;
-        else
-            throw new IllegalArgumentException("unknown context type: "+clazz);
+    public static Window getOrCreate(EnduringElement element) {
+        Window w = element.extra(Window.class);
+        if (w == null)
+            element.extras.add(w = new Window());
+        return w;
     }
 }

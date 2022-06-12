@@ -1,21 +1,21 @@
 package ui10.base;
 
-import ui10.binding2.ChangeEvent;
 import ui10.binding2.ElementEvent;
-import ui10.decoration.css.CSSDecorator;
-import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
 public non-sealed abstract class RenderableElement extends EnduringElement {
 
-    public RendererData rendererData;
-
     protected Shape shape;
-    protected List<LayoutContext1.LayoutDependency<?, ?>> layoutDependencies;
+    protected Map<RenderableElement, List<LayoutContext1.LayoutDependency<?, ?>>> layoutDependencies;
+
+    protected abstract void invalidateRendererData();
 
     @Override
     protected void enumerateStaticChildren(Consumer<Element> consumer) {
@@ -26,14 +26,28 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
     protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
         boolean changed = !Objects.equals(this.shape, shape);
         this.shape = shape;
-        this.layoutDependencies = context.getDependencies(this);
-        if (changed && rendererData != null)
-            rendererData.invalidateRendererData();
+        this.layoutDependencies = context.dependencies;
+        if (changed)
+            invalidateRendererData();
 
         onShapeApplied(shape);
     }
 
-    public void dispatchElementEvent(ElementEvent event) {
+    @Override
+    public void initParent(Element parent) {
+        Element e = parent;
+        while (e instanceof TransientElement t) {
+            e = t.logicalParent;
+        }
+
+        this.parent = (EnduringElement) e;
+
+        enumerateStaticChildren(elem -> elem.initParent(this));
+    }
+
+    @Override
+    public RenderableElement renderableElement() {
+        return this;
     }
 
     protected void onShapeApplied(Shape shape) {
@@ -45,22 +59,12 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
         return shape;
     }
 
-    public Point origin() {
-        return getShapeOrFail().bounds().topLeft();
-    }
-
     public void invalidate() {
-        if (rendererData != null)
-            rendererData.invalidateRendererData();
-        if (uiContext() == null)
+        invalidateRendererData();
+        if (lookup(UIContext.class) == null)
             return;
         // lehet hogy kéne még valami feltételt szabni (pl. van-e már shape)
-        uiContext().requestLayout(new UIContext.LayoutTask(this, this::revalidate));
-    }
-
-    @Override
-    public void invalidateDecoration() {
-        invalidate();
+        lookup(UIContext.class).requestLayout(new UIContext.LayoutTask(this, this::revalidate));
     }
 
     public void revalidate() {
@@ -71,7 +75,7 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
 
         LayoutContext1 ctx = new LayoutContext1();
 
-        for (LayoutContext1.LayoutDependency<?, ?> dep : layoutDependencies) {
+        for (LayoutContext1.LayoutDependency<?, ?> dep : layoutDependencies.getOrDefault(this, Collections.emptyList())) {
             if (ctx.isInvalidated(this, dep)) {
                 Objects.requireNonNull(parent, this::toString);
                 parentRenderable().invalidate(); // itt parent vagy parentRenderable kell?
@@ -80,14 +84,10 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
         }
 
         try {
-            onShapeApplied(shape);
+                    onShapeApplied(shape);
         } catch (RuntimeException e) {
             System.err.print("Failed to layout " + this + ": ");
             e.printStackTrace();
         }
-    }
-
-    public static RenderableElement of(Element node) {
-        return node instanceof RenderableElement r ? r : Container.of(node);
     }
 }

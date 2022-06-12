@@ -6,11 +6,9 @@ public class CSSDecorator {
 
     //public static final Property<CSSDecorator> DECORATOR_PROPERTY = new Property<>(true);
 
-    final Element content;
     final CSSParser css;
 
-    public CSSDecorator(Element content, CSSParser css) {
-        this.content = content;
+    public CSSDecorator(CSSParser css) {
         this.css = css;
     }
 

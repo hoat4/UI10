@@ -1,9 +1,12 @@
 package ui10.layout;
 
+import ui10.base.ElementExtra;
+import ui10.base.EnduringElement;
 import ui10.binding2.Property;
 import ui10.geom.*;
 import ui10.base.Element;
 import ui10.base.LayoutContext1;
+import ui10.window.Window;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -51,6 +54,8 @@ public class LinearLayout extends RectangularLayout {
     private FlexLayout computeLayout(BoxConstraints constraints, LayoutContext1 context) {
         FlexLayout l = new FlexLayout(primaryAxis, constraints,
                 children.stream().map(e -> new FlexLayout.FlexElement() {
+
+                    private final LinearLayoutConstraints constraints = e.extra(LinearLayoutConstraints.class);
                     @Override
                     public Size preferredSize(BoxConstraints constraints) {
                         return context.preferredSize(e, constraints);
@@ -58,8 +63,7 @@ public class LinearLayout extends RectangularLayout {
 
                     @Override
                     public Fraction growFactor() {
-                        return Fraction.WHOLE;
-                        // TODO return e.getProperty(GROW_FACTOR);
+                        return constraints == null ? Fraction.WHOLE : constraints.growFactor;
                     }
                 }).toList());
 
@@ -71,5 +75,14 @@ public class LinearLayout extends RectangularLayout {
     @Override
     public String toString() {
         return primaryAxis + "LY" + children;
+    }
+
+    public static class LinearLayoutConstraints extends ElementExtra {
+
+        public Fraction growFactor = Fraction.WHOLE;
+
+        public static LinearLayoutConstraints of(Element element) {
+            return element.extra(LinearLayoutConstraints.class, LinearLayoutConstraints::new);
+        }
     }
 }

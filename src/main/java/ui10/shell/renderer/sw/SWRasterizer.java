@@ -1,3 +1,4 @@
+/*
 package ui10.shell.renderer.sw;
 
 import jdk.incubator.foreign.MemoryAccess;
@@ -78,3 +79,4 @@ public class SWRasterizer {
         return p.y() * renderRect.width() + p.x();
     }
 }
+*/

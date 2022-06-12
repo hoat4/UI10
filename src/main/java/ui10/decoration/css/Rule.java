@@ -1,15 +1,9 @@
 package ui10.decoration.css;
 
 import ui10.base.Element;
-import ui10.base.EnduringElement;
-import ui10.controls.Label;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.DecorationContext;
-import ui10.geom.Fraction;
 import ui10.geom.Insets;
-import ui10.graphics.TextNode;
-import ui10.layout.Grid;
-import ui10.layout.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +55,7 @@ public class Rule {
     }
 
     @SuppressWarnings("unchecked")
-    <T> T get(CSSProperty<T> prop) {
+    public <T> T get(CSSProperty<T> prop) {
         for (Transition<?> t : transitions)
             if (t.spec.property().equals(prop))
                 return ((Transition<T>) t).value();

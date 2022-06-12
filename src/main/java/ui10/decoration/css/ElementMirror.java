@@ -5,11 +5,21 @@ import java.util.OptionalInt;
 
 public interface ElementMirror {
 
-    String elementName();
+    default String elementName() {
+        return null;
+    }
 
-    boolean hasClass(String className);
+    default boolean hasClass(String className) {
+        return false;
+    }
 
-    boolean hasPseudoClass(String pseudoClass);
+    default boolean hasPseudoClass(String pseudoClass) {
+        return false;
+    }
+
+    boolean isPseudoElement(String pseudoElementName);
 
     Optional<Integer> indexInSiblings();
+
+    ElementMirror parent();
 }

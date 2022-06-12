@@ -1,8 +1,6 @@
 package ui10.decoration.css;
 
-import ui10.Main6;
-import ui10.control4.controls.TextField;
-import ui10.controls.Label;
+import ui10.base.TextAlign;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.Fill;
 import ui10.decoration.PointSpec;
@@ -84,7 +82,7 @@ public class CSSParser {
         if (selectors.size() == 1)
             return selectors.get(0);
         else
-            return new Selector.ConjunctionSelector(selectors);
+            return new Selector.DisjunctionSelector(selectors);
     }
 
     private Selector parseAncestorList() {
@@ -139,7 +137,12 @@ public class CSSParser {
                     selectors.add(new Selector.ClassSelector(scanner.readIdentifier()));
                 }
                 case ':' -> {
-                    selectors.add(parsePseudoClass());
+                    scanner.take();
+                    if (scanner.tryRead(':')) { // pseudo-element
+                        // TODO mi van ha a pseudoelemnév után következik még valami?
+                        return new Selector.PseudoElementSelector(conjunction(selectors), scanner.readIdentifier());
+                    } else
+                        selectors.add(parsePseudoClass());
                 }
                 case '[' -> {
                     selectors.add(parseAttributeSelector());
@@ -154,6 +157,10 @@ public class CSSParser {
         if (selectors.isEmpty())
             throw scanner.new CSSParseException("empty selector list");
 
+        return conjunction(selectors);
+    }
+
+    private Selector conjunction(List<Selector> selectors) {
         if (selectors.size() == 1)
             return selectors.get(0);
         else
@@ -161,11 +168,6 @@ public class CSSParser {
     }
 
     private Selector parsePseudoClass() {
-        scanner.expect(':');
-
-        if (scanner.tryRead(':')) // pseudo-element
-            throw scanner.new CSSParseException("pseudo-element not supported: ::" + scanner.readIdentifier());
-
         String name = scanner.readIdentifier();
 
         switch (name) {
@@ -249,7 +251,7 @@ public class CSSParser {
             if (a.equals("none"))
                 return new BorderSpec(Length.zero(), new Fill.ColorFill(Colors.TRANSPARENT));
             else
-                throw scanner.new CSSParseException("unexpected token: "+a);
+                throw scanner.new CSSParseException("unexpected token: " + a);
 
         Length len = parseLength();
         scanner.skipWhitespaces();
@@ -438,12 +440,12 @@ public class CSSParser {
             throw scanner.new CSSParseException("unknown duration unit: " + s);
     }
 
-    public Label.TextAlign parseTextAlign() {
+    public TextAlign parseTextAlign() {
         String s = scanner.readIdentifier();
         return switch (s) {
-            case "left" -> Label.TextAlign.LEFT;
-            case "center" -> Label.TextAlign.CENTER;
-            case "right" -> Label.TextAlign.RIGHT;
+            case "left" -> TextAlign.LEFT;
+            case "center" -> TextAlign.CENTER;
+            case "right" -> TextAlign.RIGHT;
             default -> throw scanner.new CSSParseException("unknown text align value: " + s);
         };
     }
@@ -461,7 +463,7 @@ public class CSSParser {
         // TODO eliminate doubles
         String l = scanner.readPossibleChars("0123456789-.");
         double d = Double.parseDouble(l);
-        return Fraction.of(d, (int)Math.pow(10, l.length()));
+        return Fraction.of(d, (int) Math.pow(10, l.length()));
     }
 
     public record NumberWithUnit(double n, Unit unit) {

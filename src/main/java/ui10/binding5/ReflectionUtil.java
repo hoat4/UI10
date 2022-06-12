@@ -5,12 +5,12 @@ package ui10.binding5;
 // import org.atteo.classindex.ClassIndex;
 
 // import javax.annotation.Nonnull;
+
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.function.Predicate;
 
 import static java.lang.invoke.MethodHandles.lookup;
 import static java.util.Arrays.asList;
@@ -111,6 +111,7 @@ public class ReflectionUtil {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, 0), false);
     }
 */
+
     /**
      * Ha a megadott elem egy osztály, akkor ez a visszatérési érték az lesz, nem pedig egy
      * bennfoglaló osztály.
@@ -181,7 +182,7 @@ public class ReflectionUtil {
         throw new IllegalArgumentException(element + ", " + element.getClass());
     }
 
-	// TODO ezt a configbinderbe kéne mozgatni, mert az method esetén CB-specifikus a működése, nem pedig valami általános elfogadott
+    // TODO ezt a configbinderbe kéne mozgatni, mert az method esetén CB-specifikus a működése, nem pedig valami általános elfogadott
     public static AnnotatedType typeOf(AnnotatedElement e) {
         if (e instanceof Method) {
             Method m = (Method) e;
@@ -254,5 +255,21 @@ public class ReflectionUtil {
             c = c.getSuperclass();
         }
         return d;
+    }
+
+    public static <A extends Annotation> void invokeAnnotatedMethods(Object obj, Class<A> annotationType, Predicate<A> predicate) {
+        for (Method m : methodsIn(obj.getClass())) {
+            A ann = m.getAnnotation(annotationType);
+            if (ann != null && predicate.test(ann)) {
+                m.setAccessible(true);
+                try {
+                    m.invoke(obj);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("should not reach here", e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(memberToShortString(m) + " threw exception: " + e.getCause(), e.getCause());
+                }
+            }
+        }
     }
 }

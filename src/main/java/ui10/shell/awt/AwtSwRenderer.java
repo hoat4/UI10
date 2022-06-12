@@ -1,9 +1,10 @@
+/*
 package ui10.shell.awt;
 
 import jdk.incubator.foreign.MemorySegment;
 import ui10.base.Control;
+import ui10.base.EnduringElement;
 import ui10.base.EventContext;
-import ui10.base.RenderableElement;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.input.pointer.MouseEvent;
@@ -24,7 +25,7 @@ public class AwtSwRenderer extends AWTRenderer{
     }
 
     @Override
-    protected void initRoot(RenderableElement root) {
+    protected void initRoot(EnduringElement root) {
         swRasterizer.initRoot(root);
     }
 
@@ -48,3 +49,4 @@ public class AwtSwRenderer extends AWTRenderer{
         return false;
     }
 }
+*/

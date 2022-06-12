@@ -1,3 +1,4 @@
+/*
 package ui10.base;
 
 import ui10.binding.ScalarProperty;
@@ -81,7 +82,7 @@ public abstract class Control extends Container {
         invalidate();
     }
 
-    protected Point relativePos(RenderableElement e) {
+    protected Point relativePos(EnduringElement e) {
         return e.origin().subtract(origin());
     }
 
@@ -99,3 +100,4 @@ public abstract class Control extends Container {
         Keyboard.StandardFunctionSymbol value();
     }
 }
+*/

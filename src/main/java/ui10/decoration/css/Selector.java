@@ -1,11 +1,6 @@
 package ui10.decoration.css;
 
-import ui10.base.Element;
-import ui10.decoration.IndexInSiblings;
-
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Optional;
 
 public interface Selector {
 
@@ -32,6 +27,13 @@ public interface Selector {
         }
     }
 
+    record PseudoElementSelector(Selector selector, String pseudoElementName) implements Selector {
+        @Override
+        public boolean test(ElementMirror e, CSSDecorator cssDecorator) {
+            return e.parent() != null && selector.test(e.parent(), cssDecorator) && e.isPseudoElement(pseudoElementName);
+        }
+    }
+
     record ConjunctionSelector(List<Selector> selectors) implements Selector {
         @Override
         public boolean test(ElementMirror e, CSSDecorator cssDecorator) {
@@ -42,10 +44,21 @@ public interface Selector {
         }
     }
 
+    record DisjunctionSelector(List<Selector> selectors) implements Selector {
+        @Override
+        public boolean test(ElementMirror e, CSSDecorator cssDecorator) {
+            for (Selector s : selectors)
+                if (s.test(e, cssDecorator))
+                    return true;
+            return false;
+        }
+    }
+
     record ChildSelector(Selector parentSelector, Selector childSelector) implements Selector {
         @Override
         public boolean test(ElementMirror e, CSSDecorator cssDecorator) {
-            throw new UnsupportedOperationException();
+            ElementMirror parent = e.parent();
+            return parent != null && parentSelector.test(parent, cssDecorator);
         }
     }
 

@@ -5,17 +5,17 @@ import ui10.controls.Action;
 
 public class FocusContext {
 
-    public final ScalarProperty<Control> focusedControl = ScalarProperty.create("focusedControl");
-    public final ScalarProperty<Control> hoveredControl = ScalarProperty.create("hoveredControl");
+    public final ScalarProperty<EnduringElement> focusedControl = ScalarProperty.create("focusedControl");
+    public final ScalarProperty<EnduringElement> hoveredControl = ScalarProperty.create("hoveredControl");
 
     public final ScalarProperty<Action> defaultAction = ScalarProperty.create("defaultAction");
 
     {
         focusedControl.subscribe(e->{
-            if (e.oldValue() != null)
-                e.oldValue().onFocusLost();
-            if (e.newValue() != null)
-                e.newValue().onFocusGain();
+            if (e.oldValue() instanceof InputHandler h)
+                h.onFocusLost();
+            if (e.newValue() instanceof InputHandler h)
+                h.onFocusGain();
         });
         /*
         hoveredControl.subscribe(e->{

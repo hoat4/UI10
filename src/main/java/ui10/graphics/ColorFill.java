@@ -1,12 +1,9 @@
 package ui10.graphics;
 
-import ui10.geom.Size;
+import ui10.base.ElementModel;
 import ui10.image.Color;
-import ui10.layout.BoxConstraints;
-import ui10.base.RenderableElement;
-import ui10.base.LayoutContext1;
 
-public class ColorFill extends RenderableElement {
+public class ColorFill extends ElementModel<ColorFill.ColorFillListener> {
 
     private Color color;
 
@@ -23,17 +20,17 @@ public class ColorFill extends RenderableElement {
 
     public ColorFill color(Color color) {
         this.color = color;
-        invalidate();
+        listener().colorChanged();
         return this;
     }
 
     @Override
-    public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return constraints.min();
+    public String toString() {
+        return "ColorFill {color=" + color/* + ", shape=" + shape*/ + "}";
     }
 
-    @Override
-    public String toString() {
-        return "ColorFill {color=" + color + ", shape=" + shape + "}";
+    public interface ColorFillListener extends  ElementModelListener{
+
+        void colorChanged();
     }
 }

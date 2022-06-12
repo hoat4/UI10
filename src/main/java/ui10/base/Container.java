@@ -1,18 +1,9 @@
 package ui10.base;
 
-import ui10.binding2.ElementEvent;
-import ui10.binding2.Property;
-import ui10.geom.Size;
-import ui10.geom.shape.Shape;
-import ui10.layout.BoxConstraints;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-public abstract class Container extends RenderableElement {
+public abstract class Container extends ElementModel<Container.ContainerListener> {
 
-    private final List<RenderableElement> children = new ArrayList<>();
     private boolean valid;
 
     protected void validate() {
@@ -22,12 +13,12 @@ public abstract class Container extends RenderableElement {
 
     private Element cachedContent;
 
-    private Element getContent() {
+    // ez nem tudom hogy jó-e ha publikus, egyelőre a view miatt muszáj annak lennie
+    public Element getContent() {
         if (!valid) {
             validate();
 
             cachedContent = Objects.requireNonNull(content(), () -> "null content in " + this);
-            cachedContent.initParent(this);
 
             valid = true;
         }
@@ -35,40 +26,9 @@ public abstract class Container extends RenderableElement {
         return cachedContent;
     }
 
-    public List<RenderableElement> renderableElements() {
-        if (!valid)
-            onShapeApplied(shape);
-        return children;
-    }
-
-    @Override
     public void invalidate() {
         valid = false;
-        super.invalidate();
-    }
-
-    @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return context.preferredSize(getContent(), constraints);
-    }
-
-    @Override
-    protected void onShapeApplied(Shape shape) {
-        children.clear();
-
-        // inter-container layout dependencies are not supported currently
-        new LayoutContext2() {
-
-            @Override
-            public void accept(RenderableElement e) {
-                if (e.parentRenderable() == null)
-                    // this should not occur, but currently does because decoration
-                    e.parent = Container.this;
-                else if (e.parentRenderable() != Container.this)
-                    throw new IllegalStateException("not a child of " + Container.this + ": " + e);
-                children.add(e);
-            }
-        }.placeElement(getContent(), shape);
+        listener().contentChanged();
     }
 
     public static Container of(Element node) {
@@ -83,8 +43,13 @@ public abstract class Container extends RenderableElement {
 
                 @Override
                 public String toString() {
-                    return "Container[" + node + "]";
+                    return "Container[" + node + ", parent="+parent+"]";
                 }
             };
+    }
+
+    public interface ContainerListener extends ElementModelListener {
+
+        void contentChanged();
     }
 }

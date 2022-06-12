@@ -3,19 +3,12 @@ package ui10.decoration;
 import ui10.base.Element;
 import ui10.decoration.css.Length;
 import ui10.geom.Size;
-import ui10.graphics.TextNode;
 
 public class DecorationContext {
 
     public final Element element;
     public Size parentSize;
     private final int emSize;
-
-    public DecorationContext(Element element) {
-        this.element = element;
-        Integer emSize = element.getProperty(TextNode.FONT_SIZE_PROPERTY);
-        this.emSize = emSize == null ? -1 : emSize;
-    }
 
     public DecorationContext(Element element, int emSize) {
         this.element = element;

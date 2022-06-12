@@ -1,46 +1,29 @@
 package ui10.shell.awt;
 
-import ui10.base.*;
+import ui10.base.EnduringElement;
+import ui10.base.EventLoop;
 import ui10.binding.ObservableList;
-import ui10.geom.Size;
-import ui10.layout.BoxConstraints;
 import ui10.window.Desktop;
 import ui10.window.Window;
 
 public class AWTDesktop extends Desktop {
 
+    private static final AWTDesktop INSTANCE = new AWTDesktop();
     private final EventLoop eventLoop = new EventLoop();
-    public ViewProvider viewProvider;
 
     {
         windows.subscribe(ObservableList.simpleListSubscriber(this::showWindow, this::hideWindow));
     }
 
-    private void showWindow(Window window) {
-        //Size size = new LayoutContext1().preferredSize(window,
-        //        new BoxConstraints(Size.ZERO, new Size(Size.INFINITY, Size.INFINITY)));
-        Size size = new Size(640, 480);
-        int scale = 1;
-        size = size.multiply(scale);
+    private void showWindow(EnduringElement element) {
+        AWTWindow2 w = new AWTWindow2(this, element);
 
-        if (window.rendererData != null)
-            throw new IllegalStateException(window + " is already displayed");
-
-        AWTWindowImpl frame = new AWTWindowImpl(window, this, scale);
-        window.rendererData = frame;
-
-        frame.addNotify();
-        frame.setSize(frame.getInsets().left + size.width() + frame.getInsets().right,
-                frame.getInsets().top + size.height() + frame.getInsets().bottom);
-        frame.setLocationRelativeTo(null);
-        frame.applySize();
-        frame.setVisible(true);
     }
 
-    private void hideWindow(Window window) {
-        AWTWindowImpl w = (AWTWindowImpl) window.rendererData;
-        w.dispose();
-        window.rendererData = null;
+    private void hideWindow(EnduringElement window) {
+        AWTWindow2 w = (AWTWindow2) Window.of(window).view;
+        w.disposeFrame();
+        // ki kéne szedni a viewproviderchainből
 
         if (windows.isEmpty())
             eventLoop.stop();
@@ -48,5 +31,9 @@ public class AWTDesktop extends Desktop {
 
     public EventLoop eventLoop() {
         return eventLoop;
+    }
+
+    public static AWTDesktop instance() {
+        return INSTANCE;
     }
 }

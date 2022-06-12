@@ -1,22 +1,10 @@
 package ui10.controls.dialog;
 
-import ui10.Main6;
-import ui10.base.Container;
-import ui10.base.Element;
-import ui10.base.FocusContext;
 import ui10.binding2.ElementEvent;
 import ui10.binding3.PropertyIdentifier;
 import ui10.controls.Action;
-import ui10.decoration.css.CSSDecorator;
-import ui10.decoration.css.CSSParser;
-import ui10.decoration.css.CSSScanner;
-import ui10.shell.awt.AWTWindowImpl;
 import ui10.window.Desktop;
-import ui10.window.Window;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -33,6 +21,8 @@ public class Dialogs {
     }
 
     private static void showDialog(MessageDialogContent content) {
+        throw new UnsupportedOperationException("TODO");
+        /*
         Desktop desktop = Desktop.THREAD_LOCAL.get();
         Element e = new DialogView(content);
 
@@ -53,19 +43,21 @@ public class Dialogs {
         content.window = w;
 
         desktop.windows.add(w);
+
+         */
     }
 
     private static class MessageDialogContent implements DialogContent {
 
         Desktop desktop;
-        Window window;
+//        Window window;
 
         private final String text;
         private DialogAction okAction = new DialogAction() {
 
             @Override
             public void performAction() {
-                desktop.windows.remove(window);
+  // TODO              desktop.windows.remove(window);
             }
 
             @Override
@@ -115,14 +107,14 @@ public class Dialogs {
     private static class TextInputDialogContent implements DialogContent {
 
         Desktop desktop;
-        Window window;
+        //Window window;
 
         private final String text;
         private DialogAction okAction = new DialogAction() {
 
             @Override
             public void performAction() {
-                desktop.windows.remove(window);
+          // TODO      desktop.windows.remove(window);
             }
 
             @Override

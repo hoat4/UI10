@@ -18,23 +18,17 @@ public class LayoutContext1 {
         Objects.requireNonNull(e);
         Objects.requireNonNull(constraints);
 
-        if (e.replacement() == null) {
-            O output = protocol.preferredSize(e, constraints, this);
-            Objects.requireNonNull(output, e::toString);
+        while (e instanceof ElementModel m)
+            // kikerüljük ElementModeleket, hogy ne dobozosítsunk alternatív layout protokollok esetén
+            // de így sem teljesen jó, mert így meg Containernél lesz ugyanez a probléma
+            e = m.view();
 
-            // itt lehet hogy inkább EnduringElement kéne
-            if (e instanceof RenderableElement)
-                addLayoutDependency((RenderableElement) e, new LayoutDependency<>(constraints, output, protocol));
-            return output;
-        } else {
-            Element replacement = e.replacement;
-            e.replacement = null;
-            try {
-                return preferredSize(replacement, constraints, protocol);
-            } finally {
-                e.replacement = replacement;
-            }
-        }
+        O output = protocol.preferredSize(e, constraints, this);
+        Objects.requireNonNull(output, e::toString);
+
+        if (e instanceof RenderableElement)
+            addLayoutDependency((RenderableElement) e, new LayoutDependency<>(constraints, output, protocol));
+        return output;
     }
 
     <I, O> boolean isInvalidated(RenderableElement renderableElement, LayoutDependency<I, O> dep) {

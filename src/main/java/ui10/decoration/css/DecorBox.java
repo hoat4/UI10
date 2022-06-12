@@ -36,11 +36,6 @@ public class DecorBox extends TransientElement {
     }
 
     @Override
-    public void replacement(Element e) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         int marginLeft = len(CSSProperty.MARGIN_LEFT_DCB_INDEX),
                 marginRight = len(CSSProperty.MARGIN_RIGHT_DCB_INDEX),
