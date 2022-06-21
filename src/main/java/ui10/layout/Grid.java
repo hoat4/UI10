@@ -2,7 +2,6 @@ package ui10.layout;
 
 import ui10.base.Element;
 import ui10.base.LayoutContext1;
-import ui10.binding2.Property;
 import ui10.geom.*;
 
 import java.util.List;
@@ -21,12 +20,12 @@ public class Grid extends RectangularLayout {
     }
 
     @Override
-    public void enumerateStaticChildren(Consumer<Element> consumer) {
+    public void enumerateChildren(Consumer<Element> consumer) {
         rows.forEach(row -> row.forEach(consumer));
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+    protected Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
         return computeLayout(constraints, context).containerSize;
     }
 

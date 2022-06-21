@@ -15,6 +15,7 @@ import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.keyboard.Keyboard;
 import ui10.input.pointer.MouseEvent;
 import ui10.layout.BoxConstraints;
+import ui10.layout.LinearLayout;
 import ui10.layout.RectangularLayout;
 
 import java.util.function.BiConsumer;
@@ -31,6 +32,7 @@ public class StyleableTextFieldView extends StyleableView<TextField, StyleableTe
     private final ColorFill caret = new ColorFill().color(Colors.BLACK);
     private final TextElement textNodeSel = new TextElement();
     private final TextElement textNodeAfterSel = new TextElement();
+    private final TextFieldContent content = new TextFieldContent();
     private Element selectionFill;
 
     private int selectionBegin;
@@ -43,27 +45,16 @@ public class StyleableTextFieldView extends StyleableView<TextField, StyleableTe
     @Override
     protected void onDecorationChanged() {
         selectionFill = decoration().selectedPart().background().makeElement(decoration().decorationContext());
+        textNode.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
+        textNodeSel.fill(decoration().selectedPart().foreground().makeElement(decoration().decorationContext()));
+        textNodeAfterSel.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
+        textNode.textStyle(decoration().textStyle());
+        textNodeSel.textStyle(decoration().textStyle());
+        textNodeAfterSel.textStyle(decoration().textStyle());
     }
 
-    @Override
-    public void textChanged() {
-        invalidate();
-    }
-
-    @Override
-    public void caretPositionChanged() {
-        invalidate();
-    }
-
-    @Override
-    public void selectionChanged() {
-        invalidate();
-    }
-
-    @Override
-    protected void validate() {
-        super.validate();
-
+    @AfterModelAttach
+    private void updateTexts() {
         if (model.selection() == null) {
             textNode.text(model.text());
             textNodeSel.text(null);
@@ -73,71 +64,31 @@ public class StyleableTextFieldView extends StyleableView<TextField, StyleableTe
             textNodeSel.text(model.text().substring(model.selection().begin(), model.selection().end()));
             textNodeAfterSel.text(model.text().substring(model.selection().end()));
         }
-        textNode.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
-        textNodeSel.fill(decoration().selectedPart().foreground().makeElement(decoration().decorationContext()));
-        textNodeAfterSel.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
-        textNode.textStyle(decoration().textStyle());
-        textNodeSel.textStyle(decoration().textStyle());
-        textNodeAfterSel.textStyle(decoration().textStyle());
+    }
+
+    @Override
+    public void textChanged() {
+        updateTexts();
+        content.refresh();
+    }
+
+    @Override
+    public void caretPositionChanged() {
+        content.refresh();
+    }
+
+    @Override
+    public void selectionChanged() {
+        updateTexts();
+        content.refresh();
     }
 
     @Override
     protected Element contentImpl() {
-        return new RectangularLayout() {
-            @Override
-            public void enumerateStaticChildren(Consumer<Element> consumer) {
-                consumer.accept(textNode);
-                consumer.accept(caret);
-                consumer.accept(selectionFill);
-                if (model.selection() != null) {
-                    consumer.accept(textNodeSel);
-                    consumer.accept(textNodeAfterSel);
-                }
-            }
-
-            @Override
-            public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-                    Size caretWidth = new Size(1, 0);
-                if (model.selection() == null) {
-                    return context.preferredSize(textNode, constraints.subtract(caretWidth)).add(caretWidth);
-                } else
-                    return context.preferredSize(horizontally(textNode, textNodeSel, textNodeAfterSel),
-                            constraints.subtract(caretWidth)).add(caretWidth);
-            }
-
-            @Override
-            protected void doPerformLayout(Size size, BiConsumer<Element, Rectangle> placer, LayoutContext1 context) {
-                if (model.selection() != null) {
-                    int begin = model.selection().begin();
-                    int end = model.selection().end();
-
-                    int beginX = textPosToX(begin), endX = textPosToX(end);
-
-                    Rectangle r = Rectangle.of(size.withWidth(beginX));
-                    placer.accept(textNode, r);
-                    r = new Rectangle(r.topRight(), size.withWidth(endX - beginX));
-                    placer.accept(selectionFill, r);
-                    placer.accept(textNodeSel, r);
-                    r = new Rectangle(r.topRight(), size.withWidth(size.width() - endX));
-                    placer.accept(textNodeAfterSel, r);
-                } else {
-                    placer.accept(textNode, Rectangle.of(size));
-                }
-
-                int caretX = textPosToX(model.caretPosition());
-
-                Rectangle caretShape = new Rectangle(caretX, 0, 1, size.height());
-                placer.accept(caret, caretShape);
-            }
-
-            private int textPosToX(Integer x) {
-                return textNode.textStyle().textSize(model.text().substring(0, x)).width();
-            }
-
-        };
+        return content;
     }
 
-    private Point relativePos(EnduringElement e) {
+    private Point relativePos(Element e) {
         return e.origin().subtract(origin());
     }
 
@@ -230,5 +181,52 @@ public class StyleableTextFieldView extends StyleableView<TextField, StyleableTe
 
             Fill background();
         }
+    }
+
+    private class TextFieldContent extends RectangularLayout {
+
+        private final LinearLayout hbox = horizontally(textNode, textNodeSel, textNodeAfterSel);
+
+        void refresh() {
+            listener().layoutInvalidated();
+        }
+
+        @Override
+        public void enumerateChildren(Consumer<Element> consumer) {
+            consumer.accept(hbox);
+            consumer.accept(caret);
+            consumer.accept(selectionFill);
+        }
+
+        @Override
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
+            Size caretWidth = new Size(1, 0);
+            return context.preferredSize(hbox, constraints.subtract(caretWidth)).add(caretWidth);
+        }
+
+        @Override
+        protected void doPerformLayout(Size size, BiConsumer<Element, Rectangle> placer, LayoutContext1 context) {
+            if (model.selection() != null) {
+                int begin = model.selection().begin();
+                int end = model.selection().end();
+
+                int beginX = textPosToX(begin), endX = textPosToX(end);
+
+                Rectangle r = Rectangle.of(size.withWidth(beginX));
+                r = Rectangle.of(r.topLeft().addX(beginX), r.bottomLeft().addX(endX));
+                placer.accept(selectionFill, r);
+            }
+            placer.accept(hbox, Rectangle.of(size));
+
+            int caretX = textPosToX(model.caretPosition());
+
+            Rectangle caretShape = new Rectangle(caretX, 0, 1, size.height());
+            placer.accept(caret, caretShape);
+        }
+
+        private int textPosToX(Integer x) {
+            return textNode.textStyle().textSize(model.text().substring(0, x)).width();
+        }
+
     }
 }

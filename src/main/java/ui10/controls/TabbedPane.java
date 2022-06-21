@@ -1,18 +1,16 @@
 package ui10.controls;
 
-import ui10.base.Element;
 import ui10.base.ElementExtra;
 import ui10.base.ElementModel;
-import ui10.base.EnduringElement;
+import ui10.base.Element;
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;
-import ui10.window.Window;
 
 import java.util.List;
 
 public class TabbedPane extends ElementModel<TabbedPane.TabbedPaneListener> {
 
-    private final ObservableList<EnduringElement> tabs = new ObservableListImpl<>(ObservableList.simpleListSubscriber(
+    private final ObservableList<Element> tabs = new ObservableListImpl<>(ObservableList.simpleListSubscriber(
             this::tabAdded, this::tabRemoved));
 
     private Element selectedTab;
@@ -20,11 +18,11 @@ public class TabbedPane extends ElementModel<TabbedPane.TabbedPaneListener> {
     public TabbedPane() {
     }
 
-    public TabbedPane(List<? extends EnduringElement> tabs) {
+    public TabbedPane(List<? extends Element> tabs) {
         this.tabs.addAll(tabs);
     }
 
-    public List<EnduringElement> tabs() {
+    public List<Element> tabs() {
         return tabs;
     }
 
@@ -70,7 +68,7 @@ public class TabbedPane extends ElementModel<TabbedPane.TabbedPaneListener> {
             return title;
         }
 
-        public static Tab of(EnduringElement element) {
+        public static Tab of(Element element) {
             Tab t = element.extra(Tab.class);
             if (t == null)
                 element.extras.add(t = new Tab());

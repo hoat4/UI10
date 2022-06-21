@@ -3,10 +3,7 @@ package ui10.decoration;
 import ui10.base.Element;
 import ui10.controls.Button;
 import ui10.decoration.css.ElementMirror;
-import ui10.decoration.views.StyleableButtonView;
-import ui10.decoration.views.StyleableTabbedPaneView;
-import ui10.decoration.views.StyleableTextFieldView;
-import ui10.decoration.views.StyleableLabelView;
+import ui10.decoration.views.*;
 
 import java.util.Optional;
 
@@ -81,7 +78,7 @@ public class ElementMirrorImpl implements ElementMirror {
             ((StyleableButtonView) element).model.listeners().add(new Button.ButtonModelListener() {
                 @Override
                 public void pressedChanged() {
-                    element.invalidateDecoration();
+                    ((CSSStyle)element.decoration()).refresh();
                 }
             });
         }

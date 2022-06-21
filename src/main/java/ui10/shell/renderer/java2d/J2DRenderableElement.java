@@ -91,4 +91,9 @@ public abstract class J2DRenderableElement<N extends ElementModel<?>> extends Re
         return new TexturePaint(bufferedImage, bounds);
     }
 
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName()+" ("+node+")";
+    }
 }

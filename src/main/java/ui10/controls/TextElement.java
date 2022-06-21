@@ -1,7 +1,7 @@
 package ui10.controls;
 
-import ui10.base.Element;
 import ui10.base.ElementModel;
+import ui10.base.Element;
 import ui10.font.TextStyle;
 import ui10.graphics.TextLayout;
 
@@ -16,7 +16,7 @@ public class TextElement extends ElementModel<TextElement.TextElementListener> {
 
  */
 
-    private String text;
+    private String text = "";
     private Element fill;
     private TextStyle textStyle;
 
@@ -25,6 +25,8 @@ public class TextElement extends ElementModel<TextElement.TextElementListener> {
     }
 
     public void text(String text) {
+        if (text == null)
+            text = "";
         this.text = text;
         listener().textChanged();
     }
@@ -61,5 +63,12 @@ public class TextElement extends ElementModel<TextElement.TextElementListener> {
     public interface TextView extends TextElementListener {
 
         TextLayout textLayout();
+    }
+
+    @Override
+    public String toString() {
+        return "TextElement{" +
+                "text='" + text + '\'' +
+                '}';
     }
 }

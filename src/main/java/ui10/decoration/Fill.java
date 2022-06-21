@@ -1,10 +1,10 @@
 package ui10.decoration;
 
+import ui10.base.Element;
 import ui10.geom.Fraction;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 import ui10.image.Color;
-import ui10.base.Element;
 import ui10.decoration.css.Length;
 import ui10.graphics.LinearGradient;
 import ui10.layout.Layouts;

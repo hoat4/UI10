@@ -1,7 +1,6 @@
 package ui10.decoration.views;
 
 import ui10.base.Element;
-import ui10.base.EnduringElement;
 import ui10.controls.Label;
 import ui10.controls.TabbedPane;
 import ui10.decoration.Style;
@@ -86,7 +85,7 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
         private final Element tab;
         private final TabButtonInner tabButtonInner;
 
-        public TabButton(EnduringElement tab) {
+        public TabButton(Element tab) {
             this.tab = tab;
             tabButtonInner = new TabButtonInner(tab);
         }
@@ -105,7 +104,7 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
 
         private final Label tabButtonLabel;
 
-        private TabButtonInner(EnduringElement tab){
+        private TabButtonInner(Element tab){
             tabButtonLabel = new Label(TabbedPane.Tab.of(tab).title());
         }
 

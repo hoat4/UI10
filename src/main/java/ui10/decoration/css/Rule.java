@@ -197,11 +197,8 @@ public class Rule {
             return e;
     }
 
-    public Element apply2(Element elem, DecorationContext context) {
-        if (dcbMask != 0)
-            return new DecorBox(elem, this, context);
-        else
-            return elem;
+    public boolean needsDecorBox() {
+        return dcbMask != 0;
     }
 
     private Element makePadding(Element element, List<Length> lengths, DecorationContext context) {

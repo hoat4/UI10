@@ -6,7 +6,6 @@ import ui10.input.keyboard.KeyTypeEvent;
 import ui10.input.pointer.MouseEvent;
 import ui10.shell.renderer.java2d.J2DRenderer;
 import ui10.shell.renderer.java2d.J2DUtil;
-import ui10.window.Cursor;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -19,11 +18,11 @@ import java.util.concurrent.ExecutionException;
 public class AWTWindowImpl extends Frame {
 
     public final AWTRenderer renderer;
-    private final EnduringElement window;
+    private final Element window;
     private final AWTDesktop desktop;
     private final int scale;
 
-    public AWTWindowImpl(EnduringElement window, AWTDesktop desktop, int scale) throws HeadlessException {
+    public AWTWindowImpl(Element window, AWTDesktop desktop, int scale) throws HeadlessException {
         this.window = window;
         this.desktop = desktop;
         this.scale = scale;
@@ -142,7 +141,7 @@ public class AWTWindowImpl extends Frame {
                     break;
 
                 InputHandler control = l.get(i);
-                MouseEvent translatedEvent = e.subtract(((EnduringElement)control).origin());
+                MouseEvent translatedEvent = e.subtract(((Element)control).origin());
                 InputHandler.dispatchInputEvent(translatedEvent, control, eventContext, false);
             }
         });
@@ -150,21 +149,21 @@ public class AWTWindowImpl extends Frame {
 
     private void dispatchKeyEvent(KeyTypeEvent e) {
         renderer.uiContext.eventLoop().runLater(() -> {
-            EnduringElement focusedControl = window.focusContext().focusedControl.get();
-            List<EnduringElement> hierarchy = new ArrayList<>();
-            for (EnduringElement re = focusedControl; re != null; re = re.parentRenderable()) {
+            Element focusedControl = window.focusContext().focusedControl.get();
+            List<Element> hierarchy = new ArrayList<>();
+            for (Element re = focusedControl; re != null; re = re.parentRenderable()) {
                 if (re instanceof InputHandler)
                     hierarchy.add(0, re);
             }
 
             EventContext eventContext = new EventContext();
-            for (EnduringElement c : hierarchy) {
+            for (Element c : hierarchy) {
                 InputHandler.dispatchInputEvent(e, (InputHandler) c, eventContext, true);
                 if (eventContext.stopPropagation)
                     return;
             }
             Collections.reverse(hierarchy);
-            for (EnduringElement c : hierarchy) {
+            for (Element c : hierarchy) {
                 InputHandler.dispatchInputEvent(e, (InputHandler) c, eventContext, false);
                 if (eventContext.stopPropagation)
                     return;

@@ -1,9 +1,6 @@
 package ui10.decoration.views;
 
-import ui10.base.Container;
-import ui10.base.Element;
-import ui10.base.ElementModel;
-import ui10.base.ViewProvider;
+import ui10.base.*;
 import ui10.controls.Button;
 import ui10.controls.Label;
 import ui10.controls.TabbedPane;

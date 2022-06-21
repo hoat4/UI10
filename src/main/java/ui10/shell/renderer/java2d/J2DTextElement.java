@@ -1,6 +1,5 @@
 package ui10.shell.renderer.java2d;
 
-import ui10.base.EnduringElement;
 import ui10.base.LayoutContext1;
 import ui10.base.LayoutContext2;
 import ui10.controls.TextElement;
@@ -29,7 +28,7 @@ public class J2DTextElement extends J2DRenderableElement<TextElement> implements
         Objects.requireNonNull(node.textStyle());
 
         node.fill().initParent(this);
-        fill = (J2DRenderableElement<?>) ((EnduringElement)node.fill()).renderableElement();
+        fill = (J2DRenderableElement<?>) node.fill().renderableElement();
 
         textLayout = new J2DTextLayout(node.text(), (AWTTextStyle) node.textStyle());
 
@@ -52,8 +51,8 @@ public class J2DTextElement extends J2DRenderableElement<TextElement> implements
     }
 
     @Override
-    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
-        super.performLayoutImpl(shape, context);
+    protected void applyShape(Shape shape, LayoutContext2 context) {
+        super.applyShape(shape, context);
         validateIfNeeded();
         LayoutContext2.ignoring(this).placeElement(fill, shape);
     }

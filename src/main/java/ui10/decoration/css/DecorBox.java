@@ -1,9 +1,6 @@
 package ui10.decoration.css;
 
-import ui10.base.Element;
-import ui10.base.LayoutContext1;
-import ui10.base.LayoutContext2;
-import ui10.base.TransientElement;
+import ui10.base.*;
 import ui10.decoration.BorderShape;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.DecorationContext;
@@ -18,10 +15,10 @@ import ui10.layout.BoxConstraints;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class DecorBox extends TransientElement {
+public class DecorBox extends LayoutElement {
 
     public final Element content;
-    public final Rule rule;
+    public Rule rule;
     public final DecorationContext decorContext;
 
     public DecorBox(Element content, Rule rule, DecorationContext decorContext) {
@@ -31,12 +28,16 @@ public class DecorBox extends TransientElement {
     }
 
     @Override
-    protected void enumerateStaticChildren(Consumer<Element> consumer) {
+    protected void enumerateChildren(Consumer<Element> consumer) {
         consumer.accept(content);
     }
 
+    public void refresh() {
+        listener().layoutInvalidated();
+    }
+
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+    protected Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
         int marginLeft = len(CSSProperty.MARGIN_LEFT_DCB_INDEX),
                 marginRight = len(CSSProperty.MARGIN_RIGHT_DCB_INDEX),
                 marginTop = len(CSSProperty.MARGIN_TOP_DCB_INDEX),
@@ -92,7 +93,7 @@ public class DecorBox extends TransientElement {
     }
 
     @Override
-    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
+    protected void performLayout(Shape shape, LayoutContext2 context) {
         if ((rule.dcbMask & CSSProperty.MARGIN_MASK) != 0) {
             int marginLeft = len(CSSProperty.MARGIN_LEFT_DCB_INDEX),
                     marginRight = len(CSSProperty.MARGIN_RIGHT_DCB_INDEX),
@@ -205,5 +206,10 @@ public class DecorBox extends TransientElement {
         }
 
         context.placeElement(content, shape);
+    }
+
+    @Override
+    public String toString() {
+        return "DecorBox 0x"+Integer.toUnsignedString(hashCode(), 16)+" ("+content +')';
     }
 }

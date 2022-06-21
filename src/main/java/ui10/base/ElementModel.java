@@ -1,6 +1,5 @@
 package ui10.base;
 
-import ui10.binding2.ElementEvent;
 import ui10.binding5.ListenerMulticaster;
 import ui10.binding5.Parameterization;
 import ui10.binding5.ReflectionUtil;
@@ -10,33 +9,31 @@ import ui10.layout.BoxConstraints;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
-public non-sealed class ElementModel<L extends ElementModel.ElementModelListener> extends EnduringElement {
+public non-sealed class ElementModel<L extends ElementModel.ElementModelListener> extends Element {
 
     private final List<L> listeners = new ArrayList<>();
 
     public void initParent(Element parent) {
         Element e = parent;
-        while (e instanceof TransientElement t)
-            e = t.logicalParent;
         if (e == this.parent)
             return;
-        this.parent = (EnduringElement) e;
 
         if (!listeners.isEmpty())
-            throw new IllegalStateException();
+            throw new IllegalStateException(this+" already has listeners: "+listeners+" (old parent: "+this.parent+", new parent: "+parent+")");
+
+        this.parent = (Element) e;
 
         // view must be instance of {@linkplain EnduringElement},
         // but there's no way to express this in the type system
         L view = (L) ViewProvider.makeView(this, lookupMultiple(ViewProvider.class));
-        assert view instanceof EnduringElement;
+        assert view instanceof Element;
         listeners.add(view);
-        ((EnduringElement) view).initParent(this);
+        ((Element) view).initParent(this);
 
         // TODO ez a predicate nem jó ha csak megváltoztattuk a parentet
-        ReflectionUtil.invokeAnnotatedMethods(this, EnduringElement.OnChange.class,
+        ReflectionUtil.invokeAnnotatedMethods(this, Element.OnChange.class,
                 ann -> !lookupMultiple(ann.value()).isEmpty());
     }
 
@@ -52,28 +49,21 @@ public non-sealed class ElementModel<L extends ElementModel.ElementModelListener
     }
 
     // ez így nem jó, hogy dekorált elementmodeleken is látszik ez a függvény
-    public EnduringElement view() {
+    public Element view() {
         if (listeners.isEmpty())
             throw new IllegalStateException("no view associated with " + this + " (parent: " + parent + ")");
-        return (EnduringElement) listeners.get(0);
+        return (Element) listeners.get(0);
     }
 
     public Shape getShapeOrFail() {
         return view().getShapeOrFail();
     }
 
-    // ezt így értelmetlen használni, mert alternatív layout protokolloknál dobozosít
-    // nem is használjuk, LayoutContext1::preferredSize kikerüli
-    @Override
-    protected final Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        return context.preferredSize(view(), constraints);
-    }
-
     protected void preShapeChange(Shape shape) {
     }
 
     @Override
-    protected final void performLayoutImpl(Shape shape, LayoutContext2 context) {
+    protected final void applyShape(Shape shape, LayoutContext2 context) {
         preShapeChange(shape);
         context.placeElement(view(), shape);
     }

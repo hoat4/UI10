@@ -1,6 +1,6 @@
 package ui10.decoration.css;
 
-import ui10.base.EnduringElement;
+import ui10.base.Element;
 import ui10.geom.Fraction;
 
 import java.util.Objects;
@@ -8,7 +8,7 @@ import java.util.concurrent.ScheduledFuture;
 
 public class Transition<T>  {
 
-    public final EnduringElement element;
+    public final Element element;
     public final TransitionSpec<T> spec;
     private T begin;
     private Fraction progress;
@@ -16,7 +16,7 @@ public class Transition<T>  {
 
     public ScheduledFuture<?> activeAnimation;
 
-    public Transition(EnduringElement element, TransitionSpec<T> spec, T begin) {
+    public Transition(Element element, TransitionSpec<T> spec, T begin) {
         this.element = element;
         this.spec = spec;
         this.begin = begin;

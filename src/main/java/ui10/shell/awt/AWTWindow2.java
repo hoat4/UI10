@@ -9,11 +9,11 @@ import java.util.function.Consumer;
 public class AWTWindow2 extends RootElement implements ElementModel.ElementModelListener {
 
     private final AWTDesktop desktop;
-    private final EnduringElement element;
+    private final Element element;
     private AWTWindowImpl frame;
     private ViewProvider contentViewProvider;
 
-    public AWTWindow2(AWTDesktop desktop, EnduringElement element) {
+    public AWTWindow2(AWTDesktop desktop, Element element) {
         this.desktop = desktop;
         this.element = element;
 

@@ -5,8 +5,8 @@ import ui10.controls.Action;
 
 public class FocusContext {
 
-    public final ScalarProperty<EnduringElement> focusedControl = ScalarProperty.create("focusedControl");
-    public final ScalarProperty<EnduringElement> hoveredControl = ScalarProperty.create("hoveredControl");
+    public final ScalarProperty<Element> focusedControl = ScalarProperty.create("focusedControl");
+    public final ScalarProperty<Element> hoveredControl = ScalarProperty.create("hoveredControl");
 
     public final ScalarProperty<Action> defaultAction = ScalarProperty.create("defaultAction");
 

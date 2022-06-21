@@ -1,6 +1,6 @@
 package ui10.shell.awt;
 
-import ui10.base.EnduringElement;
+import ui10.base.Element;
 import ui10.base.EventContext;
 import ui10.base.InputHandler;
 import ui10.base.ViewProvider;
@@ -65,7 +65,7 @@ public abstract class AWTRenderer {
         return cf;
     }
 
-    protected abstract void initRoot(EnduringElement root);
+    protected abstract void initRoot(Element root);
 
     protected abstract void draw(Graphics2D g);
 

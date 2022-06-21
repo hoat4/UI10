@@ -1,7 +1,8 @@
 package ui10.base;
 
-import ui10.binding2.ElementEvent;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
+import ui10.layout.BoxConstraints;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,12 +11,15 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
-public non-sealed abstract class RenderableElement extends EnduringElement {
+public non-sealed abstract class RenderableElement extends Element {
 
-    protected Shape shape;
     protected Map<RenderableElement, List<LayoutContext1.LayoutDependency<?, ?>>> layoutDependencies;
+    protected Shape shape;
 
     protected abstract void invalidateRendererData();
+
+    // nevek 4-es layoutban computeSize és setBounds voltak
+    protected abstract Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context);
 
     @Override
     protected void enumerateStaticChildren(Consumer<Element> consumer) {
@@ -23,7 +27,7 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
     }
 
     @Override
-    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
+    protected void applyShape(Shape shape, LayoutContext2 context) {
         boolean changed = !Objects.equals(this.shape, shape);
         this.shape = shape;
         this.layoutDependencies = context.dependencies;
@@ -34,18 +38,6 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
     }
 
     @Override
-    public void initParent(Element parent) {
-        Element e = parent;
-        while (e instanceof TransientElement t) {
-            e = t.logicalParent;
-        }
-
-        this.parent = (EnduringElement) e;
-
-        enumerateStaticChildren(elem -> elem.initParent(this));
-    }
-
-    @Override
     public RenderableElement renderableElement() {
         return this;
     }
@@ -53,17 +45,14 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
     protected void onShapeApplied(Shape shape) {
     }
 
-    public Shape getShapeOrFail() {
-        if (shape == null)
-            throw new IllegalStateException("no shape for " + this);
-        return shape;
-    }
-
     public void invalidate() {
         invalidateRendererData();
         if (lookup(UIContext.class) == null)
             return;
-        // lehet hogy kéne még valami feltételt szabni (pl. van-e már shape)
+
+        if (shape == null)
+            return;
+
         lookup(UIContext.class).requestLayout(new UIContext.LayoutTask(this, this::revalidate));
     }
 
@@ -71,9 +60,9 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
         //System.out.println("revalidate " + this + ": " + shape);
 
         if (shape == null)
-            throw new IllegalStateException(); // should not happen
+            throw new IllegalStateException("no shape for " + this); // should not happen because of the check in invalidate()
 
-        LayoutContext1 ctx = new LayoutContext1();
+        LayoutContext1 ctx = new LayoutContext1(this);
 
         for (LayoutContext1.LayoutDependency<?, ?> dep : layoutDependencies.getOrDefault(this, Collections.emptyList())) {
             if (ctx.isInvalidated(this, dep)) {
@@ -84,10 +73,33 @@ public non-sealed abstract class RenderableElement extends EnduringElement {
         }
 
         try {
-                    onShapeApplied(shape);
+            onShapeApplied(shape);
         } catch (RuntimeException e) {
             System.err.print("Failed to layout " + this + ": ");
             e.printStackTrace();
         }
+    }
+
+    public void initParent(Element parent) {
+        this.parent = (Element) parent;
+
+        enumerateStaticChildren(e -> {
+            Objects.requireNonNull(e);
+            e.initParent(this);
+        });
+    }
+
+    public Shape getShapeOrFail() {
+        if (shape == null)
+            throw new IllegalStateException("no shape for " + this);
+        return shape;
+    }
+
+    protected static void performLayoutHelper(LayoutElement e, LayoutContext2 context) {
+        e.performLayout(e.getShapeOrFail(), context);
+    }
+
+    protected static void enumerateChildrenHelper(LayoutElement e, Consumer<Element> consumer) {
+        e.enumerateChildren(consumer);
     }
 }

@@ -5,7 +5,8 @@ import ui10.base.*;
 public abstract class StyleableContainer<D extends Style> extends Container {
 
     private D decoration;
-    private boolean decorationInvalid;
+
+    //private boolean decorationInvalid;
 
     protected D decoration() {
         return decoration;
@@ -20,18 +21,20 @@ public abstract class StyleableContainer<D extends Style> extends Container {
     }
 
     protected void onDecorationChanged() {}
-
+/*
     public void invalidateDecoration() {
         decorationInvalid = true;
         invalidate();
     }
-
+*/
     @Override
     protected Element content() {
+        /*
         if (decorationInvalid) {
             initDecoration();
             decorationInvalid = false;
         }
+         */
         return decoration.wrapContent(contentImpl());
     }
 

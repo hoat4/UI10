@@ -1,12 +1,8 @@
 package ui10.controls;
 
 import ui10.base.Element;
-import ui10.binding2.ElementEvent;
 import ui10.binding3.Model;
-import ui10.binding3.PropertyIdentifier;
 import ui10.input.keyboard.KeyCombination;
-
-import java.util.function.Consumer;
 
 public interface Action extends Model {
 

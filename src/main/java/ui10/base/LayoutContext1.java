@@ -7,7 +7,10 @@ import java.util.*;
 
 public class LayoutContext1 {
 
-    public LayoutContext1() {
+    protected final Element defaultParent;
+
+    public LayoutContext1(Element defaultParent) {
+        this.defaultParent = defaultParent;
     }
 
     public Size preferredSize(Element e, BoxConstraints constraints) {
@@ -17,6 +20,9 @@ public class LayoutContext1 {
     public <I, O> O preferredSize(Element e, I constraints, LayoutProtocol<I, O> protocol) {
         Objects.requireNonNull(e);
         Objects.requireNonNull(constraints);
+
+        if (e.parent() == null)
+            throw new RuntimeException("no parent: "+e);
 
         while (e instanceof ElementModel m)
             // kikerüljük ElementModeleket, hogy ne dobozosítsunk alternatív layout protokollok esetén

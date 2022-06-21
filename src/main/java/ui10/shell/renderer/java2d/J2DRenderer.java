@@ -1,6 +1,6 @@
 package ui10.shell.renderer.java2d;
 
-import ui10.base.EnduringElement;
+import ui10.base.Element;
 import ui10.base.EventContext;
 import ui10.base.InputHandler;
 import ui10.base.ViewProvider;
@@ -23,7 +23,7 @@ public class J2DRenderer extends AWTRenderer {
     }
 
     @Override
-    protected void initRoot(EnduringElement root) {
+    protected void initRoot(Element root) {
         this.root = (J2DRenderableElement<?>) root.renderableElement();
     }
 

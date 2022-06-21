@@ -13,7 +13,7 @@ public class Wrapper extends SingleNodeLayout{
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+    protected Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
         return context.preferredSize(content, constraints);
     }
 

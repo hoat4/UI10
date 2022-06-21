@@ -55,8 +55,8 @@ public class Main7 extends Container {
         );
         vbox.gap = 10;
 
-        EnduringElement tab1 = Container.of(centered(vbox));
-        EnduringElement tab2 = Container.of(empty());
+        Element tab1 = (Element) centered(vbox);
+        Element tab2 = (Element) empty();
         TabbedPane.Tab.of(tab1).title("Egyik tab");
         TabbedPane.Tab.of(tab2).title("Táblázat");
         return new TabbedPane(List.of(tab1, tab2));

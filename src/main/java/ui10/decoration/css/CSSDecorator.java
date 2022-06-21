@@ -1,7 +1,5 @@
 package ui10.decoration.css;
 
-import ui10.base.Element;
-
 public class CSSDecorator {
 
     //public static final Property<CSSDecorator> DECORATOR_PROPERTY = new Property<>(true);

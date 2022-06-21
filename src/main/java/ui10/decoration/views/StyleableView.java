@@ -1,7 +1,7 @@
 package ui10.decoration.views;
 
-import ui10.base.Element;
 import ui10.base.ElementModel;
+import ui10.base.Element;
 import ui10.binding5.ReflectionUtil;
 import ui10.decoration.Style;
 import ui10.decoration.StyleableContainer;

@@ -34,13 +34,13 @@ public class UIContextImpl implements UIContext {
             eventLoop.runLater(renderer::draw);
 
         for (LayoutTask t : layoutTasks) {
-            if (isAncestorOfOrSameAs(t.element().renderableElement(), task.element().renderableElement()))
+            if (isAncestorOfOrSameAs(t.element(), task.element()))
                 return;
         }
 
         BitSet bitSet = new BitSet();
         for (int i = inLayout + 1; i<layoutTasks.size(); i++) {
-            if (isAncestorOfOrSameAs(task.element().renderableElement(), layoutTasks.get(i).element().renderableElement()))
+            if (isAncestorOfOrSameAs(task.element(), layoutTasks.get(i).element()))
                 bitSet.set(i);
         }
         for (int i = bitSet.previousSetBit(bitSet.size()-1); i!= -1; i = bitSet.previousSetBit(i-1))
@@ -59,12 +59,12 @@ public class UIContextImpl implements UIContext {
         layoutTasks.clear();
     }
 
-    private static boolean isAncestorOfOrSameAs(RenderableElement e1, RenderableElement e2) {
+    private static boolean isAncestorOfOrSameAs(Element e1, Element e2) {
         while (e2 != null)
             if (e2 == e1)
                 return true;
             else
-                e2 = e2.parentRenderable();
+                e2 = e2.parent();
         return false;
     }
 }

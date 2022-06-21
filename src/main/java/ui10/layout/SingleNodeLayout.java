@@ -1,13 +1,13 @@
 package ui10.layout;
 
-import ui10.base.TransientElement;
-import ui10.geom.shape.Shape;
 import ui10.base.Element;
+import ui10.base.LayoutElement;
+import ui10.geom.shape.Shape;
 import ui10.base.LayoutContext2;
 
 import java.util.function.Consumer;
 
-public abstract class SingleNodeLayout extends TransientElement {
+public abstract class SingleNodeLayout extends LayoutElement {
 
     protected final Element content;
 
@@ -16,12 +16,12 @@ public abstract class SingleNodeLayout extends TransientElement {
     }
 
     @Override
-    public void enumerateStaticChildren(Consumer<Element> consumer) {
+    public void enumerateChildren(Consumer<Element> consumer) {
         consumer.accept(content);
     }
 
     @Override
-    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
+    protected void performLayout(Shape shape, LayoutContext2 context) {
         Shape contentShape = computeContentShape(shape, context);
         // ilyenkor lehet hogy mégis hozzá kéne adni, de mondjuk 0 méretű téglalapként
         if (contentShape != null)

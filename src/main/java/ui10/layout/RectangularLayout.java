@@ -1,18 +1,15 @@
 package ui10.layout;
 
-import ui10.base.TransientElement;
+import ui10.base.*;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
-import ui10.base.Element;
-import ui10.base.LayoutContext1;
-import ui10.base.LayoutContext2;
 
 import java.util.function.BiConsumer;
 
-public abstract class RectangularLayout extends TransientElement {
+public abstract class RectangularLayout extends LayoutElement {
     @Override
-    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
+    protected void performLayout(Shape shape, LayoutContext2 context) {
         Rectangle shapeBounds = shape.bounds();
         Size size = shapeBounds.size();
         doPerformLayout(size, (elem, rect) -> {

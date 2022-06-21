@@ -1,9 +1,6 @@
 package ui10.layout;
 
-import ui10.base.Element;
-import ui10.base.LayoutContext1;
-import ui10.base.LayoutContext2;
-import ui10.base.TransientElement;
+import ui10.base.*;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
@@ -14,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class FlowLayout extends TransientElement implements Flowable {
+public class FlowLayout extends LayoutElement implements Flowable {
 
     public final List<Element> items;
 
@@ -23,12 +20,12 @@ public class FlowLayout extends TransientElement implements Flowable {
     }
 
     @Override
-    public void enumerateStaticChildren(Consumer<Element> consumer) {
+    public void enumerateChildren(Consumer<Element> consumer) {
         items.forEach(consumer);
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+    protected Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
         FlowableElementSize s = computeSize(null, constraints.max(), context);
         Size size = Size.ZERO;
         for (Size line : s.lineSizes())
@@ -78,7 +75,7 @@ public class FlowLayout extends TransientElement implements Flowable {
     }
 
     @Override
-    protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
+    protected void performLayout(Shape shape, LayoutContext2 context) {
         // TODO kezelni kell, ha a shape FlowShape
         //      de hogy kéne ezt, ha annak egy transzformált (vagy más miatt wrappelt) változata?
 

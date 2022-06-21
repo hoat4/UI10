@@ -18,19 +18,19 @@ public class Layouts {
         return new Empty();
     }
 
-    private static class Empty extends TransientElement {
+    private static class Empty extends LayoutElement {
 
         @Override
-        public void enumerateStaticChildren(Consumer<Element> consumer) {
+        public void enumerateChildren(Consumer<Element> consumer) {
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             return constraints.min();
         }
 
         @Override
-        protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
+        protected void performLayout(Shape shape, LayoutContext2 context) {
         }
     }
 
@@ -45,7 +45,7 @@ public class Layouts {
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             return context.preferredSize(content, constraints);
         }
 
@@ -66,7 +66,7 @@ public class Layouts {
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             return constraints.clamp(context.preferredSize(content, constraints.withMinimum(Size.ZERO)));
         }
 
@@ -93,7 +93,7 @@ public class Layouts {
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             return context.preferredSize(content, constraints.withMinimum(Size.max(constraints.min(), minSize)));
         }
 
@@ -116,7 +116,7 @@ public class Layouts {
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             Size insetsSize = insets.all();
             Size contentSize = context.preferredSize(content, constraints.subtract(insetsSize));
             return contentSize.add(insetsSize);
@@ -141,7 +141,7 @@ public class Layouts {
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             Size insetsSize = insets.all();
             Size contentSize = context.preferredSize(content, constraints.subtract(insetsSize));
             return contentSize.add(insetsSize);
@@ -178,7 +178,7 @@ public class Layouts {
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             Size minSize = Size.max(constraints.min(), new Size(
                     Math.max(topLeftRadius, bottomLeftRadius) + Math.max(topRightRadius, bottomRightRadius),
                     Math.max(topLeftRadius, topRightRadius) + Math.max(bottomLeftRadius, bottomRightRadius)
@@ -197,7 +197,7 @@ public class Layouts {
         return new StackLayout(nodes);
     }
 
-    private static class StackLayout extends TransientElement {
+    private static class StackLayout extends LayoutElement {
 
         private final List<Element> elements;
 
@@ -206,12 +206,12 @@ public class Layouts {
         }
 
         @Override
-        public void enumerateStaticChildren(Consumer<Element> consumer) {
+        public void enumerateChildren(Consumer<Element> consumer) {
             elements.forEach(consumer);
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             Size size = Size.ZERO;
             for (Element e : elements)
                 size = Size.max(size, context.preferredSize(e, constraints));
@@ -219,7 +219,7 @@ public class Layouts {
         }
 
         @Override
-        protected void performLayoutImpl(Shape shape, LayoutContext2 context) {
+        protected void performLayout(Shape shape, LayoutContext2 context) {
             for (Element e : elements)
                 context.placeElement(e, shape);
         }
@@ -228,7 +228,7 @@ public class Layouts {
     public static Element withOpacity(Element e, Fraction opacity) {
         // TODO ennek nem csak EnduringElementnek szabadna lennie
         //      vagy de?
-        return new Opacity((EnduringElement) e, opacity);
+        return new Opacity((Element) e, opacity);
     }
 
     public static Element withSize(Element e, Size size) { // paramétersorrend ne fordítva legyen?
@@ -245,7 +245,7 @@ public class Layouts {
         }
 
         @Override
-        public Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        public Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             return constraints.clamp(size);
         }
 
@@ -292,7 +292,7 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        protected Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             Size contentSize = context.preferredSize(content, constraints.withMinimum(constraints.min().withWidth(0)));
             return constraints.clamp(contentSize);
         }
@@ -326,7 +326,7 @@ public class Layouts {
         }
 
         @Override
-        protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        protected Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
             Size contentSize = context.preferredSize(content, constraints.withMinimum(constraints.min().withHeight(0)));
             return constraints.clamp(contentSize);
         }

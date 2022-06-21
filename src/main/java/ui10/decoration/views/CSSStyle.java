@@ -1,18 +1,14 @@
 package ui10.decoration.views;
 
 import ui10.base.Element;
-import ui10.base.EnduringElement;
 import ui10.decoration.*;
-import ui10.decoration.css.CSSDecorator;
-import ui10.decoration.css.CSSProperty;
-import ui10.decoration.css.Length;
-import ui10.decoration.css.Rule;
+import ui10.decoration.css.*;
 
-public class CSSStyle<V extends EnduringElement> implements Style {
+public class CSSStyle<V extends Element> implements Style {
 
     protected final V view;
     private final CSSDecorator css;
-    protected final Rule rule;
+    protected Rule rule;
 
     protected DecorationContext dc;
 
@@ -29,7 +25,7 @@ public class CSSStyle<V extends EnduringElement> implements Style {
     }
 
     protected Fill textFill() {
-        EnduringElement e = view;
+        Element e = view;
         while (true) {
             if (e instanceof StyleableView) {
                 ElementMirrorImpl elementMirror = new ElementMirrorImpl((StyleableView<?, ?>) e);
@@ -42,7 +38,7 @@ public class CSSStyle<V extends EnduringElement> implements Style {
         }
     }
 
-    private static int findEmSize(EnduringElement e, CSSDecorator css) {
+    private static int findEmSize(Element e, CSSDecorator css) {
         int scale = 1 << 14;
         while (true) {
             if (e instanceof StyleableView) {
@@ -60,13 +56,35 @@ public class CSSStyle<V extends EnduringElement> implements Style {
         }
     }
 
+    private DecorBox decorBox;
+
     @Override
     public Element wrapContent(Element controlContent) {
-        return rule.apply2(controlContent, dc);
+        if (rule.needsDecorBox()) {
+            if (decorBox == null)
+                decorBox = new DecorBox(controlContent, rule, dc);
+            return decorBox;
+        }else {
+            decorBox = null; // ???
+            return controlContent;
+        }
     }
 
     @Override
     public DecorationContext decorationContext() {
         return dc;
+    }
+
+    public void refresh() {
+        this.rule = css.ruleOf(elementMirror);
+
+        if (rule.needsDecorBox() != (decorBox != null)) {
+            throw new UnsupportedOperationException();
+        }
+
+        if (decorBox != null) {
+            decorBox.rule = rule;
+            decorBox.refresh();
+        }
     }
 }

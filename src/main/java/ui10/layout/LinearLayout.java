@@ -1,12 +1,10 @@
 package ui10.layout;
 
 import ui10.base.ElementExtra;
-import ui10.base.EnduringElement;
+import ui10.base.Element;
 import ui10.binding2.Property;
 import ui10.geom.*;
-import ui10.base.Element;
 import ui10.base.LayoutContext1;
-import ui10.window.Window;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -31,12 +29,12 @@ public class LinearLayout extends RectangularLayout {
     }
 
     @Override
-    public void enumerateStaticChildren(Consumer<Element> consumer) {
+    public void enumerateChildren(Consumer<Element> consumer) {
         children.forEach(consumer);
     }
 
     @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+    protected Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
         return computeLayout(constraints, context).containerSize;
     }
 
