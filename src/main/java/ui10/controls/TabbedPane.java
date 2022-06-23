@@ -3,15 +3,16 @@ package ui10.controls;
 import ui10.base.ElementExtra;
 import ui10.base.ElementModel;
 import ui10.base.Element;
+import ui10.binding.ListChange;
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;
+import ui10.binding5.ElementEvent;
 
 import java.util.List;
 
 public class TabbedPane extends ElementModel<TabbedPane.TabbedPaneListener> {
 
-    private final ObservableList<Element> tabs = new ObservableListImpl<>(ObservableList.simpleListSubscriber(
-            this::tabAdded, this::tabRemoved));
+    private final ObservableList<Element> tabs = new ObservableListImpl<>(this::tabsChanged);
 
     private Element selectedTab;
 
@@ -22,7 +23,7 @@ public class TabbedPane extends ElementModel<TabbedPane.TabbedPaneListener> {
         this.tabs.addAll(tabs);
     }
 
-    public List<Element> tabs() {
+    public ObservableList<Element> tabs() {
         return tabs;
     }
 
@@ -33,27 +34,33 @@ public class TabbedPane extends ElementModel<TabbedPane.TabbedPaneListener> {
     public void selectedTab(Element selectedTab) {
         if (selectedTab == this.selectedTab)
             return;
+        Element old = this.selectedTab;
         this.selectedTab = selectedTab;
-        listener().selectedTabChanged();
+        listener().selectedTabChanged(old, selectedTab);
     }
 
-    private void tabAdded(Element tab) {
-        selectedTab(tabs.get(0));
-        listener().tabAdded(tab);
-    }
-
-    private void tabRemoved(Element tab) {
+    private void tabsChanged(ListChange<Element> change) {
+        listener().tabsChanged(change);
         selectedTab(tabs.isEmpty() ? null : tabs.get(0));
-        listener().tabRemoved(tab);
+    }
+
+    public record TabsChanged(TabbedPane source, ListChange<Element> change) implements ElementEvent {
+    }
+
+    public record TabSelected(TabbedPane source, Element oldValue, Element newValue) implements ElementEvent.ChangeEvent<Element> {
+    }
+
+    @FunctionalInterface
+    interface ChangeEventFactory<SRC, T, E extends ElementEvent.ChangeEvent<T>> {
+
+        E makeChangeEvent(SRC source, T oldValue, T newValue);
     }
 
     public interface TabbedPaneListener extends ElementModelListener {
 
-        void tabAdded(Element tab);
+        void tabsChanged(ListChange<Element> change);
 
-        void tabRemoved(Element tab);
-
-        void selectedTabChanged();
+        void selectedTabChanged(Element oldSelectedTab, Element newSelectedTab);
     }
 
     public static class Tab extends ElementExtra {

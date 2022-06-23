@@ -5,13 +5,15 @@ import ui10.controls.Button;
 import ui10.decoration.css.ElementMirror;
 import ui10.decoration.views.*;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class ElementMirrorImpl implements ElementMirror {
 
     final StyleableContainer<?> element;
 
-    private boolean updateOnButtonPressedChanged;
+    public final Set<Object> interests = new HashSet<>();
 
     public ElementMirrorImpl(StyleableContainer<?> element) {
         this.element = element;
@@ -42,7 +44,7 @@ public class ElementMirrorImpl implements ElementMirror {
             case "root" -> parent() == null;
             case "active" -> {
                 if (element instanceof StyleableButtonView btn) {
-                    updateOnButtonPressedChanged = true;
+                    interests.add(Button.ButtonProperty.PRESSED);
                     yield btn.model.pressed();
                 } else if (element instanceof StyleableTabbedPaneView.TabButton btn)
                     yield btn.isSelected();
@@ -69,18 +71,5 @@ public class ElementMirrorImpl implements ElementMirror {
         while (e != null && !(e instanceof StyleableContainer<?>))
             e = e.parent();
         return e == null ? null : new ElementMirrorImpl((StyleableContainer<?>) e);
-    }
-
-    // IDE bug
-    @SuppressWarnings("RedundantCast")
-    public void installListeners() {
-        if (updateOnButtonPressedChanged) {
-            ((StyleableButtonView) element).model.listeners().add(new Button.ButtonModelListener() {
-                @Override
-                public void pressedChanged() {
-                    ((CSSStyle)element.decoration()).refresh();
-                }
-            });
-        }
     }
 }

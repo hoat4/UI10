@@ -4,22 +4,24 @@ import ui10.base.Element;
 import ui10.decoration.*;
 import ui10.decoration.css.*;
 
+import java.util.Collections;
+import java.util.Set;
+
 public class CSSStyle<V extends Element> implements Style {
 
     protected final V view;
-    private final CSSDecorator css;
+    protected final CSSDecorator css;
     protected Rule rule;
 
     protected DecorationContext dc;
 
-    final ElementMirrorImpl elementMirror;
+    protected final ElementMirrorImpl elementMirror;
 
     public CSSStyle(V view, CSSDecorator css) {
         this.view = view;
         this.css = css;
         elementMirror = new ElementMirrorImpl((StyleableContainer<?>) view);
         this.rule = css.ruleOf(elementMirror);
-        elementMirror.installListeners();
 
         dc = new DecorationContext(view, findEmSize(view, css));
     }
@@ -73,6 +75,12 @@ public class CSSStyle<V extends Element> implements Style {
     @Override
     public DecorationContext decorationContext() {
         return dc;
+    }
+
+    @Override
+    public void invalidated(Set<?> dirtyProperties) {
+        if (!Collections.disjoint(elementMirror.interests, dirtyProperties))
+            refresh();
     }
 
     public void refresh() {

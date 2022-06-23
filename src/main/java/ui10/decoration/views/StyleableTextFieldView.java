@@ -53,7 +53,7 @@ public class StyleableTextFieldView extends StyleableView<TextField, StyleableTe
         textNodeAfterSel.textStyle(decoration().textStyle());
     }
 
-    @AfterModelAttach
+    @Setup
     private void updateTexts() {
         if (model.selection() == null) {
             textNode.text(model.text());

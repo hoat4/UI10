@@ -87,7 +87,9 @@ public class Parameterization {
 
     // @Nullable
     public static Parameterization ofRawType(Class<?> type) {
-        return type.getTypeParameters().length == 0 ? new Parameterization(type, Collections.emptyMap()) : null;
+        // itt ez volt: return type.getTypeParameters().length == 0 ? new Parameterization(type, Collections.emptyMap()) : null;
+        // de így nem működött listener() parameterizált típusokon, pl. LinearLayout
+        return new Parameterization(type, Collections.emptyMap());
     }
 
     @Override

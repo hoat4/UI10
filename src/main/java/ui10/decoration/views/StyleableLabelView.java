@@ -30,17 +30,17 @@ public class StyleableLabelView extends StyleableView<Label, StyleableLabelView.
     }
 
     @Override
-    @AfterModelAttach
+    @Setup
     public void textChanged() {
         textElement.text(model.text());
     }
 
-    @AfterModelAttach
+    @Setup
     public void textColorChanged() {
         textElement.fill(decoration().textFill().makeElement(null));
     }
 
-    @AfterModelAttach
+    @Setup
     public void textStyleChanged() {
         textElement.textStyle(decoration().textStyle());
     }

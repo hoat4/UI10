@@ -1,5 +1,6 @@
 package ui10.base;
 
+import ui10.binding.ListChange;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -15,6 +16,8 @@ public abstract class LayoutElement extends ElementModel<LayoutElement.LayoutEle
     protected abstract void performLayout(Shape shape, LayoutContext2 context1);
 
     public interface LayoutElementListener extends ElementModelListener {
+
+        void childrenChanged(ListChange<? extends Element> change);
 
         void layoutInvalidated();
     }

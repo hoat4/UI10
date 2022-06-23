@@ -9,6 +9,7 @@ import ui10.layout.BoxConstraints;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class J2DContainer extends J2DRenderableElement<Container> implements Container.ContainerListener {
@@ -22,7 +23,7 @@ public class J2DContainer extends J2DRenderableElement<Container> implements Con
 
     @Override
     public void contentChanged() {
-        invalidateRendererData();
+        invalidate();
     }
 
     @Override
@@ -87,12 +88,23 @@ public class J2DContainer extends J2DRenderableElement<Container> implements Con
 
     @Override
     public boolean captureMouseEvent(MouseEvent p, List<InputHandler> l, EventContext eventContext) {
-        if (node instanceof InputHandler c) {
-            InputHandler.dispatchInputEvent(p, c, eventContext, true);
-            if (eventContext.stopPropagation)
-                return true;
+        List<Element> e = new ArrayList<>();
+        Element e2 = node;
+        do {
+            e.add(e2);
+            e2 = e2.parent();
+        }while(e2 != null && !(e2 instanceof J2DRenderableElement));
+        Collections.reverse(e);
+        boolean wasIH = false;
+        for (Element element : e) {
+            if (element instanceof InputHandler c) {
+                InputHandler.dispatchInputEvent(p, c, eventContext, true);
+                if (eventContext.stopPropagation)
+                    return true;
 
-            l.add(c);
+                l.add(c);
+                wasIH = true;
+            }
         }
 
         for (J2DRenderableElement<?> item : children) {
@@ -102,7 +114,7 @@ public class J2DContainer extends J2DRenderableElement<Container> implements Con
             }
         }
 
-        return node instanceof InputHandler;
+        return wasIH;
     }
 
     @Override

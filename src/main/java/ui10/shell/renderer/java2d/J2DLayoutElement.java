@@ -1,6 +1,7 @@
 package ui10.shell.renderer.java2d;
 
 import ui10.base.*;
+import ui10.binding.ListChange;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.input.pointer.MouseEvent;
@@ -20,6 +21,11 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> implem
 
     public J2DLayoutElement(J2DRenderer renderer, LayoutElement node) {
         super(renderer, node);
+    }
+
+    @Override
+    public void childrenChanged(ListChange<? extends Element> change) {
+        change.newElements().forEach(e->e.initParent(this));
     }
 
     @Override

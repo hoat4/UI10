@@ -1,8 +1,8 @@
 package ui10.controls;
 
-import ui10.base.ElementModel;
+import ui10.binding7.PropertyBasedModel;
 
-public class Button extends ElementModel<Button.ButtonModelListener> {
+public class Button extends PropertyBasedModel<Button.ButtonProperty> {
 
     private String text;
     private boolean pressed;
@@ -14,6 +14,7 @@ public class Button extends ElementModel<Button.ButtonModelListener> {
     public Button(String text, Runnable action) {
         this.text = text;
         this.action = action;
+        dirtyProperties().add(ButtonProperty.TEXT);
     }
 
     public String text() {
@@ -22,7 +23,7 @@ public class Button extends ElementModel<Button.ButtonModelListener> {
 
     public void text(String text) {
         this.text = text;
-        listener().textChanged();
+        invalidate(ButtonProperty.TEXT);
     }
 
     public Runnable action() { // ez lehetne csak sima publikus field is
@@ -43,15 +44,11 @@ public class Button extends ElementModel<Button.ButtonModelListener> {
 
     public void pressed(boolean pressed) {
         this.pressed = pressed;
-        listener().pressedChanged();
+        invalidate(ButtonProperty.PRESSED);
     }
 
-    public interface ButtonModelListener extends ElementModelListener {
+    public enum ButtonProperty {
 
-        default void textChanged() {}
-
-        default void enabledChanged() {}
-
-        default void pressedChanged() {}
+        TEXT, PRESSED, ENABLED
     }
 }

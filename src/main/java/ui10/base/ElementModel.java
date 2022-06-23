@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public non-sealed class ElementModel<L extends ElementModel.ElementModelListener> extends Element {
+public non-sealed abstract class ElementModel<L extends ElementModel.ElementModelListener> extends Element {
 
     private final List<L> listeners = new ArrayList<>();
 
@@ -21,9 +21,9 @@ public non-sealed class ElementModel<L extends ElementModel.ElementModelListener
             return;
 
         if (!listeners.isEmpty())
-            throw new IllegalStateException(this+" already has listeners: "+listeners+" (old parent: "+this.parent+", new parent: "+parent+")");
+            throw new IllegalStateException(this + " already has listeners: " + listeners + " (old parent: " + this.parent + ", new parent: " + parent + ")");
 
-        this.parent = (Element) e;
+        this.parent = e;
 
         // view must be instance of {@linkplain EnduringElement},
         // but there's no way to express this in the type system
@@ -79,7 +79,6 @@ public non-sealed class ElementModel<L extends ElementModel.ElementModelListener
 
     @SuppressWarnings("unchecked")
     private Class<L> listenerClass() {
-        // TODO itt NPE lesz, ha van a végső leszármazottnak type variable-je
         return (Class<L>) ReflectionUtil.rawType(
                 Parameterization.ofRawType(getClass()).resolve(ElementModel.class.getTypeParameters()[0]));
     }

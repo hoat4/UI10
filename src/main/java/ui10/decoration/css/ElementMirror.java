@@ -17,9 +17,27 @@ public interface ElementMirror {
         return false;
     }
 
-    boolean isPseudoElement(String pseudoElementName);
+    default boolean isPseudoElement(String pseudoElementName){
+        return false;
+    }
 
-    Optional<Integer> indexInSiblings();
+    default Optional<Integer> indexInSiblings() {
+        return Optional.empty();
+    }
 
     ElementMirror parent();
+
+    static ElementMirror ofElementName(ElementMirror parent, String name) {
+        return new ElementMirror() {
+            @Override
+            public ElementMirror parent() {
+                return parent;
+            }
+
+            @Override
+            public String elementName() {
+                return name;
+            }
+        };
+    }
 }

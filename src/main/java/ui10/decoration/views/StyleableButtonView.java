@@ -3,14 +3,14 @@ package ui10.decoration.views;
 import ui10.base.Element;
 import ui10.base.EventContext;
 import ui10.base.InputHandler;
+import ui10.binding7.PropertyBasedView;
 import ui10.controls.Button;
 import ui10.controls.Label;
 import ui10.decoration.Style;
 import ui10.input.pointer.MouseEvent;
 
 // "Button" element name
-public class StyleableButtonView extends StyleableView<Button, Style>
-        implements Button.ButtonModelListener, InputHandler {
+public class StyleableButtonView extends PropertyBasedView<Button, Style> implements InputHandler {
 
     private final Label textNode = new Label();
 
@@ -19,14 +19,14 @@ public class StyleableButtonView extends StyleableView<Button, Style>
     }
 
     @Override
-    protected Element contentImpl() {
-        return textNode;
+    protected void validateImpl() {
+        if (model.dirtyProperties().contains(Button.ButtonProperty.TEXT))
+            textNode.text(model.text());
     }
 
     @Override
-    @AfterModelAttach
-    public void textChanged() {
-        textNode.text(model.text());
+    protected Element contentImpl() {
+        return textNode;
     }
 
     @EventHandler

@@ -29,11 +29,11 @@ public abstract class StyleableView<M extends ElementModel<?>, D extends Style>
         if (parent != model)
             throw new IllegalArgumentException();
         super.initParent(model);
-        ReflectionUtil.invokeAnnotatedMethods(this, AfterModelAttach.class, ann -> true);
+        ReflectionUtil.invokeAnnotatedMethods(this, Setup.class, ann -> true);
     }
 
     @Target(METHOD)
     @Retention(RUNTIME)
-    protected @interface AfterModelAttach {
+    protected @interface Setup {
     }
 }

@@ -2,6 +2,7 @@ package ui10.decoration;
 
 import ui10.base.ElementExtra;
 import ui10.decoration.css.CSSDecorator;
+import ui10.decoration.views.TabbedPaneCSS;
 import ui10.decoration.views.*;
 
 public class StyleProvider extends ElementExtra {
@@ -22,17 +23,9 @@ public class StyleProvider extends ElementExtra {
         if (view instanceof StyleableContainerView v)
             return (D) new CSSStyle<>(v, css);
         if (view instanceof StyleableTabbedPaneView v)
-            return (D) new CSSStyle<>(v, css);
+            return (D) new TabbedPaneCSS(v, css);
         if (view instanceof StyleableTabbedPaneView.TabButton v)
-            return (D) new CSSStyle<>(v, css);
-        if (view instanceof StyleableTabbedPaneView.TabHeaderArea v)
-            return (D) new CSSStyle<>(v, css);
-        if (view instanceof StyleableTabbedPaneView.TabButtonInner v)
-            return (D) new CSSStyle<>(v, css);
-        if (view instanceof StyleableTabbedPaneView.TabButtons v)
-            return (D) new CSSStyle<>(v, css);
-        if (view instanceof StyleableTabbedPaneView.TabHeaderBackground v)
-            return (D) new CSSStyle<>(v, css);
+            return (D) new TabButtonCSS(v, css);
         throw new UnsupportedOperationException("unknown view: " + view);
     }
 }
