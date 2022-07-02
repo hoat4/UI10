@@ -1,7 +1,7 @@
 package ui10.shell.renderer.java2d;
 
 import ui10.base.*;
-import ui10.binding.ListChange;
+import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.input.pointer.MouseEvent;
@@ -12,34 +12,14 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> implements LayoutElement.LayoutElementListener {
-
+public abstract class AbstractJ2DContainer<E extends ElementModel<?>> extends J2DRenderableElement<E> {
 
     private final List<J2DRenderableElement<?>> children = new ArrayList<>();
     private Shape shape2;
 
-    public J2DLayoutElement(J2DRenderer renderer, LayoutElement node) {
+    public AbstractJ2DContainer(J2DRenderer renderer, E node) {
         super(renderer, node);
     }
-
-    @Override
-    public void childrenChanged(ListChange<? extends Element> change) {
-        change.newElements().forEach(e->e.initParent(this));
-    }
-
-    @Override
-    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
-        enumerateChildrenHelper(node, e->e.initParent(this));
-        return LayoutProtocol.BOX.preferredSize(node, constraints, context);
-    }
-
-
-    /*
-    @Override
-    public void contentChanged() {
-        invalidateRendererData();
-    }
-     */
 
     @Override
     protected void drawImpl(Graphics2D g) {
@@ -53,34 +33,23 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> implem
         }
     }
 
-    @Override
-    public void layoutInvalidated() {
-        invalidate();
-    }
+    protected abstract Element getContent();
 
     @Override
     protected void validateImpl() {
         if (shape2 == null)
             return;
 
-        enumerateChildrenHelper(node, e->e.initParent(this));
-
-    }
-
-    @Override
-    protected void onShapeApplied(Shape shape) {
-        this.shape2 = shape;
-        super.onShapeApplied(shape);
-
-        validateIfNeeded();
+        Element content = getContent();
+        content.initParent(this);
 
         children.clear();
 
         // inter-container layout dependencies are not supported currently
-        performLayoutHelper(node, new LayoutContext2(this) {
+        new LayoutContext2(this) {
 
             {
-                dependencies.putAll(J2DLayoutElement.this.layoutDependencies);
+                dependencies.putAll(AbstractJ2DContainer.this.layoutDependencies);
             }
 
             @Override
@@ -90,11 +59,28 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> implem
                     // régi komment: this should not occur, but currently does because decoration
                     // e.parent = ui10.base.Container.this;
 
-                else if (e.parentRenderable() != J2DLayoutElement.this)
-                    throw new IllegalStateException(e+" is not a child of " + J2DLayoutElement.this +", instead child of " + e.parentRenderable());
+                else if (e.parentRenderable() != AbstractJ2DContainer.this)
+                    throw new IllegalStateException("not a child of " + AbstractJ2DContainer.this + ": " + e + ", instead child of " + e.parentRenderable());
                 children.add((J2DRenderableElement<?>) e);
             }
-        });
+        }.placeElement(content, shape2);
+    }
+
+
+    @Override
+    protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
+        validateIfNeeded();
+        Element content = getContent();
+        content.initParent(this);
+        return context.preferredSize(content, constraints);
+    }
+
+    @Override
+    protected void onShapeApplied(Shape shape) {
+        this.shape2 = shape;
+        super.onShapeApplied(shape);
+
+        validateIfNeeded();
     }
 
     @Override
@@ -102,12 +88,21 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> implem
         for (J2DRenderableElement<?> item : children)
             if (item.shape.contains(J2DUtil.point(p.point())) && item.captureMouseEvent(p, l, eventContext))
                 return true;
-
         return false;
     }
 
     @Override
+    public ContentEditable.ContentPoint pickPosition(Point point) {
+        return getContent().pickPosition(point);
+    }
+
+    @Override
+    public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
+        return getContent().shapeOfSelection(range);
+    }
+
+    @Override
     public String toString() {
-        return "J2DLayoutElement (" + node + ")";
+        return getClass().getSimpleName() + " (" + node + ")";
     }
 }

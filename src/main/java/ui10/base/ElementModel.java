@@ -3,6 +3,7 @@ package ui10.base;
 import ui10.binding5.ListenerMulticaster;
 import ui10.binding5.Parameterization;
 import ui10.binding5.ReflectionUtil;
+import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -79,10 +80,28 @@ public non-sealed abstract class ElementModel<L extends ElementModel.ElementMode
 
     @SuppressWarnings("unchecked")
     private Class<L> listenerClass() {
-        return (Class<L>) ReflectionUtil.rawType(
-                Parameterization.ofRawType(getClass()).resolve(ElementModel.class.getTypeParameters()[0]));
+        return (Class<L>) LISTENER_CLASS_CV.get(getClass());
+    }
+
+    @Override
+    public ContentEditable.ContentPoint pickPosition(Point point) {
+        return view().pickPosition(point);
+    }
+
+    @Override
+    public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
+        return view().shapeOfSelection(range);
     }
 
     public interface ElementModelListener {
     }
+
+    private static final ClassValue<Class<? extends ElementModelListener>> LISTENER_CLASS_CV = new ClassValue<Class<? extends ElementModelListener>>() {
+        @SuppressWarnings("unchecked")
+        @Override
+        protected Class<? extends ElementModelListener> computeValue(Class<?> type) {
+            return (Class<? extends ElementModelListener>) ReflectionUtil.rawType(
+                    Parameterization.ofRawType(type).resolve(ElementModel.class.getTypeParameters()[0]));
+        }
+    };
 }

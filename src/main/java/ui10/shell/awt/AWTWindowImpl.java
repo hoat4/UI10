@@ -113,20 +113,41 @@ public class AWTWindowImpl extends Frame {
         }
     }
 
+    private MouseTarget.DragHandler dragHandler;
+
     private void dispatchMouseEvent(MouseEvent e) {
         renderer.uiContext.eventLoop().runLater(() -> {
-            List<InputHandler> l = new ArrayList<>();
+            if (e instanceof MouseEvent.MouseDragEvent drag) {
+                if (dragHandler != null)
+                    dragHandler.drag(drag);
+                return;
+            }
+            if (e instanceof MouseEvent.MouseReleaseEvent release) {
+                if (dragHandler != null) {
+                    dragHandler.release(release);
+                    dragHandler = null;
+                }
+                return;
+            }
+
+            if (dragHandler != null)
+                // ilyenkor inkább nullra kéne állítani dragHandlert és továbbmenni
+                // esetleg logozni a hibát
+                throw new IllegalStateException();
+
+            List<MouseTarget> l = new ArrayList<>();
             EventContext eventContext = new EventContext();
-            if (!renderer.captureMouseEvent(e, eventContext, l)) {
+            renderer.captureMouseEvent(e, eventContext, l);
+            if (l.isEmpty()) {
                 setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
                 window.focusContext().hoveredControl.set(null);
                 return;
             }
-            /*
-            Cursor cursor = Cursor.POINTER;
-            for (InputHandler control : l) {
-                if (control.cursor.get() != null)
-                    cursor = control.cursor.get();
+
+            ui10.window.Cursor cursor = ui10.window.Cursor.POINTER;
+            for (MouseTarget control : l) {
+                if (control.cursor() != null)
+                    cursor = control.cursor();
             }
             setCursor(switch (cursor) {
                 case POINTER -> java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR);
@@ -135,14 +156,14 @@ public class AWTWindowImpl extends Frame {
 
             // de mit csinálunk, ha a a controlnak vagy vmelyik ancestorának külön FocusContextje van?
             window.focusContext().hoveredControl.set(l.get(l.size() - 1));
-*/
+
             for (int i = l.size() - 1; i >= 0; i--) {
                 if (eventContext.stopPropagation)
                     break;
 
-                InputHandler control = l.get(i);
-                MouseEvent translatedEvent = e.subtract(((Element)control).origin());
-                InputHandler.dispatchInputEvent(translatedEvent, control, eventContext, false);
+                MouseTarget control = l.get(i);
+                if (e instanceof MouseEvent.MousePressEvent press)
+                    dragHandler = control.handlePress(press);
             }
         });
     }

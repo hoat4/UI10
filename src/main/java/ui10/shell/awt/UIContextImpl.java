@@ -15,8 +15,6 @@ public class UIContextImpl implements UIContext {
     private final AWTDesktop desktop;
     private final AWTRenderer renderer;
 
-    private int inLayout =-1;
-
     public UIContextImpl(AWTDesktop desktop, AWTRenderer renderer) {
         this.eventLoop = desktop.eventLoop();
         this.desktop = desktop;
@@ -33,30 +31,24 @@ public class UIContextImpl implements UIContext {
         if (layoutTasks.isEmpty())
             eventLoop.runLater(renderer::draw);
 
-        for (LayoutTask t : layoutTasks) {
-            if (isAncestorOfOrSameAs(t.element(), task.element()))
+        int i = 0;
+        while (i < layoutTasks.size()) {
+            LayoutTask t = layoutTasks.get(i);
+            if (t.element() == task.element())
                 return;
+            if (isAncestorOfOrSameAs(task.element(), t.element()))
+                break;
+            i++;
         }
 
-        BitSet bitSet = new BitSet();
-        for (int i = inLayout + 1; i<layoutTasks.size(); i++) {
-            if (isAncestorOfOrSameAs(task.element(), layoutTasks.get(i).element()))
-                bitSet.set(i);
-        }
-        for (int i = bitSet.previousSetBit(bitSet.size()-1); i!= -1; i = bitSet.previousSetBit(i-1))
-            layoutTasks.remove(i);
-        layoutTasks.add(task);
+        layoutTasks.add(i, task);
     }
 
     public void performLayouts() {
         //System.out.println(layoutTasks);
-        for (inLayout = 0; inLayout < layoutTasks.size(); inLayout++) {
-            LayoutTask t = layoutTasks.get(inLayout);
-            t.task().run();
-        }
-        inLayout = -1;
+        while (!layoutTasks.isEmpty())
+            layoutTasks.remove(0).task().run();
         //System.out.println(layoutTasks);
-        layoutTasks.clear();
     }
 
     private static boolean isAncestorOfOrSameAs(Element e1, Element e2) {

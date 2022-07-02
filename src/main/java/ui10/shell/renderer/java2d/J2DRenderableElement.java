@@ -64,7 +64,7 @@ public abstract class J2DRenderableElement<N extends ElementModel<?>> extends Re
 
     protected abstract void drawImpl(Graphics2D g);
 
-    public boolean captureMouseEvent(MouseEvent p, List<InputHandler> l, EventContext eventContext) {
+    public boolean captureMouseEvent(MouseEvent p, List<MouseTarget> l, EventContext eventContext) {
         return false;
     }
 

@@ -1,7 +1,7 @@
 package ui10.decoration;
 
 import ui10.base.Element;
-import ui10.controls.Button;
+import ui10.controls.SmallStateControl;
 import ui10.decoration.css.ElementMirror;
 import ui10.decoration.views.*;
 
@@ -44,8 +44,8 @@ public class ElementMirrorImpl implements ElementMirror {
             case "root" -> parent() == null;
             case "active" -> {
                 if (element instanceof StyleableButtonView btn) {
-                    interests.add(Button.ButtonProperty.PRESSED);
-                    yield btn.model.pressed();
+                    interests.add(SmallStateControl.SmallStateControlProperty.STATE);
+                    yield btn.model.state().press();
                 } else if (element instanceof StyleableTabbedPaneView.TabButton btn)
                     yield btn.isSelected();
                 else

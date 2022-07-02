@@ -1,5 +1,6 @@
 package ui10.base;
 
+import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -33,6 +34,16 @@ public non-sealed abstract class RootElement extends Element {
 
     @Override
     protected void enumerateStaticChildren(Consumer<Element> consumer) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ContentEditable.ContentPoint pickPosition(Point point) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
         throw new UnsupportedOperationException();
     }
 }

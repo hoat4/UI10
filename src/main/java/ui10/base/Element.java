@@ -2,9 +2,8 @@ package ui10.base;
 
 import ui10.di.Component;
 import ui10.geom.Point;
-import ui10.geom.Size;
+import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
-import ui10.layout.BoxConstraints;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -46,6 +45,10 @@ public sealed abstract class Element implements Component
         return list;
     }
 
+    protected final Point relativePos(Element e) { // lehetne publikus is, pl. JavaFX-ben publikus
+        return e.origin().subtract(origin());
+    }
+
     @Override
     public <T> void collect(Class<T> type, Consumer<T> consumer) {
         if (parent != null)
@@ -85,6 +88,10 @@ public sealed abstract class Element implements Component
 
     public abstract void initParent(Element parent);
 
+    public abstract ContentEditable.ContentPoint pickPosition(Point point);
+
+    public abstract Shape shapeOfSelection(ContentEditable.ContentRange<?> range);
+
     public <E extends ElementExtra> E extra(Class<E> elementExtraClass) {
         for (ElementExtra e : extras) {
             if (elementExtraClass.isInstance(e))
@@ -108,4 +115,7 @@ public sealed abstract class Element implements Component
     protected @interface OnChange {
         Class<? extends ElementExtra> value();
     }
+
+
+
 }

@@ -2,7 +2,7 @@ package ui10.controls.dialog;
 
 import ui10.base.Container;
 import ui10.base.Element;
-import ui10.controls.Label;
+import ui10.controls.TextView;
 
 import static ui10.binding3.PropertyIdentifier.prop;
 import static ui10.layout.Layouts.vertically;
@@ -31,7 +31,7 @@ public class DialogView extends Container {
 
     // .dialog-main
     Element main() {
-        return new Label(content.text());
+        return new TextView(content.text());
     }
 
     Element buttonBar() {

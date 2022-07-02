@@ -1,6 +1,5 @@
 package ui10.binding7;
 
-import ui10.base.Element;
 import ui10.decoration.Style;
 import ui10.decoration.views.StyleableView;
 
@@ -17,7 +16,8 @@ public abstract class PropertyBasedView<M extends PropertyBasedModel<?>, S exten
         model.dirtyProperties().clear();
     }
 
-    protected abstract void validateImpl();
+    protected void validateImpl() {
+    }
 
     @Override
     public void modelInvalidated() {

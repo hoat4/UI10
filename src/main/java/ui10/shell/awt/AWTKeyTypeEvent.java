@@ -23,17 +23,11 @@ public class AWTKeyTypeEvent implements KeyTypeEvent {
         if (ch == KeyEvent.CHAR_UNDEFINED || ch == 8 || ch == 127)
             return functionKeySymbol(evt.getExtendedKeyCode());
         else
-            return new Keyboard.Symbol() {
-
-                @Override
-                public Optional<Keyboard.StandardSymbol> standardSymbol() {
-                    return Optional.of(new Keyboard.StandardTextSymbol(new String(new char[]{evt.getKeyChar()})));
-                }
-            };
+            return new Keyboard.StandardTextSymbol(new String(new char[]{evt.getKeyChar()}));
     }
 
     private Keyboard.Symbol functionKeySymbol(int code) {
-        Keyboard.StandardFunctionSymbol s = switch (code) {
+        return switch (code) {
             case VK_LEFT -> Keyboard.StandardFunctionSymbol.LEFT;
             case VK_RIGHT -> Keyboard.StandardFunctionSymbol.RIGHT;
             case VK_DOWN -> Keyboard.StandardFunctionSymbol.DOWN;
@@ -41,12 +35,6 @@ public class AWTKeyTypeEvent implements KeyTypeEvent {
             case VK_BACK_SPACE ->Keyboard.StandardFunctionSymbol.BACKSPACE;
             case VK_DELETE ->Keyboard.StandardFunctionSymbol.DELETE;
             default -> null;
-        };
-        return new Keyboard.Symbol() {
-            @Override
-            public Optional<Keyboard.StandardSymbol> standardSymbol() {
-                return Optional.ofNullable(s);
-            }
         };
     }
 }

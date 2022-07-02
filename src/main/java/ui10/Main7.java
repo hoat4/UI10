@@ -1,10 +1,7 @@
 package ui10;
 
 import ui10.base.*;
-import ui10.controls.Button;
-import ui10.controls.Label;
-import ui10.controls.TabbedPane;
-import ui10.controls.TextField;
+import ui10.controls.*;
 import ui10.decoration.StyleProvider;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
@@ -25,9 +22,9 @@ import static ui10.layout.Layouts.*;
 
 public class Main7 extends Container {
 
-    private final Label label = new Label("Hello world!");
-    private final Button button = new Button("Gomb", () -> System.out.println("asdf"));
-    private final TextField textField = new TextField();
+    private final TextView label = new TextView("Hello world!");
+    private final Button button = new Button(new TextView("Gomb"), () -> System.out.println("asdf"));
+    private final TextField textField = new TextField("asdf");
 
     @Provide
     private final ViewProvider decorableViewProvider = new DecorableControlViewProvider();
@@ -47,9 +44,9 @@ public class Main7 extends Container {
 
     @Override
     protected Element content() {
-        textField.text("szövegmező");
+        textField.content.text("szövegmező");
         LinearLayout vbox = vertically(
-                new Label("label"),
+                new TextView("label"),
                 button,
                 textField
         );

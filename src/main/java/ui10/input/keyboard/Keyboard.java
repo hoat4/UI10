@@ -35,7 +35,7 @@ public interface Keyboard {
         String toString();
     }
 
-    interface StandardKey {
+    sealed interface StandardKey {
     }
 
     record StandardTextKey(String text) implements StandardKey {
@@ -45,24 +45,22 @@ public interface Keyboard {
 
     interface Symbol {
 
-        Optional<StandardSymbol> standardSymbol();
-
         @Override
         String toString();
     }
 
-    interface StandardSymbol {
-        @Override
-        String toString();
+    sealed interface StandardSymbol extends Symbol {
     }
 
-    record StandardTextSymbol(String text) implements StandardSymbol {}
+    record StandardTextSymbol(String text) implements StandardSymbol {
+    }
 
     enum StandardFunctionSymbol implements StandardSymbol {
         LEFT, RIGHT, UP, DOWN, BACKSPACE, DELETE
     }
 
-    interface Modifier {}
+    interface Modifier {
+    }
 
     enum StandardModifier {}
 }

@@ -1,9 +1,13 @@
 package ui10.shell.renderer.java2d;
 
+import ui10.base.ContentEditable;
 import ui10.base.LayoutContext1;
 import ui10.base.LayoutContext2;
 import ui10.controls.TextElement;
+import ui10.controls.TextView;
 import ui10.font.FontMetrics;
+import ui10.geom.Point;
+import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.graphics.TextLayout;
@@ -70,5 +74,22 @@ public class J2DTextElement extends J2DRenderableElement<TextElement> implements
     @Override
     public TextLayout textLayout() {
         return textLayout;
+    }
+
+    @Override
+    public ContentEditable.ContentPoint pickPosition(Point point) {
+        int p = textLayout.pickTextPos(point.subtract(origin()));
+        return new TextView.StringContentPoint(p, node);
+    }
+
+    @Override
+    public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
+        assert range.begin().element() == node;
+        assert range.end().element() == node;
+        int beginPos = ((TextView.StringContentPoint) range.begin()).characterOffset();
+        int endPos = ((TextView.StringContentPoint) range.end()).characterOffset();
+        int x = node.textStyle().textSize(node.text().substring(0, beginPos)).width();
+        int w = node.textStyle().textSize(node.text().substring(beginPos, endPos)).width();
+        return new Rectangle(x, 0, w, node.textStyle().height()).translate(origin());
     }
 }

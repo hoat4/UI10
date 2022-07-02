@@ -10,7 +10,7 @@ TextField {
     border-radius: 3px;
     font-size: 13px;
 }
-TextField::selection { background: #0096C9; color: #fff; }
+Label::selection { background: #0096C9; color: #fff; }
 
 Button {
     border: 1px solid #B6B6B6;

@@ -1,5 +1,6 @@
 package ui10.base;
 
+import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -101,5 +102,23 @@ public non-sealed abstract class RenderableElement extends Element {
 
     protected static void enumerateChildrenHelper(LayoutElement e, Consumer<Element> consumer) {
         e.enumerateChildren(consumer);
+    }
+
+    @Override
+    public ContentEditable.ContentPoint pickPosition(Point point) {
+        return new NullContentPoint(this);
+    }
+
+    @Override
+    public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
+        return shape.bounds().withSize(new Size(0, shape.bounds().height()));
+    }
+
+    public static record NullContentPoint(RenderableElement element) implements ContentEditable.ContentPoint {
+        @Override
+        public int compareTo(ContentEditable.ContentPoint o) {
+            assert o.element() == element;
+            return 0;
+        }
     }
 }

@@ -1,9 +1,6 @@
 package ui10.shell.awt;
 
-import ui10.base.Element;
-import ui10.base.EventContext;
-import ui10.base.InputHandler;
-import ui10.base.ViewProvider;
+import ui10.base.*;
 import ui10.input.pointer.MouseEvent;
 
 import java.awt.*;
@@ -69,7 +66,7 @@ public abstract class AWTRenderer {
 
     protected abstract void draw(Graphics2D g);
 
-    protected abstract boolean captureMouseEvent(MouseEvent e, EventContext eventContext, List<InputHandler> destinationList);
+    protected abstract boolean captureMouseEvent(MouseEvent e, EventContext eventContext, List<MouseTarget> destinationList);
 
     public abstract ViewProvider createViewProvider();
 }

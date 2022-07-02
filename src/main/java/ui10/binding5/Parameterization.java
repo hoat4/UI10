@@ -105,9 +105,30 @@ public class Parameterization {
         return Objects.hash(params);
     }
 
+    // ez sem egyezik meg fodutilban lévővel
     public AnnotatedType resolve(AnnotatedTypeVariable v) {
         TypeVariable<?> typeVar = (TypeVariable<?>) v.getType();
-        return resolve(typeVar);
+
+        if (!(typeVar.getGenericDeclaration() instanceof Class))
+            // throw new UnsupportedOperationException("method type parameters are not supported: " + v);
+            // egyelőre tegyük fel, hogy LocalizedRichText-hez van használva a típusparaméter.
+            // majd lehet hogy szükség lesz rá, hogy ténylegesen parameterizáljunk
+            // interface metódust paraméter alapján (pl. Class<T>).
+            return AnnotatedClassImpl.of(Object.class);
+
+        Class<?> typeVarClass = (Class<?>) typeVar.getGenericDeclaration();
+        Map<TypeVariable<? extends Class<?>>, AnnotatedType> p = params.get(typeVarClass);
+        if (p == null)
+            throw new IllegalArgumentException("no type argument map found for " + typeVarClass +
+                    " (needed to resolve type variable " + typeVar.getName() + ")");
+
+        @SuppressWarnings("unchecked")
+        AnnotatedType t = p.
+                get((TypeVariable<? extends Class<?>>) typeVar);
+
+        if (t == null)
+            return v;
+        return t;
     }
 
     public AnnotatedType resolve(TypeVariable<?> typeVar) {
@@ -129,8 +150,8 @@ public class Parameterization {
                 get((TypeVariable<? extends Class<?>>) typeVar);
 
         if (t == null)
-            throw new IllegalArgumentException("no value found for type variable " + typeVar.getName() +
-                    " (which is declared in " + typeVarClass + ")");
+             throw new IllegalArgumentException("no value found for type variable " + typeVar.getName() +
+                     " (which is declared in " + typeVarClass + ")");
         return t;
     }
 

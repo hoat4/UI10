@@ -5,8 +5,10 @@ import java.util.Objects;
 public abstract class Container extends ElementModel<Container.ContainerListener> {
 
     private boolean valid;
+    protected boolean contentValid;
 
     protected void validate() {
+        contentValid = false;
     }
 
     protected abstract Element content();
@@ -18,7 +20,10 @@ public abstract class Container extends ElementModel<Container.ContainerListener
         if (!valid) {
             validate();
 
-            cachedContent = Objects.requireNonNull(content(), () -> "null content in " + this);
+            if (!contentValid || cachedContent == null) {
+                cachedContent = Objects.requireNonNull(content(), () -> "null content in " + this);
+                contentValid = true;
+            }
 
             valid = true;
         }

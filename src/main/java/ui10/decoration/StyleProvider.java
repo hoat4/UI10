@@ -19,7 +19,7 @@ public class StyleProvider extends ElementExtra {
         if (view instanceof StyleableTextFieldView v)
             return (D) new TextFieldCSS(v, css);
         if (view instanceof StyleableLabelView v)
-            return (D) new LabelCSS(v, css);
+            return (D) new TextViewCSS(v, css);
         if (view instanceof StyleableContainerView v)
             return (D) new CSSStyle<>(v, css);
         if (view instanceof StyleableTabbedPaneView v)
