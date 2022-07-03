@@ -1,9 +1,10 @@
 package ui10.graphics;
 
 import ui10.base.ElementModel;
+import ui10.binding7.InvalidationMark;
 import ui10.image.Color;
 
-public class ColorFill extends ElementModel<ColorFill.ColorFillListener> {
+public class ColorFill extends ElementModel {
 
     private Color color;
 
@@ -20,7 +21,7 @@ public class ColorFill extends ElementModel<ColorFill.ColorFillListener> {
 
     public ColorFill color(Color color) {
         this.color = color;
-        listener().colorChanged();
+        invalidate(ColorFillProperty.COLOR);
         return this;
     }
 
@@ -29,8 +30,8 @@ public class ColorFill extends ElementModel<ColorFill.ColorFillListener> {
         return "ColorFill {color=" + color/* + ", shape=" + shape*/ + "}";
     }
 
-    public interface ColorFillListener extends  ElementModelListener{
+    public enum ColorFillProperty implements InvalidationMark {
 
-        void colorChanged();
+        COLOR
     }
 }

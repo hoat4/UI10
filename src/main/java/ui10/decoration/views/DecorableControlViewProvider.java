@@ -9,7 +9,7 @@ import ui10.controls.InputField;
 public class DecorableControlViewProvider implements ViewProvider {
 
     @Override
-    public Element makeView(ElementModel<?> e) {
+    public Element makeView(ElementModel e) {
         if (e instanceof TextView m)
             return new StyleableLabelView(m);
         if (e instanceof InputField m)

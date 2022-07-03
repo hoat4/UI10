@@ -2,7 +2,7 @@ package ui10.controls;
 
 import ui10.base.Element;
 import ui10.base.ContentEditable;
-import ui10.binding7.PropertyBasedModel;
+import ui10.binding7.InvalidationMark;
 
 import java.awt.datatransfer.StringSelection;
 
@@ -11,7 +11,7 @@ import static ui10.base.ContentEditable.TraversalDirection.FORWARD;
 import static ui10.base.ContentEditable.TraversalUnit.CHARACTER;
 
 public class InputField<C extends Element & ContentEditable<P>, P extends ContentEditable.ContentPoint>
-        extends PropertyBasedModel<InputField.InputFieldProperty> {
+        extends ui10.base.ElementModel {
 
     public final C content;
 
@@ -66,7 +66,8 @@ public class InputField<C extends Element & ContentEditable<P>, P extends Conten
             caretPosition(content.delete(new ContentEditable.ContentRange<>(rightPos, caretPosition)));
     }
 
-    public enum InputFieldProperty {
+    public enum InputFieldProperty implements InvalidationMark {
+
         CARET_POSITION
     }
 }

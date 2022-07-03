@@ -1,5 +1,6 @@
 package ui10.shell.renderer.java2d;
 
+import ui10.binding7.Invalidable;
 import ui10.geom.shape.Shape;
 import ui10.input.pointer.MouseEvent;
 import ui10.base.*;
@@ -15,7 +16,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.List;
 
-public abstract class J2DRenderableElement<N extends ElementModel<?>> extends RenderableElement {
+public abstract class J2DRenderableElement<N extends ElementModel> extends RenderableElement {
 
     protected final J2DRenderer renderer;
     private boolean valid;
@@ -30,6 +31,12 @@ public abstract class J2DRenderableElement<N extends ElementModel<?>> extends Re
     }
 
     @Override
+    public void onInvalidated(Invalidable invalidable) {
+        if (invalidable == node)
+            invalidateRenderableElementAndLayout(); // layoutot nem mindig kéne
+    }
+
+    @Override
     public void invalidateRendererData() {
         if (valid) {
             valid = false;
@@ -40,6 +47,7 @@ public abstract class J2DRenderableElement<N extends ElementModel<?>> extends Re
 
     private void validate() {
         validateImpl();
+        node.dirtyProperties().clear();
     }
 
     @Override

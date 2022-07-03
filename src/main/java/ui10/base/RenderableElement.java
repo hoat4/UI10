@@ -1,5 +1,6 @@
 package ui10.base;
 
+import ui10.binding7.InvalidationListener;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -12,7 +13,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
-public non-sealed abstract class RenderableElement extends Element {
+public non-sealed abstract class RenderableElement extends Element implements InvalidationListener {
 
     protected Map<RenderableElement, List<LayoutContext1.LayoutDependency<?, ?>>> layoutDependencies;
     protected Shape shape;
@@ -46,7 +47,7 @@ public non-sealed abstract class RenderableElement extends Element {
     protected void onShapeApplied(Shape shape) {
     }
 
-    public void invalidate() {
+    public void invalidateRenderableElementAndLayout() {
         invalidateRendererData();
         if (lookup(UIContext.class) == null)
             return;
@@ -68,7 +69,7 @@ public non-sealed abstract class RenderableElement extends Element {
         for (LayoutContext1.LayoutDependency<?, ?> dep : layoutDependencies.getOrDefault(this, Collections.emptyList())) {
             if (ctx.isInvalidated(this, dep)) {
                 Objects.requireNonNull(parent, this::toString);
-                parentRenderable().invalidate(); // itt parent vagy parentRenderable kell?
+                parentRenderable().invalidateRenderableElementAndLayout(); // itt parent vagy parentRenderable kell?
                 return;
             }
         }

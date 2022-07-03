@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 
 // "Table" element name
-public class Table<T> extends ElementModel<ElementModel.ElementModelListener> {
+public class Table<T> extends ElementModel {
 
     // ha nem lehet szerkeszteni, lehetne TableColumn<? super T> is
     public final List<? extends Column<T>> columns;

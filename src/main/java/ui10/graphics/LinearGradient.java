@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // TODO listener
-public class LinearGradient extends ElementModel<ElementModel.ElementModelListener> {
+public class LinearGradient extends ElementModel {
 
     private Point start, end;
     public final List<Stop> stops = new ArrayList<>();

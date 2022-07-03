@@ -16,7 +16,7 @@ import ui10.layout.BoxConstraints;
 import java.awt.Graphics2D;
 import java.util.Objects;
 
-public class J2DTextElement extends J2DRenderableElement<TextElement> implements TextElement.TextElementListener, TextElement.TextView {
+public class J2DTextElement extends J2DRenderableElement<TextElement> implements TextElement.TextView {
 
     private J2DRenderableElement<?> fill;
     private TextLayout textLayout;
@@ -59,16 +59,6 @@ public class J2DTextElement extends J2DRenderableElement<TextElement> implements
         super.applyShape(shape, context);
         validateIfNeeded();
         LayoutContext2.ignoring(this).placeElement(fill, shape);
-    }
-
-    @Override
-    public void textChanged() {
-        invalidate();
-    }
-
-    @Override
-    public void fillChanged() {
-        invalidateRendererData();
     }
 
     @Override

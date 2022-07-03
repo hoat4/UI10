@@ -12,7 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractJ2DContainer<E extends ElementModel<?>> extends J2DRenderableElement<E> {
+public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRenderableElement<E> {
 
     private final List<J2DRenderableElement<?>> children = new ArrayList<>();
     private Shape shape2;

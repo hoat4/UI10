@@ -1,8 +1,8 @@
 package ui10.base;
 
+import ui10.binding7.Invalidable;
 import ui10.di.Component;
 import ui10.geom.Point;
-import ui10.geom.Rectangle;
 import ui10.geom.shape.Shape;
 
 import java.lang.annotation.Retention;
@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public sealed abstract class Element implements Component
+public sealed abstract class Element extends Invalidable implements Component
         permits ElementModel, RenderableElement, RootElement {
 
     public final List<ElementExtra> extras = new ArrayList<>();

@@ -1,8 +1,8 @@
 package ui10.controls;
 
-import ui10.binding7.PropertyBasedModel;
+import ui10.binding7.InvalidationMark;
 
-public class SmallStateControl<S> extends PropertyBasedModel<SmallStateControl.SmallStateControlProperty> {
+public class SmallStateControl<S> extends ui10.base.ElementModel {
 
     private S state;
 
@@ -19,7 +19,7 @@ public class SmallStateControl<S> extends PropertyBasedModel<SmallStateControl.S
         invalidate(SmallStateControlProperty.STATE);
     }
 
-    public enum SmallStateControlProperty {
+    public enum SmallStateControlProperty implements InvalidationMark {
 
         STATE
     }

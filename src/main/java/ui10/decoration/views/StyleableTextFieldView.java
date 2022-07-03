@@ -1,7 +1,6 @@
 package ui10.decoration.views;
 
 import ui10.base.*;
-import ui10.binding7.PropertyBasedView;
 import ui10.controls.InputField;
 import ui10.controls.InputField.InputFieldProperty;
 import ui10.decoration.Style;
@@ -23,8 +22,8 @@ import java.util.function.Consumer;
 
 // .text-field, .text, .caret, .selection
 public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
-        extends PropertyBasedView<InputField<?, P>, StyleableTextFieldView.TextFieldStyle>
-        implements InputHandler {
+        extends StyleableView<InputField<?, P>, StyleableTextFieldView.TextFieldStyle>
+        implements InputHandler, ui10.binding7.InvalidationListener {
 
     private final TextFieldContent textFieldContent = new TextFieldContent();
     private final ColorFill caret = new ColorFill().color(Colors.BLACK);
@@ -37,7 +36,7 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
     @Override
     protected void validateImpl() {
         if (model.dirtyProperties().contains(InputFieldProperty.CARET_POSITION))
-            textFieldContent.refresh();
+            textFieldContent.refreshCaretPosition();
     }
 
     @Override
@@ -121,8 +120,8 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
 
     private class TextFieldContent extends RectangularLayout {
 
-        void refresh() {
-            listener().layoutInvalidated();
+        void refreshCaretPosition() {
+            invalidate(LayoutElementProperty.LAYOUT);
         }
 
         @Override

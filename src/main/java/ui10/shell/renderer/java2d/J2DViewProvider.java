@@ -15,7 +15,7 @@ public class J2DViewProvider implements ViewProvider {
     }
 
     @Override
-    public Element makeView(ElementModel<?> n) {
+    public Element makeView(ElementModel n) {
         if (n instanceof ColorFill f)
             return new J2DColorFillElement(renderer, f);
 

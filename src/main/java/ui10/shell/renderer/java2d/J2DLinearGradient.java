@@ -1,6 +1,5 @@
 package ui10.shell.renderer.java2d;
 
-import ui10.base.ElementModel;
 import ui10.base.LayoutContext1;
 import ui10.geom.Point;
 import ui10.geom.Size;
@@ -11,7 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.geom.Rectangle2D;
 
-public class J2DLinearGradient extends J2DRenderableElement<LinearGradient> implements ElementModel.ElementModelListener {
+public class J2DLinearGradient extends J2DRenderableElement<LinearGradient> {
 
     private LinearGradientPaint p;
 

@@ -2,7 +2,7 @@ package ui10.controls;
 
 import ui10.base.ContentEditable;
 import ui10.base.Element;
-import ui10.binding7.PropertyBasedModel;
+import ui10.binding7.InvalidationMark;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -11,7 +11,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Objects;
 
-public class TextView extends PropertyBasedModel<TextView.TextViewProperty> implements ContentEditable<TextView.StringContentPoint> {
+public class TextView extends ui10.base.ElementModel implements ContentEditable<TextView.StringContentPoint> {
 
     private String text = "";
     private ContentEditable.ContentRange<StringContentPoint> selection;
@@ -99,7 +99,7 @@ public class TextView extends PropertyBasedModel<TextView.TextViewProperty> impl
         return new StringContentPoint(text.length(), this);
     }
 
-    public enum TextViewProperty {
+    public enum TextViewProperty implements InvalidationMark {
 
         TEXT, SELECTION
     }

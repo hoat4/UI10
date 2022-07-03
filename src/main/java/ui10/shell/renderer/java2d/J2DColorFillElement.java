@@ -9,7 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.util.Objects;
 
-public class J2DColorFillElement extends J2DRenderableElement<ColorFill> implements ColorFill.ColorFillListener {
+public class J2DColorFillElement extends J2DRenderableElement<ColorFill> {
 
     private ui10.image.Color prevColor;
     private java.awt.Color awtColor;
@@ -43,10 +43,5 @@ public class J2DColorFillElement extends J2DRenderableElement<ColorFill> impleme
     public Paint asPaint() {
         validateIfNeeded();
         return awtColor;
-    }
-
-    @Override
-    public void colorChanged() {
-        invalidateRendererData();
     }
 }

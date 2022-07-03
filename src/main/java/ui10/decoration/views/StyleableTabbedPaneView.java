@@ -1,7 +1,6 @@
 package ui10.decoration.views;
 
 import ui10.base.*;
-import ui10.binding7.PropertyBasedView;
 import ui10.controls.TextView;
 import ui10.controls.TabbedPane;
 import ui10.decoration.Style;
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 
 import static ui10.layout.Layouts.HorizontalAlignment.LEFT;
 
-public class StyleableTabbedPaneView extends PropertyBasedView<TabbedPane, StyleableTabbedPaneView.TabbedPaneStyle> {
+public class StyleableTabbedPaneView extends StyleableView<TabbedPane, StyleableTabbedPaneView.TabbedPaneStyle> implements ui10.binding7.InvalidationListener {
 
     private LinearLayout<TabButton> tabButtons = new LinearLayout<>(Axis.HORIZONTAL);
     private final TabPaneContent content = new TabPaneContent();
@@ -105,7 +104,7 @@ public class StyleableTabbedPaneView extends PropertyBasedView<TabbedPane, Style
     private class TabPaneContent extends Container {
 
         void refresh() {
-            invalidate();
+            invalidateContainer();
         }
 
         @Override

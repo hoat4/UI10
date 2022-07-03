@@ -1,7 +1,6 @@
 package ui10.decoration.views;
 
 import ui10.base.*;
-import ui10.binding7.PropertyBasedView;
 import ui10.controls.TextView;
 import ui10.controls.TextElement;
 import ui10.decoration.Fill;
@@ -23,7 +22,7 @@ import static ui10.layout.Layouts.horizontally;
 
 // TODO text-align legyen állítható CSS-ből
 // .label
-public class StyleableLabelView extends PropertyBasedView<TextView, StyleableLabelView.TextViewStyle> {
+public class StyleableLabelView extends StyleableView<TextView, StyleableLabelView.TextViewStyle> implements ui10.binding7.InvalidationListener {
 
     private final TextElement textElement = new TextElement(); // .label-text
     private final TextElement textNodeSel = new TextElement();
@@ -83,7 +82,7 @@ public class StyleableLabelView extends PropertyBasedView<TextView, StyleableLab
     }
 
     public void textAlignChanged() {
-        invalidate();
+        invalidateContainer();
     }
 
     @Override
@@ -120,10 +119,6 @@ public class StyleableLabelView extends PropertyBasedView<TextView, StyleableLab
     private class TextViewContent extends RectangularLayout {
 
         private final LinearLayout hbox = horizontally(textElement, textNodeSel, textNodeAfterSel);
-
-        void refresh() {
-            listener().layoutInvalidated();
-        }
 
         @Override
         public void enumerateChildren(Consumer<Element> consumer) {

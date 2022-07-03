@@ -2,11 +2,13 @@ package ui10.controls;
 
 import ui10.base.ElementModel;
 import ui10.base.Element;
+import ui10.binding7.InvalidationListener;
+import ui10.binding7.InvalidationMark;
 import ui10.font.TextStyle;
 import ui10.graphics.TextLayout;
 
 
-public class TextElement extends ElementModel<TextElement.TextElementListener> {
+public class TextElement extends ElementModel {
 /*
 
     public static final Property<Integer> FONT_SIZE_PROPERTY = new Property<>(true);
@@ -28,7 +30,7 @@ public class TextElement extends ElementModel<TextElement.TextElementListener> {
         if (text == null)
             text = "";
         this.text = text;
-        listener().textChanged();
+        invalidate(TextElementProperty.TEXT);
     }
 
     public final Element fill() {
@@ -37,7 +39,7 @@ public class TextElement extends ElementModel<TextElement.TextElementListener> {
 
     public final void fill(Element fill) {
         this.fill = fill;
-        listener().fillChanged();
+        invalidate(TextElementProperty.FILL);
     }
 
     public TextStyle textStyle() {
@@ -53,14 +55,7 @@ public class TextElement extends ElementModel<TextElement.TextElementListener> {
         return ((TextView) view()).textLayout();
     }
 
-    public interface TextElementListener extends ElementModelListener {
-
-        void textChanged();
-
-        void fillChanged();
-    }
-
-    public interface TextView extends TextElementListener {
+    public interface TextView extends InvalidationListener {
 
         TextLayout textLayout();
     }
@@ -70,5 +65,9 @@ public class TextElement extends ElementModel<TextElement.TextElementListener> {
         return "TextElement{" +
                 "text='" + text + '\'' +
                 '}';
+    }
+
+    public enum TextElementProperty implements InvalidationMark {
+        TEXT, FILL
     }
 }

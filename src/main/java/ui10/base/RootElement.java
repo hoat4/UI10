@@ -1,9 +1,8 @@
 package ui10.base;
 
 import ui10.geom.Point;
-import ui10.geom.Size;
 import ui10.geom.shape.Shape;
-import ui10.layout.BoxConstraints;
+import ui10.input.InputEvent;
 
 import java.util.function.Consumer;
 

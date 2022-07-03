@@ -42,8 +42,7 @@ public class LinearLayout<E extends Element> extends RectangularLayout {
     }
 
     private void onChildrenChange(ListChange<E> change) {
-        listener().childrenChanged(change);
-        listener().layoutInvalidated();
+        invalidate(LayoutElementProperty.CHILDREN, LayoutElementProperty.LAYOUT);
     }
 
     public List<E> elements() {

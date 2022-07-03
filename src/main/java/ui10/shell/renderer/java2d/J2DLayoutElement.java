@@ -12,7 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> implements LayoutElement.LayoutElementListener {
+public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
 
 
     private final List<J2DRenderableElement<?>> children = new ArrayList<>();
@@ -23,8 +23,12 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> implem
     }
 
     @Override
-    public void childrenChanged(ListChange<? extends Element> change) {
-        change.newElements().forEach(e->e.initParent(this));
+    protected void validateImpl() {
+        if (shape2 == null)
+            return;
+
+        if (node.dirtyProperties().contains(LayoutElement.LayoutElementProperty.CHILDREN))
+            enumerateChildrenHelper(node, e->e.initParent(this));
     }
 
     @Override
@@ -51,20 +55,6 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> implem
             item.draw(g);
             //g.setTransform(t);
         }
-    }
-
-    @Override
-    public void layoutInvalidated() {
-        invalidate();
-    }
-
-    @Override
-    protected void validateImpl() {
-        if (shape2 == null)
-            return;
-
-        enumerateChildrenHelper(node, e->e.initParent(this));
-
     }
 
     @Override

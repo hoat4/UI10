@@ -15,7 +15,7 @@ public class DialogView extends Container {
     public DialogView(DialogContent content) {
         this.content = content;
         content.subscribe(e -> {
-            invalidate();
+            invalidateContainer();
         }, prop(DialogContent::text));
 
      //   withClass("dialog", this);

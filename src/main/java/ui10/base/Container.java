@@ -1,8 +1,10 @@
 package ui10.base;
 
+import ui10.binding7.InvalidationMark;
+
 import java.util.Objects;
 
-public abstract class Container extends ElementModel<Container.ContainerListener> {
+public abstract class Container extends ElementModel {
 
     private boolean valid;
     protected boolean contentValid;
@@ -31,9 +33,9 @@ public abstract class Container extends ElementModel<Container.ContainerListener
         return cachedContent;
     }
 
-    public void invalidate() {
+    public void invalidateContainer() {
         valid = false;
-        listener().contentChanged();
+        invalidate(ContainerProperties.CONTENT);
     }
 
     public static Container of(Element node) {
@@ -53,8 +55,8 @@ public abstract class Container extends ElementModel<Container.ContainerListener
             };
     }
 
-    public interface ContainerListener extends ElementModelListener {
+    public enum ContainerProperties implements InvalidationMark {
 
-        void contentChanged();
+        CONTENT
     }
 }

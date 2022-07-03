@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface ViewProvider {
 
-    Element makeView(ElementModel<?> model);
+    Element makeView(ElementModel model);
 
-    static Element makeView(ElementModel<?> model, List<ViewProvider> viewProviders) {
+    static Element makeView(ElementModel model, List<ViewProvider> viewProviders) {
         for (ViewProvider viewProvider : viewProviders) {
             Element e = viewProvider.makeView(model);
             if (e != null)

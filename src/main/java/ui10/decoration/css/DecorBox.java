@@ -33,7 +33,7 @@ public class DecorBox extends LayoutElement {
     }
 
     public void refresh() {
-        listener().layoutInvalidated();
+        invalidate(LayoutElementProperty.LAYOUT, LayoutElementProperty.CHILDREN);
     }
 
     @Override

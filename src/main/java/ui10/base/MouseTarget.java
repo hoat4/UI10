@@ -1,10 +1,10 @@
 package ui10.base;
 
-import ui10.binding7.PropertyBasedModel;
+import ui10.binding7.InvalidationMark;
 import ui10.input.pointer.MouseEvent;
 import ui10.window.Cursor;
 
-public abstract class MouseTarget extends PropertyBasedModel<MouseTarget.MouseHandlerProperty> {
+public abstract class MouseTarget extends ElementModel {
 
     private Cursor cursor;
 
@@ -27,7 +27,7 @@ public abstract class MouseTarget extends PropertyBasedModel<MouseTarget.MouseHa
         return cursor;
     }
 
-    public enum MouseHandlerProperty {
+    public enum MouseHandlerProperty implements InvalidationMark {
 
         CURSOR
     }

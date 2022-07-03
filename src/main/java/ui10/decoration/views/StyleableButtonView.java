@@ -1,12 +1,11 @@
 package ui10.decoration.views;
 
 import ui10.base.Element;
-import ui10.binding7.PropertyBasedView;
 import ui10.controls.Button;
 import ui10.controls.PressDetector;
 import ui10.decoration.Style;
 
-public class StyleableButtonView extends PropertyBasedView<Button, Style> {
+public class StyleableButtonView extends StyleableView<Button, Style> implements ui10.binding7.InvalidationListener {
 
     public StyleableButtonView(Button model) {
         super(model);

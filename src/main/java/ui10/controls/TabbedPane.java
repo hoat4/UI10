@@ -5,11 +5,11 @@ import ui10.base.Element;
 import ui10.binding.ListChange;
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;
-import ui10.binding7.PropertyBasedModel;
+import ui10.binding7.InvalidationMark;
 
 import java.util.List;
 
-public class TabbedPane extends PropertyBasedModel<TabbedPane.TabPaneProperty> {
+public class TabbedPane extends ui10.base.ElementModel {
 
     private final ObservableList<Element> tabs = new ObservableListImpl<>(this::tabsChanged);
 
@@ -44,7 +44,7 @@ public class TabbedPane extends PropertyBasedModel<TabbedPane.TabPaneProperty> {
             selectedTab(tabs.isEmpty() ? null : tabs.get(0));
     }
 
-    public enum TabPaneProperty {
+    public enum TabPaneProperty implements InvalidationMark {
 
         TABS, SELECTED_TAB
     }

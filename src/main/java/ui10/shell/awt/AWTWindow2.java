@@ -6,7 +6,7 @@ import ui10.window.Window;
 
 import java.util.function.Consumer;
 
-public class AWTWindow2 extends RootElement implements ElementModel.ElementModelListener {
+public class AWTWindow2 extends RootElement {
 
     private final AWTDesktop desktop;
     private final Element element;
