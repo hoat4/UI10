@@ -1,9 +1,11 @@
 package ui10.decoration;
 
 import ui10.base.Element;
-import ui10.controls.SmallStateControl;
 import ui10.decoration.css.ElementMirror;
-import ui10.decoration.views.*;
+import ui10.decoration.views.StyleableButtonView;
+import ui10.decoration.views.StyleableLabelView;
+import ui10.decoration.views.StyleableTabbedPaneView;
+import ui10.decoration.views.StyleableTextFieldView;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -12,8 +14,6 @@ import java.util.Set;
 public class ElementMirrorImpl implements ElementMirror {
 
     final StyleableContainer<?> element;
-
-    public final Set<Object> interests = new HashSet<>();
 
     public ElementMirrorImpl(StyleableContainer<?> element) {
         this.element = element;
@@ -43,11 +43,10 @@ public class ElementMirrorImpl implements ElementMirror {
         return switch (pseudoClass) {
             case "root" -> parent() == null;
             case "active" -> {
-                if (element instanceof StyleableButtonView btn) {
-                    interests.add(SmallStateControl.SmallStateControlProperty.STATE);
-                    yield btn.model.state().press();
-                } else if (element instanceof StyleableTabbedPaneView.TabButton btn)
-                    yield btn.isSelected();
+                if (element instanceof StyleableButtonView btn)
+                    yield btn.model.state.get().press();
+                else if (element instanceof StyleableTabbedPaneView.TabButton btn)
+                    yield btn.selected.get();
                 else
                     yield false;
             }

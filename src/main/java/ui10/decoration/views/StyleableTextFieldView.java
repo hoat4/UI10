@@ -2,7 +2,6 @@ package ui10.decoration.views;
 
 import ui10.base.*;
 import ui10.controls.InputField;
-import ui10.controls.InputField.InputFieldProperty;
 import ui10.decoration.Style;
 import ui10.font.TextStyle;
 import ui10.geom.Rectangle;
@@ -35,8 +34,6 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
 
     @Override
     protected void validateImpl() {
-        if (model.dirtyProperties().contains(InputFieldProperty.CARET_POSITION))
-            textFieldContent.refreshCaretPosition();
     }
 
     @Override
@@ -67,7 +64,7 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
             @SuppressWarnings("unchecked")
             P newPos = (P) model.content.pickPosition(event.point());
 
-            model.caretPosition(newPos);
+            model.caretPosition.set(newPos);
             model.content.select(null);
 
             selectionBegin = newPos;
@@ -79,10 +76,10 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
                     @SuppressWarnings("unchecked")
                     P p = (P) model.content.pickPosition(event.point());
 
-                    model.caretPosition(p);
+                    model.caretPosition.set(p);
 
-                    P begin = ContentEditable.ContentPoint.min(selectionBegin, model.caretPosition());
-                    P end = ContentEditable.ContentPoint.max(selectionBegin, model.caretPosition());
+                    P begin = ContentEditable.ContentPoint.min(selectionBegin, model.caretPosition.get());
+                    P end = ContentEditable.ContentPoint.max(selectionBegin, model.caretPosition.get());
                     model.content.select(begin == end ? null : new ContentEditable.ContentRange<>(begin, end));
                 }
 
@@ -120,10 +117,6 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
 
     private class TextFieldContent extends RectangularLayout {
 
-        void refreshCaretPosition() {
-            invalidate(LayoutElementProperty.LAYOUT);
-        }
-
         @Override
         public void enumerateChildren(Consumer<Element> consumer) {
             consumer.accept(model.content);
@@ -140,7 +133,7 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
         protected void doPerformLayout(Size size, BiConsumer<Element, Rectangle> placer, LayoutContext1 context) {
             placer.accept(model.content, Rectangle.of(size));
             Shape rangeShape = model.content.shapeOfSelection(
-                    new ContentEditable.ContentRange<>(model.caretPosition(), model.caretPosition())).
+                            new ContentEditable.ContentRange<>(model.caretPosition.get(), model.caretPosition.get())).
                     translate(origin().negate());
             Rectangle rect = rangeShape.bounds();
             placer.accept(caret, rect.withSize(new Size(1, rect.height())));

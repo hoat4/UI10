@@ -4,6 +4,8 @@ import ui10.binding7.InvalidationMark;
 
 import java.util.Objects;
 
+import static ui10.binding9.Bindings.onInvalidated;
+
 public abstract class Container extends ElementModel {
 
     private boolean valid;
@@ -23,7 +25,8 @@ public abstract class Container extends ElementModel {
             validate();
 
             if (!contentValid || cachedContent == null) {
-                cachedContent = Objects.requireNonNull(content(), () -> "null content in " + this);
+                cachedContent = onInvalidated(() -> Objects.requireNonNull(content(), () -> "null content in " + this),
+                        this::invalidateContainer);
                 contentValid = true;
             }
 
@@ -50,7 +53,7 @@ public abstract class Container extends ElementModel {
 
                 @Override
                 public String toString() {
-                    return "Container[" + node + ", parent="+parent+"]";
+                    return "Container[" + node + ", parent=" + parent + "]";
                 }
             };
     }

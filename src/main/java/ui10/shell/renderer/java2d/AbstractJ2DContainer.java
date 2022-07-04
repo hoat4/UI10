@@ -1,6 +1,7 @@
 package ui10.shell.renderer.java2d;
 
 import ui10.base.*;
+import ui10.binding9.Bindings;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -11,6 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
+
+import static ui10.binding9.Bindings.onInvalidated;
 
 public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRenderableElement<E> {
 
@@ -45,25 +48,22 @@ public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRe
 
         children.clear();
 
-        // inter-container layout dependencies are not supported currently
-        new LayoutContext2(this) {
+        Bindings.onInvalidated(() -> {
+            new LayoutContext2(this) {
 
-            {
-                dependencies.putAll(AbstractJ2DContainer.this.layoutDependencies);
-            }
+                @Override
+                public void accept(RenderableElement e) {
+                    if (e.parentRenderable() == null)
+                        throw new IllegalStateException("no parent renderable set for: " + e);
+                        // régi komment: this should not occur, but currently does because decoration
+                        // e.parent = ui10.base.Container.this;
 
-            @Override
-            public void accept(RenderableElement e) {
-                if (e.parentRenderable() == null)
-                    throw new IllegalStateException("no parent renderable set for: " + e);
-                    // régi komment: this should not occur, but currently does because decoration
-                    // e.parent = ui10.base.Container.this;
-
-                else if (e.parentRenderable() != AbstractJ2DContainer.this)
-                    throw new IllegalStateException("not a child of " + AbstractJ2DContainer.this + ": " + e + ", instead child of " + e.parentRenderable());
-                children.add((J2DRenderableElement<?>) e);
-            }
-        }.placeElement(content, shape2);
+                    else if (e.parentRenderable() != AbstractJ2DContainer.this)
+                        throw new IllegalStateException("not a child of " + AbstractJ2DContainer.this + ": " + e + ", instead child of " + e.parentRenderable());
+                    children.add((J2DRenderableElement<?>) e);
+                }
+            }.placeElement(content, shape2);
+        }, this::invalidateRenderableElementAndLayout);
     }
 
 

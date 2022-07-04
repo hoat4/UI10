@@ -4,6 +4,7 @@ import ui10.base.ElementModel;
 import ui10.base.Element;
 import ui10.binding7.InvalidationListener;
 import ui10.binding7.InvalidationMark;
+import ui10.binding9.OVal;
 import ui10.font.TextStyle;
 import ui10.graphics.TextLayout;
 
@@ -18,37 +19,39 @@ public class TextElement extends ElementModel {
 
  */
 
-    private String text = "";
-    private Element fill;
-    private TextStyle textStyle;
+    public final OVal<String> text = new OVal<>() {
+        @Override
+        protected String normalize(String value) {
+            return value == null ? "" : value;
+        }
+    };
+
+    public final OVal<Element> fill = new OVal<>();
+    public final OVal<TextStyle> textStyle = new OVal<>();
+
 
     public String text() {
-        return text;
+        return text.get();
     }
 
     public void text(String text) {
-        if (text == null)
-            text = "";
-        this.text = text;
-        invalidate(TextElementProperty.TEXT);
+        this.text.set(text);
     }
 
     public final Element fill() {
-        return fill;
+        return fill.get();
     }
 
     public final void fill(Element fill) {
-        this.fill = fill;
-        invalidate(TextElementProperty.FILL);
+        this.fill.set(fill);
     }
 
     public TextStyle textStyle() {
-        return textStyle;
+        return textStyle.get();
     }
 
     public void textStyle(TextStyle textStyle) {
-        this.textStyle = textStyle;
-        // listener().textStyleChanged();
+        this.textStyle.set(textStyle);
     }
 
     public TextLayout textLayout() {
@@ -65,9 +68,5 @@ public class TextElement extends ElementModel {
         return "TextElement{" +
                 "text='" + text + '\'' +
                 '}';
-    }
-
-    public enum TextElementProperty implements InvalidationMark {
-        TEXT, FILL
     }
 }

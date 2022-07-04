@@ -1,5 +1,6 @@
 package ui10.base;
 
+import ui10.binding9.Bindings;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
 
@@ -29,27 +30,11 @@ public class LayoutContext1 {
             // de így sem teljesen jó, mert így meg Containernél lesz ugyanez a probléma
             e = m.view();
 
-        O output = protocol.preferredSize(e, constraints, this);
+        RenderableElement e2 = (RenderableElement) e;
+        O output = protocol.preferredSize(e2, constraints, this);
         Objects.requireNonNull(output, e::toString);
 
-        if (e instanceof RenderableElement)
-            addLayoutDependency((RenderableElement) e, new LayoutDependency<>(constraints, output, protocol));
         return output;
-    }
-
-    <I, O> boolean isInvalidated(RenderableElement renderableElement, LayoutDependency<I, O> dep) {
-        O output = dep.protocol().preferredSize(renderableElement, dep.inputConstraints, this);
-        Objects.requireNonNull(output);
-        // addLayoutDependency?
-        return !Objects.equals(output, dep.size);
-    }
-
-    /**
-     * Records that the current element must be layouted again if the size of the specified element is changed.
-     * This is invoked only in this class, when an element has completed computing its preferred size.
-     */
-    void addLayoutDependency(RenderableElement element, LayoutDependency<?, ?> d) {
-        // these known shapes should be used later to avoid computing preferred shapes redundantly
     }
 
     /**

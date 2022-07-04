@@ -6,13 +6,7 @@ import java.util.Set;
 
 public interface Style {
 
-    default Set<?> dirtyProperties() {
-        return Set.of(); // TODO
-    }
-
     Element wrapContent(Element controlContent);
-
-    void invalidated(Set<?> dirtyProperties);
 
     DecorationContext decorationContext(); /// ???
 }

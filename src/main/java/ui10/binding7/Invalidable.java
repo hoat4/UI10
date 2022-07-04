@@ -11,14 +11,14 @@ public abstract class Invalidable {
         return dirty;
     }
 
-    protected void invalidate(InvalidationMark property) {
+    public void invalidate(InvalidationMark property) {
         boolean notify = dirty.isEmpty();
         dirty.add(property);
         if (notify)
             listeners.forEach(l -> l.onInvalidated(this));
     }
 
-    protected void invalidate(InvalidationMark... properties) {
+    public void invalidate(InvalidationMark... properties) {
         boolean notify = dirty.isEmpty();
         dirty.addAll(Arrays.asList(properties));
         if (notify)

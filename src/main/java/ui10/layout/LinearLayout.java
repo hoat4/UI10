@@ -1,15 +1,12 @@
 package ui10.layout;
 
-import ui10.base.ElementExtra;
 import ui10.base.Element;
-import ui10.binding.ListChange;
-import ui10.binding.ObservableList;
-import ui10.binding.ObservableListImpl;
-import ui10.binding2.Property;
-import ui10.geom.*;
+import ui10.base.ElementExtra;
 import ui10.base.LayoutContext1;
+import ui10.binding2.Property;
+import ui10.binding9.OList;
+import ui10.geom.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -20,29 +17,22 @@ public class LinearLayout<E extends Element> extends RectangularLayout {
     public static final Property<Fraction> GROW_FACTOR = new Property<>(false, Fraction.WHOLE);
 
     private final Axis primaryAxis;
-    private final ObservableList<E> children;
+    private final OList<E> children;
     public int gap; // TODO Length-nek kéne lennie
 
     public LinearLayout(Axis primaryAxis) {
         this.primaryAxis = primaryAxis;
-        this.children = new ObservableListImpl<>();
-        this.children.subscribe(this::onChildrenChange);
+        this.children = new OList<>();
     }
 
-    public LinearLayout(Axis primaryAxis, ObservableList<E> observableList) {
+    public LinearLayout(Axis primaryAxis, OList<E> OList) {
         this.primaryAxis = primaryAxis;
-        this.children = observableList;
-        this.children.subscribe(this::onChildrenChange);
+        this.children = OList;
     }
 
     public LinearLayout(Axis primaryAxis, List<E> children) {
         this.primaryAxis = primaryAxis;
-        this.children = new ObservableListImpl<>(children); // List.copyOf?
-        this.children.subscribe(this::onChildrenChange);
-    }
-
-    private void onChildrenChange(ListChange<E> change) {
-        invalidate(LayoutElementProperty.CHILDREN, LayoutElementProperty.LAYOUT);
+        this.children = new OList<>(children); // List.copyOf?
     }
 
     public List<E> elements() {

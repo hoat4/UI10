@@ -6,48 +6,46 @@ import ui10.binding.ListChange;
 import ui10.binding.ObservableList;
 import ui10.binding.ObservableListImpl;
 import ui10.binding7.InvalidationMark;
+import ui10.binding9.OList;
+import ui10.binding9.OVal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TabbedPane extends ui10.base.ElementModel {
 
-    private final ObservableList<Element> tabs = new ObservableListImpl<>(this::tabsChanged);
+    public final OVal<Element> selectedTab = new OVal<>();
+    public final OList<Element> tabs = new OList<>(new ArrayList<>()) {
+        @Override
+        protected void onWrite() {
+            if (selectedTab.get() == null || !tabs.contains(selectedTab.get()))
+                selectedTab(tabs.isEmpty() ? null : tabs.get(0));
 
-    private Element selectedTab;
+            super.onWrite();
+        }
+    };
 
     public TabbedPane() {
     }
 
     public TabbedPane(List<? extends Element> tabs) {
         this.tabs.addAll(tabs);
-        invalidate(TabPaneProperty.TABS);
     }
 
-    public ObservableList<Element> tabs() {
+    public List<Element> tabs() {
         return tabs;
     }
 
     public Element selectedTab() {
-        return selectedTab;
+        return selectedTab.get();
     }
 
     public void selectedTab(Element selectedTab) {
-        if (selectedTab != this.selectedTab) {
-            this.selectedTab = selectedTab;
-            invalidate(TabPaneProperty.SELECTED_TAB);
-        }
+        this.selectedTab.set(selectedTab);
     }
 
-    private void tabsChanged(ListChange<Element> change) {
-        invalidate(TabPaneProperty.TABS);
-        if (selectedTab == null || change.oldElements().contains(selectedTab))
-            selectedTab(tabs.isEmpty() ? null : tabs.get(0));
-    }
+    // TODO:  ;
 
-    public enum TabPaneProperty implements InvalidationMark {
-
-        TABS, SELECTED_TAB
-    }
 
     public static class Tab extends ElementExtra {
 

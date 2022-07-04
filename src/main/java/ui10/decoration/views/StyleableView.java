@@ -37,7 +37,6 @@ public abstract class StyleableView<M extends ElementModel, D extends Style>
     @Override
     protected final void validate() {
         validateImpl();
-        decoration().invalidated(model.dirtyProperties());
         model.dirtyProperties().clear();
     }
 

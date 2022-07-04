@@ -1,6 +1,7 @@
 package ui10.decoration.views;
 
 import ui10.base.*;
+import ui10.binding9.OVal;
 import ui10.controls.TextView;
 import ui10.controls.TabbedPane;
 import ui10.decoration.Style;
@@ -13,6 +14,7 @@ import ui10.layout.LinearLayoutBuilder;
 
 import java.util.stream.Collectors;
 
+import static ui10.binding9.Bindings.repeatIfInvalidated;
 import static ui10.layout.Layouts.HorizontalAlignment.LEFT;
 
 public class StyleableTabbedPaneView extends StyleableView<TabbedPane, StyleableTabbedPaneView.TabbedPaneStyle> implements ui10.binding7.InvalidationListener {
@@ -23,20 +25,17 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
 
     public StyleableTabbedPaneView(TabbedPane model) {
         super(model);
-    }
 
-    @Override
-    protected void validateImpl() {
-        if (model.dirtyProperties().contains(TabbedPane.TabPaneProperty.TABS)) {
+        repeatIfInvalidated(() -> {
             tabButtons.elements().clear();
             tabButtons.elements().addAll(model.tabs().stream().map(TabButton::new).collect(Collectors.toList()));
-        }
-        if (model.dirtyProperties().contains(TabbedPane.TabPaneProperty.SELECTED_TAB)) {
+        });
+
+        repeatIfInvalidated(() -> {
             if (prevSelected != null)
-                prevSelected.refresh();
-            (prevSelected = tabButton(model.selectedTab())).refresh();
-            content.refresh();
-        }
+                prevSelected.selected.set(false);
+            (prevSelected = tabButton(model.selectedTab())).selected.set(true);
+        });
     }
 
     @Override
@@ -60,19 +59,15 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
         Element tabHeaderArea(Element element);
     }
 
-    public class TabButton extends StyleableContainer<TabButton.TabButtonStyle> implements InputHandler {
+    public class TabButton extends StyleableContainer<Style> implements InputHandler {
 
         private final Element tab;
         private final TextView tabButtonLabel;
+        public final OVal<Boolean> selected= new OVal<>(false);
 
         public TabButton(Element tab) {
             this.tab = tab;
             tabButtonLabel = new TextView(TabbedPane.Tab.of(tab).title());
-        }
-
-        void refresh() {
-            if (decoration() != null)
-                decoration().selectedChanged();
         }
 
         @Override
@@ -90,22 +85,9 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
         protected Element contentImpl() {
             return tabButtonLabel;
         }
-
-        public boolean isSelected() {
-            return tab == model.selectedTab();
-        }
-
-        public interface TabButtonStyle extends Style {
-
-            void selectedChanged();
-        }
     }
 
     private class TabPaneContent extends Container {
-
-        void refresh() {
-            invalidateContainer();
-        }
 
         @Override
         protected Element content() {

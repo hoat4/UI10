@@ -1,6 +1,7 @@
 package ui10.base;
 
 import ui10.binding7.InvalidationListener;
+import ui10.binding9.Bindings;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -15,7 +16,6 @@ import java.util.function.Consumer;
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
 public non-sealed abstract class RenderableElement extends Element implements InvalidationListener {
 
-    protected Map<RenderableElement, List<LayoutContext1.LayoutDependency<?, ?>>> layoutDependencies;
     protected Shape shape;
 
     protected abstract void invalidateRendererData();
@@ -32,7 +32,6 @@ public non-sealed abstract class RenderableElement extends Element implements In
     protected void applyShape(Shape shape, LayoutContext2 context) {
         boolean changed = !Objects.equals(this.shape, shape);
         this.shape = shape;
-        this.layoutDependencies = context.dependencies;
         if (changed)
             invalidateRendererData();
 
@@ -63,16 +62,6 @@ public non-sealed abstract class RenderableElement extends Element implements In
 
         if (shape == null)
             throw new IllegalStateException("no shape for " + this); // should not happen because of the check in invalidate()
-
-        LayoutContext1 ctx = new LayoutContext1(this);
-
-        for (LayoutContext1.LayoutDependency<?, ?> dep : layoutDependencies.getOrDefault(this, Collections.emptyList())) {
-            if (ctx.isInvalidated(this, dep)) {
-                Objects.requireNonNull(parent, this::toString);
-                parentRenderable().invalidateRenderableElementAndLayout(); // itt parent vagy parentRenderable kell?
-                return;
-            }
-        }
 
         try {
             onShapeApplied(shape);

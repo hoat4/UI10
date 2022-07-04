@@ -23,8 +23,11 @@ import static ui10.layout.Layouts.*;
 public class Main7 extends Container {
 
     private final TextView label = new TextView("Hello world!");
-    private final Button button = new Button(new TextView("Gomb"), () -> System.out.println("asdf"));
     private final TextField textField = new TextField("asdf");
+    private final Button button = new Button(new TextView("Gomb"), () -> {
+        System.out.println("asdf");
+        textField.text(textField.text()+"X");
+    });
 
     @Provide
     private final ViewProvider decorableViewProvider = new DecorableControlViewProvider();

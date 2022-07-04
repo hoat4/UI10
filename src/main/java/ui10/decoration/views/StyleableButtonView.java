@@ -20,7 +20,7 @@ public class StyleableButtonView extends StyleableView<Button, Style> implements
         return new PressDetector(model.content, state->{
             if (state.focus())
                 focusContext().focusedControl.set(this);
-            model.state(state);
+            model.state.set(state);
         });
     }
 }

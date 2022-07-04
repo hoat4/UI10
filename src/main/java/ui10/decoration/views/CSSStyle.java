@@ -1,11 +1,9 @@
 package ui10.decoration.views;
 
 import ui10.base.Element;
+import ui10.binding9.Bindings;
 import ui10.decoration.*;
 import ui10.decoration.css.*;
-
-import java.util.Collections;
-import java.util.Set;
 
 public class CSSStyle<V extends Element> implements Style {
 
@@ -21,7 +19,8 @@ public class CSSStyle<V extends Element> implements Style {
         this.view = view;
         this.css = css;
         elementMirror = new ElementMirrorImpl((StyleableContainer<?>) view);
-        this.rule = css.ruleOf(elementMirror);
+
+        this.rule = Bindings.onInvalidated(() -> css.ruleOf(elementMirror), this::refresh);
 
         dc = new DecorationContext(view, findEmSize(view, css));
     }
@@ -66,7 +65,7 @@ public class CSSStyle<V extends Element> implements Style {
             if (decorBox == null)
                 decorBox = new DecorBox(controlContent, rule, dc);
             return decorBox;
-        }else {
+        } else {
             decorBox = null; // ???
             return controlContent;
         }
@@ -77,14 +76,8 @@ public class CSSStyle<V extends Element> implements Style {
         return dc;
     }
 
-    @Override
-    public void invalidated(Set<?> dirtyProperties) {
-        if (!Collections.disjoint(elementMirror.interests, dirtyProperties))
-            refresh();
-    }
-
     public void refresh() {
-        this.rule = css.ruleOf(elementMirror);
+        this.rule = Bindings.onInvalidated(() -> css.ruleOf(elementMirror), this::refresh);
 
         if (rule.needsDecorBox() != (decorBox != null)) {
             throw new UnsupportedOperationException();
@@ -92,7 +85,7 @@ public class CSSStyle<V extends Element> implements Style {
 
         if (decorBox != null) {
             decorBox.rule = rule;
-            decorBox.refresh();
+            decorBox.invalidationPoint.invalidate();
         }
     }
 }

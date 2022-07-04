@@ -1,6 +1,7 @@
 package ui10.decoration.css;
 
 import ui10.base.*;
+import ui10.binding9.InvalidationPoint;
 import ui10.decoration.BorderShape;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.DecorationContext;
@@ -21,6 +22,8 @@ public class DecorBox extends LayoutElement {
     public Rule rule;
     public final DecorationContext decorContext;
 
+    public final InvalidationPoint invalidationPoint = new InvalidationPoint();
+
     public DecorBox(Element content, Rule rule, DecorationContext decorContext) {
         this.content = content;
         this.rule = rule;
@@ -32,12 +35,10 @@ public class DecorBox extends LayoutElement {
         consumer.accept(content);
     }
 
-    public void refresh() {
-        invalidate(LayoutElementProperty.LAYOUT, LayoutElementProperty.CHILDREN);
-    }
-
     @Override
     protected Size preferredSize(BoxConstraints constraints, LayoutContext1 context) {
+        invalidationPoint.subscribe();
+
         int marginLeft = len(CSSProperty.MARGIN_LEFT_DCB_INDEX),
                 marginRight = len(CSSProperty.MARGIN_RIGHT_DCB_INDEX),
                 marginTop = len(CSSProperty.MARGIN_TOP_DCB_INDEX),
@@ -94,6 +95,8 @@ public class DecorBox extends LayoutElement {
 
     @Override
     protected void performLayout(Shape shape, LayoutContext2 context) {
+        invalidationPoint.subscribe();
+
         if ((rule.dcbMask & CSSProperty.MARGIN_MASK) != 0) {
             int marginLeft = len(CSSProperty.MARGIN_LEFT_DCB_INDEX),
                     marginRight = len(CSSProperty.MARGIN_RIGHT_DCB_INDEX),
