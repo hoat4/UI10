@@ -149,11 +149,14 @@ public class AWTWindowImpl extends Frame {
 
                     if (!p.equals(lastMouseDragPos))
                         mouseFocus.response.drag(lastMouseDragPos = p);
-                    if (mouseFocus.responder.getShapeOrFail().contains(p))
-                        mouseFocus.response.commit();
-                    else
-                        mouseFocus.response.cancel();
-                    mouseFocus = null;
+                    try {
+                        if (mouseFocus.responder.getShapeOrFail().contains(p))
+                            mouseFocus.response.commit();
+                        else
+                            mouseFocus.response.cancel();
+                    } finally {
+                        mouseFocus = null;
+                    }
                     break;
             }
         });

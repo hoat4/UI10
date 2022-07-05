@@ -3,47 +3,38 @@ package ui10.controls.dialog;
 import ui10.base.Container;
 import ui10.base.Element;
 import ui10.controls.TextView;
+import ui10.decoration.DecorationContext;
+import ui10.decoration.Style;
+import ui10.decoration.views.StyleableView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static ui10.layout.Layouts.horizontally;
 import static ui10.layout.Layouts.vertically;
 
 // .dialog
-public class DialogView extends Container {
+public class DialogView extends StyleableView<Dialog, DialogView.DialogStyle> {
 
-    public final DialogContent content;
-
-    public DialogView(DialogContent content) {
-        this.content = content;
-        /*
-        content.subscribe(e -> {
-            invalidateContainer();
-        }, prop(DialogContent::text));
-*/
-     //   withClass("dialog", this);
+    public DialogView(Dialog content) {
+        super(content);
     }
 
     @Override
-    protected Element content() {
+    protected Element contentImpl() {
+        TextView textView = new TextView(model.text());
         return vertically(
-                main(),
-                buttonBar()
+                decoration().dialogMain(textView),
+                decoration().dialogButtonBar(horizontally(model.actions()))
         );
     }
 
-    // .dialog-main
-    Element main() {
-        return new TextView(content.text());
-    }
+    public interface DialogStyle extends Style {
 
-    Element buttonBar() {
-        /*List<Element> buttons = new ArrayList<>();
-        for (DialogContent.DialogAction action : content.actions()) {
-            buttons.add(new Button.OfAction(action));
-        }
-        return withClass("dialog-button-bar",
-                halign(HorizontalAlignment.RIGHT, horizontally(buttons))
-        );
+        // .dialog-main
+        Element dialogMain(Element element);
 
-         */
-        return null;
+        // .dialog-button-bar
+        Element dialogButtonBar(Element element);
     }
 }

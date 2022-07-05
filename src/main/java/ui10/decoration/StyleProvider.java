@@ -1,6 +1,7 @@
 package ui10.decoration;
 
 import ui10.base.ElementExtra;
+import ui10.controls.dialog.DialogView;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.views.TabbedPaneCSS;
 import ui10.decoration.views.*;
@@ -13,6 +14,7 @@ public class StyleProvider extends ElementExtra {
         this.css = css;
     }
 
+    @SuppressWarnings("unchecked")
     public <D extends Style> D makeDecoration(StyleableContainer<D> view) {
         if (view instanceof StyleableButtonView v)
             return (D) new ButtonCSS(v, css);
@@ -26,6 +28,8 @@ public class StyleProvider extends ElementExtra {
             return (D) new TabbedPaneCSS(v, css);
         if (view instanceof StyleableTabbedPaneView.TabButton v)
             return (D) new TabButtonCSS(v, css);
+        if (view instanceof DialogView v)
+            return (D) new DialogCSS(v, css);
         throw new UnsupportedOperationException("unknown view: " + view);
     }
 }

@@ -1,56 +1,41 @@
 package ui10.controls.dialog;
 
-import ui10.controls.Action;
+import ui10.Main7;
+import ui10.shell.awt.AWTDesktop;
 import ui10.window.Desktop;
+import ui10.window.Window;
 
 import java.util.List;
 
 public class Dialogs {
 
     public static void showMessage(String text) {
-        MessageDialogContent content = new MessageDialogContent(text);
+        MessageDialog content = new MessageDialog(text);
         showDialog(content);
     }
 
     public static void showInput(String text) {
-        MessageDialogContent content = new MessageDialogContent(text);
+        MessageDialog content = new MessageDialog(text);
         showDialog(content);
     }
 
-    private static void showDialog(MessageDialogContent content) {
-        throw new UnsupportedOperationException("TODO");
-        /*
-        Desktop desktop = Desktop.THREAD_LOCAL.get();
-        Element e = new DialogView(content);
+    private static void showDialog(MessageDialog content) {
+        content.depParent = Main7.main;
+        Desktop desktop = AWTDesktop.instance();
 
-        CSSParser css;
-        try (Reader r = new InputStreamReader(Main6.class.getResourceAsStream("modena-imitation.css"))) {
-            css = new CSSParser(new CSSScanner(r));
-            css.parseCSS();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return;
-        }
-
-        //e = new CSSDecorator(e, css);
-
-        Window w = Window.of(e);
-        w.focusContext.defaultAction.set(content.defaultAction());
+        Window w = Window.of(content);
+        //w.focusContext.defaultAction.set(content.defaultAction());
         content.desktop = desktop;
-        content.window = w;
-
-        desktop.windows.add(w);
-
-         */
+        desktop.windows.add(content);
     }
 
-    private static class MessageDialogContent implements DialogContent {
+    private static class MessageDialog extends Dialog {
 
         Desktop desktop;
 //        Window window;
 
         private final String text;
-        private DialogAction okAction = new DialogAction() {
+        private DialogButton okAction = new DialogButton() {
 
             @Override
             public void performAction() {
@@ -72,7 +57,7 @@ public class Dialogs {
             }*/
         };
 
-        public MessageDialogContent(String text) {
+        public MessageDialog(String text) {
             this.text = text;
         }
 
@@ -87,23 +72,23 @@ public class Dialogs {
         }
 
         @Override
-        public List<DialogAction> actions() {
+        public List<DialogButton> actions() {
             return List.of(okAction);
         }
 
         @Override
-        public Action defaultAction() {
+        public DialogButton defaultAction() {
             return okAction;
         }
     }
 
-    private static class TextInputDialogContent implements DialogContent {
+    private static class TextInputDialog extends Dialog {
 
         Desktop desktop;
         //Window window;
 
         private final String text;
-        private DialogAction okAction = new DialogAction() {
+        private DialogButton okAction = new DialogButton() {
 
             @Override
             public void performAction() {
@@ -121,7 +106,7 @@ public class Dialogs {
             }
         };
 
-        public TextInputDialogContent(String text) {
+        public TextInputDialog(String text) {
             this.text = text;
         }
 
@@ -136,12 +121,12 @@ public class Dialogs {
         }
 
         @Override
-        public List<DialogAction> actions() {
+        public List<DialogButton> actions() {
             return List.of(okAction);
         }
 
         @Override
-        public Action defaultAction() {
+        public DialogButton defaultAction() {
             return okAction;
         }
     }

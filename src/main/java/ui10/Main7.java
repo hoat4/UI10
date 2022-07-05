@@ -2,6 +2,7 @@ package ui10;
 
 import ui10.base.*;
 import ui10.controls.*;
+import ui10.controls.dialog.Dialogs;
 import ui10.decoration.StyleProvider;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
@@ -25,14 +26,17 @@ public class Main7 extends Container {
     private final TextView label = new TextView("Hello world!");
     private final TextField textField = new TextField("asdf");
     private final Button button = new Button(new TextView("Gomb"), () -> {
-        System.out.println("asdf");
-        textField.text(textField.text()+"X");
+        //System.out.println("asdf");
+        //textField.text(textField.text()+"X");
+        Dialogs.showMessage("Hello world!");
     });
 
     @Provide
     private final ViewProvider decorableViewProvider = new DecorableControlViewProvider();
     @Provide
     private final StyleProvider styleProvider;
+
+    public static Main7 main;
 
     public Main7() throws IOException {
         CSSParser css;
@@ -67,6 +71,6 @@ public class Main7 extends Container {
     }
 
     public static void main(String[] args) throws IOException {
-        AWTDesktop.instance().windows.add(new Main7());
+        AWTDesktop.instance().windows.add(main = new Main7());
     }
 }

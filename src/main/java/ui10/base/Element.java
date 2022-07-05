@@ -26,6 +26,7 @@ public sealed abstract class Element implements Component
     public final List<ElementExtra> extras = new ArrayList<>();
     // content of this field should be deleted if child is removed from container, but this is not implemented
     public Element parent;
+    public Component depParent;
 
     public Element parent() {
         return parent;
@@ -57,6 +58,8 @@ public sealed abstract class Element implements Component
     public <T> void collect(Class<T> type, Consumer<T> consumer) {
         if (parent != null)
             parent.collect(type, consumer);
+        if (depParent != null)
+            depParent.collect(type, consumer);
     }
 
     public RenderableElement parentRenderable() {

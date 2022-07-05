@@ -13,6 +13,6 @@ public interface ViewProvider {
                 return e;
         }
 
-        throw new RuntimeException("couldn't find view provider for " + model);
+        throw new RuntimeException("couldn't find view provider for " + model+" (providers: "+viewProviders+")");
     }
 }

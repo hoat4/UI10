@@ -5,6 +5,8 @@ import ui10.controls.Button;
 import ui10.controls.TextView;
 import ui10.controls.TabbedPane;
 import ui10.controls.InputField;
+import ui10.controls.dialog.Dialog;
+import ui10.controls.dialog.DialogView;
 
 public class DecorableControlViewProvider implements ViewProvider {
 
@@ -18,6 +20,11 @@ public class DecorableControlViewProvider implements ViewProvider {
             return new StyleableButtonView(m);
         if (e instanceof TabbedPane m)
             return new StyleableTabbedPaneView(m);
+        if (e instanceof Dialog m)
+            return new DialogView(m);
+        if (e instanceof Dialog.DialogButton m)
+            return new DialogButtonView(m);
+
         if (e instanceof Container m && !(e instanceof StyleableView))
             return new StyleableContainerView(m);
         return null;
