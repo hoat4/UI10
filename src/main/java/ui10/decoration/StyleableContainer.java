@@ -6,8 +6,6 @@ public abstract class StyleableContainer<D extends Style> extends Container {
 
     private D decoration;
 
-    //private boolean decorationInvalid;
-
     protected D decoration() {
         return decoration;
     }
@@ -35,7 +33,10 @@ public abstract class StyleableContainer<D extends Style> extends Container {
             decorationInvalid = false;
         }
          */
-        return decoration.wrapContent(contentImpl());
+        Element content = contentImpl();
+        if (content == null)
+            throw new NullPointerException(getClass().getName()+"::contentImpl returned null: "+this);
+        return decoration.wrapContent(content);
     }
 
     protected abstract Element contentImpl();

@@ -26,8 +26,7 @@ import static ui10.input.keyboard.KeySymbol.StandardFunctionSymbol.*;
 
 // .text-field, .text, .caret, .selection
 public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
-        extends StyleableView<InputField<?, P>, StyleableTextFieldView.TextFieldStyle>
-        implements ui10.binding7.InvalidationListener {
+        extends StyleableView<InputField<?, P>, StyleableTextFieldView.TextFieldStyle> {
 
     private final TextFieldContent textFieldContent = new TextFieldContent();
     private final ColorFill caret = new ColorFill().color(Colors.BLACK);
@@ -35,14 +34,6 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
     public StyleableTextFieldView(InputField<?, P> model) {
         super(model);
         //cursor.set(Cursor.TEXT);
-    }
-
-    @Override
-    protected void validateImpl() {
-    }
-
-    @Override
-    protected void onDecorationChanged() {
     }
 
     @Override

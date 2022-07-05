@@ -95,7 +95,7 @@ public class Grid extends RectangularLayout {
 
         @Override
         public Fraction growFactor() {
-            return LinearLayout.GROW_FACTOR.defaultValue;
+            return LinearLayout.DEFAULT_GROW_FACTOR;
         }
     }
 
@@ -125,7 +125,7 @@ public class Grid extends RectangularLayout {
 
         @Override
         public Fraction growFactor() {
-            return LinearLayout.GROW_FACTOR.defaultValue;
+            return LinearLayout.DEFAULT_GROW_FACTOR;
         }
     }
 

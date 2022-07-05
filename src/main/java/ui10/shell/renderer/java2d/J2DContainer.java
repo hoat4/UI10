@@ -14,6 +14,6 @@ public class J2DContainer extends AbstractJ2DContainer<Container> {
 
     @Override
     protected Element getContent() {
-        return node.getContent();
+        return node.contentProp.get();
     }
 }

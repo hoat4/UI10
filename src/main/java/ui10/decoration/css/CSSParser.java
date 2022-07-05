@@ -1,6 +1,6 @@
 package ui10.decoration.css;
 
-import ui10.base.TextAlign;
+import ui10.controls.TextAlign;
 import ui10.decoration.BorderSpec;
 import ui10.decoration.Fill;
 import ui10.decoration.PointSpec;

@@ -13,6 +13,7 @@ import ui10.geom.shape.RoundedRectangle;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -25,6 +26,7 @@ public class DecorBox extends LayoutElement {
     public final InvalidationPoint invalidationPoint = new InvalidationPoint();
 
     public DecorBox(Element content, Rule rule, DecorationContext decorContext) {
+        Objects.requireNonNull(content);
         this.content = content;
         this.rule = rule;
         this.decorContext = decorContext;

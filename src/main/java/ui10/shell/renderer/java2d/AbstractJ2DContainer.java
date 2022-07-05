@@ -40,12 +40,12 @@ public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRe
         if (shape2 == null)
             return;
 
-        Element content = getContent();
-        content.initParent(this);
-
-        children.clear();
-
         Bindings.onInvalidated(() -> {
+            Element content = getContent();
+            content.initParent(this);
+
+            children.clear();
+
             new LayoutContext2(this) {
 
                 @Override
@@ -86,7 +86,7 @@ public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRe
             if (item.shape.contains(J2DUtil.point(p)) && item.captureMouseEvent(p, l))
                 return true;
 
-            l.add(this);
+        l.add(this);
         return true;
     }
 

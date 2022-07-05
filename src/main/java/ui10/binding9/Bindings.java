@@ -6,9 +6,9 @@ import java.util.function.Supplier;
 public class Bindings {
 
     public static <R2> R2 onInvalidated(Supplier<R2> task, Observer observer) {
-        return executeObserved(task, new ObserverData() {
+        return executeObserved(task, new Observer2() {
             @Override
-            void invalidate() {
+            protected void invalidate() {
                 observer.invalidate();
             }
         });
@@ -18,9 +18,9 @@ public class Bindings {
         executeObserved(() -> {
             task.run();
             return null;
-        }, new ObserverData() {
+        }, new Observer2() {
             @Override
-            void invalidate() {
+            protected void invalidate() {
                 observer.invalidate();
             }
         });
@@ -38,13 +38,13 @@ public class Bindings {
 
     public static <T> T onFirstChange(Supplier<T> task, Observer observer) {
 
-        class ObserverImpl extends ObserverData {
+        class ObserverImpl extends Observer2 {
 
             T prevValue;
             int state;
 
             @Override
-            void invalidate() {
+            protected void invalidate() {
                 assert state == 1 : state+", "+observer;
                 T newValue = executeObserved(task, this);
                 if (!Objects.equals(prevValue, newValue)) {
@@ -61,16 +61,29 @@ public class Bindings {
         return o.prevValue;
     }
 
-    private static <R> R executeObserved(Supplier<R> task, ObserverData observer) {
-        ObserverData previous = ObserverData.currentObserverHolder.get();
-        ObserverData.currentObserverHolder.set(observer);
+    public static <R> R executeObserved(Supplier<R> task, Observer2 observer) {
+        Observer2 previous = Observer2.currentObserverHolder.get();
+        Observer2.currentObserverHolder.set(observer);
         try {
             return task.get();
         } finally {
             if (previous == null)
-                ObserverData.currentObserverHolder.remove();
+                Observer2.currentObserverHolder.remove();
             else
-                ObserverData.currentObserverHolder.set(previous);
+                Observer2.currentObserverHolder.set(previous);
+        }
+    }
+
+    public static void withoutObserver(Runnable runnable) {
+        Observer2 previous = Observer2.currentObserverHolder.get();
+        Observer2.currentObserverHolder.set(null);
+        try {
+            runnable.run();
+        } finally {
+            if (previous == null)
+                Observer2.currentObserverHolder.remove();
+            else
+                Observer2.currentObserverHolder.set(previous);
         }
     }
 }

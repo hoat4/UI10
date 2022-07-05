@@ -1,10 +1,9 @@
 package ui10.base;
 
-import ui10.binding9.Bindings;
 import ui10.geom.Size;
 import ui10.layout.BoxConstraints;
 
-import java.util.*;
+import java.util.Objects;
 
 public class LayoutContext1 {
 
@@ -23,7 +22,7 @@ public class LayoutContext1 {
         Objects.requireNonNull(constraints);
 
         if (e.parent() == null)
-            throw new RuntimeException("no parent: "+e);
+            throw new RuntimeException("no parent: " + e);
 
         while (e instanceof ElementModel m)
             // kikerüljük ElementModeleket, hogy ne dobozosítsunk alternatív layout protokollok esetén
@@ -35,16 +34,5 @@ public class LayoutContext1 {
         Objects.requireNonNull(output, e::toString);
 
         return output;
-    }
-
-    /**
-     * This info applies to the element itself, not its replacement
-     */
-    record LayoutDependency<I, O>(I inputConstraints, O size, LayoutProtocol<I, O> protocol/*, LayoutExtra extra*/) {
-
-        LayoutDependency {
-            Objects.requireNonNull(inputConstraints);
-            Objects.requireNonNull(size);
-        }
     }
 }

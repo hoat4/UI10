@@ -2,7 +2,6 @@ package ui10.controls;
 
 import ui10.base.ContentEditable;
 import ui10.base.Element;
-import ui10.binding7.InvalidationMark;
 import ui10.binding9.OVal;
 
 import java.awt.datatransfer.DataFlavor;
@@ -10,7 +9,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.Objects;
 
 public class TextView extends ui10.base.ElementModel implements ContentEditable<TextView.StringContentPoint> {
 

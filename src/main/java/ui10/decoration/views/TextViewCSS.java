@@ -1,7 +1,7 @@
 package ui10.decoration.views;
 
 import ui10.base.Element;
-import ui10.base.TextAlign;
+import ui10.controls.TextAlign;
 import ui10.decoration.Fill;
 import ui10.decoration.css.*;
 import ui10.font.TextStyle;

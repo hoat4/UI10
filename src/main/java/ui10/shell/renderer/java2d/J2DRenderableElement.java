@@ -3,7 +3,6 @@ package ui10.shell.renderer.java2d;
 import ui10.base.Element;
 import ui10.base.ElementModel;
 import ui10.base.RenderableElement;
-import ui10.binding7.Invalidable;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 
@@ -33,12 +32,6 @@ public abstract class J2DRenderableElement<N extends ElementModel> extends Rende
     }
 
     @Override
-    public void onInvalidated(Invalidable invalidable) {
-        if (invalidable == node)
-            invalidateRenderableElementAndLayout(); // layoutot nem mindig kéne
-    }
-
-    @Override
     public void invalidateRendererData() {
         if (valid) {
             valid = false;
@@ -49,7 +42,6 @@ public abstract class J2DRenderableElement<N extends ElementModel> extends Rende
 
     private void validate() {
         validateImpl();
-        node.dirtyProperties().clear();
     }
 
     @Override

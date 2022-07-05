@@ -1,12 +1,9 @@
 package ui10.controls.dialog;
 
-import ui10.binding2.ElementEvent;
-import ui10.binding3.PropertyIdentifier;
 import ui10.controls.Action;
 import ui10.window.Desktop;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class Dialogs {
 
@@ -69,10 +66,10 @@ public class Dialogs {
             public DialogActionKind kind() {
                 return DialogActionStandardKind.OK;
             }
-
+/*
             @Override
             public void subscribe(Consumer<? super ElementEvent> consumer, PropertyIdentifier... properties) {
-            }
+            }*/
         };
 
         public MessageDialogContent(String text) {
@@ -98,10 +95,6 @@ public class Dialogs {
         public Action defaultAction() {
             return okAction;
         }
-
-        @Override
-        public void subscribe(Consumer<? super ElementEvent> consumer, PropertyIdentifier... properties) {
-        }
     }
 
     private static class TextInputDialogContent implements DialogContent {
@@ -125,10 +118,6 @@ public class Dialogs {
             @Override
             public DialogActionKind kind() {
                 return DialogActionStandardKind.OK;
-            }
-
-            @Override
-            public void subscribe(Consumer<? super ElementEvent> consumer, PropertyIdentifier... properties) {
             }
         };
 
@@ -154,10 +143,6 @@ public class Dialogs {
         @Override
         public Action defaultAction() {
             return okAction;
-        }
-
-        @Override
-        public void subscribe(Consumer<? super ElementEvent> consumer, PropertyIdentifier... properties) {
         }
     }
 }

@@ -2,7 +2,6 @@ package ui10.controls;
 
 import ui10.base.Element;
 import ui10.base.ContentEditable;
-import ui10.binding7.InvalidationMark;
 import ui10.binding9.OVal;
 
 import java.awt.datatransfer.StringSelection;

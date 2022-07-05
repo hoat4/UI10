@@ -1,6 +1,5 @@
 package ui10.base;
 
-import ui10.binding7.InvalidationListener;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -10,7 +9,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
-public non-sealed abstract class RenderableElement extends Element implements InvalidationListener {
+public non-sealed abstract class RenderableElement extends Element {
 
     protected Shape shape;
     protected abstract void invalidateRendererData();
@@ -67,7 +66,7 @@ public non-sealed abstract class RenderableElement extends Element implements In
     }
 
     public void initParent(Element parent) {
-        this.parent = (Element) parent;
+        this.parent = parent;
 
         enumerateStaticChildren(e -> {
             Objects.requireNonNull(e);

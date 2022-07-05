@@ -3,7 +3,6 @@ package ui10.layout;
 import ui10.base.Element;
 import ui10.base.ElementExtra;
 import ui10.base.LayoutContext1;
-import ui10.binding2.Property;
 import ui10.binding9.OList;
 import ui10.geom.*;
 
@@ -14,7 +13,9 @@ import java.util.function.Consumer;
 // ez most csak a GROW_FACTOR miatt publikus
 public class LinearLayout<E extends Element> extends RectangularLayout {
 
-    public static final Property<Fraction> GROW_FACTOR = new Property<>(false, Fraction.WHOLE);
+    public static final Fraction DEFAULT_GROW_FACTOR = Fraction.WHOLE;
+
+    // public static final Property<Fraction> GROW_FACTOR = new Property<>(false, Fraction.WHOLE);
 
     private final Axis primaryAxis;
     private final OList<E> children;

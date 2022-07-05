@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import static ui10.binding9.Bindings.repeatIfInvalidated;
 import static ui10.layout.Layouts.HorizontalAlignment.LEFT;
 
-public class StyleableTabbedPaneView extends StyleableView<TabbedPane, StyleableTabbedPaneView.TabbedPaneStyle> implements ui10.binding7.InvalidationListener {
+public class StyleableTabbedPaneView extends StyleableView<TabbedPane, StyleableTabbedPaneView.TabbedPaneStyle> {
 
     private LinearLayout<TabButton> tabButtons = new LinearLayout<>(Axis.HORIZONTAL);
     private final TabPaneContent content = new TabPaneContent();

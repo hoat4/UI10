@@ -6,14 +6,10 @@ import ui10.controls.Button.ButtonState;
 import ui10.decoration.Style;
 import ui10.input.Event;
 
-public class StyleableButtonView extends StyleableView<Button, Style> implements ui10.binding7.InvalidationListener {
+public class StyleableButtonView extends StyleableView<Button, Style> {
 
     public StyleableButtonView(Button model) {
         super(model);
-    }
-
-    @Override
-    protected void validateImpl() {
     }
 
     @Override

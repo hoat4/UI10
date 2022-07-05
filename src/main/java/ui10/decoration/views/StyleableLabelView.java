@@ -1,6 +1,7 @@
 package ui10.decoration.views;
 
 import ui10.base.*;
+import ui10.controls.TextAlign;
 import ui10.controls.TextView;
 import ui10.controls.TextElement;
 import ui10.decoration.Fill;
@@ -23,7 +24,7 @@ import static ui10.layout.Layouts.horizontally;
 
 // TODO text-align legyen állítható CSS-ből
 // .label
-public class StyleableLabelView extends StyleableView<TextView, StyleableLabelView.TextViewStyle> implements ui10.binding7.InvalidationListener {
+public class StyleableLabelView extends StyleableView<TextView, StyleableLabelView.TextViewStyle> {
 
     private final TextElement textElement = new TextElement(); // .label-text
     private final TextElement textNodeSel = new TextElement();
@@ -57,10 +58,6 @@ public class StyleableLabelView extends StyleableView<TextView, StyleableLabelVi
             textNodeSel.textStyle(decoration().textStyle());
             textNodeAfterSel.textStyle(decoration().textStyle());
         });
-    }
-
-    @Override
-    protected void validateImpl() {
     }
 
     private static int p(ContentEditable.ContentPoint p) {

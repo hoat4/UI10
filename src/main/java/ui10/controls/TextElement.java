@@ -1,9 +1,7 @@
 package ui10.controls;
 
-import ui10.base.ElementModel;
 import ui10.base.Element;
-import ui10.binding7.InvalidationListener;
-import ui10.binding7.InvalidationMark;
+import ui10.base.ElementModel;
 import ui10.binding9.OVal;
 import ui10.font.TextStyle;
 import ui10.graphics.TextLayout;
@@ -58,7 +56,7 @@ public class TextElement extends ElementModel {
         return ((TextView) view()).textLayout();
     }
 
-    public interface TextView extends InvalidationListener {
+    public interface TextView {
 
         TextLayout textLayout();
     }

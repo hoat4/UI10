@@ -1,13 +1,12 @@
 package ui10.controls.dialog;
 
 import ui10.base.Element;
-import ui10.binding3.Model;
 import ui10.controls.Action;
 
 import java.util.Collections;
 import java.util.List;
 
-public interface DialogContent extends Model {
+public interface DialogContent {
 
     default String title() {
         return null;

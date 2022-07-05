@@ -236,4 +236,10 @@ public class OList<E> extends Observable implements List<E> {
         onRead();
         delegate.forEach(action);
     }
+
+    @Override
+    public String toString() {
+        onRead();
+        return delegate.toString();
+    }
 }

@@ -1,7 +1,7 @@
 package ui10.base;
 
 import ui10.binding5.ReflectionUtil;
-import ui10.binding7.Invalidable;
+import ui10.binding9.Observer2;
 import ui10.di.Component;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public sealed abstract class Element extends Invalidable implements Component
+public sealed abstract class Element implements Component
         permits ElementModel, RenderableElement, RootElement {
 
     public final List<ElementExtra> extras = new ArrayList<>();
@@ -152,9 +152,27 @@ public sealed abstract class Element extends Invalidable implements Component
         Phase phase() default Phase.BUBBLE;
     }
 
+    protected abstract class DelayedObserver extends Observer2 {
+
+        private boolean valid = true;
+
+        @Override
+        protected void invalidate() {
+            if (!valid)
+                return;
+
+            valid = false;
+            lookup(UIContext.class).eventLoop().runLater(() -> {
+                valid = true;
+                invalidateImpl();
+            });
+        }
+
+        protected abstract void invalidateImpl();
+    }
 
     //private static void dispatchInputEvent(Event event, InputHandler ih, EventContext context, boolean capture) {
-        // reportolni kéne, hogy félrevezető az Stream::iterate-ben a hasNext elnevezése
+    // reportolni kéne, hogy félrevezető az Stream::iterate-ben a hasNext elnevezése
 
     //}
 }

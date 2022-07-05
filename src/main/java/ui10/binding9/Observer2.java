@@ -3,21 +3,21 @@ package ui10.binding9;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class ObserverData {
+public abstract class Observer2 {
 
     final List<Observable> observables;
 
-    static final ThreadLocal<ObserverData> currentObserverHolder = new ThreadLocal<>();
+    static final ThreadLocal<Observer2> currentObserverHolder = new ThreadLocal<>();
 
-    public ObserverData() {
+    public Observer2() {
         observables = new ArrayList<>();
     }
 
-    void clear() {
+    protected void clear() {
         for (Observable observable : observables)
             observable.observers.remove(this);
         observables.clear();
     }
 
-    abstract void invalidate();
+    protected abstract void invalidate();
 }

@@ -1,18 +1,18 @@
 package ui10.decoration.css;
 
-import ui10.binding2.Property;
+import ui10.base.ElementExtra;
 
 import java.time.Duration;
 import java.util.Objects;
 
 public record TransitionSpec<T>(CSSProperty<T> property, Duration duration) {
 
-    public static class TransitionKey<T> extends Property<Transition<T>> {
+    public static class TransitionKey<T> extends ElementExtra {
 
         public final CSSProperty<T> cssProperty;
+        public Transition<T> transition;
 
         public TransitionKey(CSSProperty<T> cssProperty) {
-            super(false);
             this.cssProperty = Objects.requireNonNull(cssProperty);
         }
 

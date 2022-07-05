@@ -5,10 +5,10 @@ import java.util.Set;
 
 public abstract class Observable {
 
-    Set<ObserverData> observers = new LinkedHashSet<>();
+    Set<Observer2> observers = new LinkedHashSet<>();
 
     protected void onRead() {
-        ObserverData observer = ObserverData.currentObserverHolder.get();
+        Observer2 observer = Observer2.currentObserverHolder.get();
         if (observer != null) {
             observer.observables.add(this);
             observers.add(observer);
@@ -16,16 +16,19 @@ public abstract class Observable {
     }
 
     protected void onWrite() {
-        ObserverData currentObserver = ObserverData.currentObserverHolder.get();
+        Observer2 currentObserver = Observer2.currentObserverHolder.get();
 
-        Set<ObserverData> s = observers;
-        observers = new LinkedHashSet<>();
+        Bindings.withoutObserver(() -> {
+            Set<Observer2> s = observers;
+            observers = new LinkedHashSet<>();
 
-        for (ObserverData o : s)
-             o.clear();
+            for (Observer2 o : s)
+                if (o != currentObserver)
+                    o.clear();
 
-        for (ObserverData observer : s)
-            if (observer != currentObserver)
-                observer.invalidate();
+            for (Observer2 observer : s)
+                if (observer != currentObserver)
+                    observer.invalidate();
+        });
     }
 }

@@ -1,14 +1,9 @@
 package ui10.base;
 
-import ui10.binding5.ListenerMulticaster;
-import ui10.binding5.Parameterization;
 import ui10.binding5.ReflectionUtil;
-import ui10.binding7.InvalidationListener;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 public non-sealed abstract class ElementModel extends Element {
@@ -25,14 +20,17 @@ public non-sealed abstract class ElementModel extends Element {
 
         this.parent = e;
 
-        view = ViewProvider.makeView(this, lookupMultiple(ViewProvider.class));
-        listeners.add((InvalidationListener) view);
-        view.initParent(this);
-
         // TODO ez a predicate nem jó ha csak megváltoztattuk a parentet
         ReflectionUtil.invokeAnnotatedMethods(this, Element.OnChange.class,
                 ann -> !lookupMultiple(ann.value()).isEmpty());
+
+        initBeforeView();
+
+        view = ViewProvider.makeView(this, lookupMultiple(ViewProvider.class));
+        view.initParent(this);
     }
+
+    protected void initBeforeView() {}
 
     @Override
     protected final void enumerateStaticChildren(Consumer<Element> consumer) {

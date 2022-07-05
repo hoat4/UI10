@@ -3,6 +3,7 @@ package ui10.shell.renderer.java2d;
 import ui10.base.*;
 import ui10.binding9.Bindings;
 import ui10.binding9.InvalidationPoint;
+import ui10.binding9.Observer2;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
@@ -11,15 +12,37 @@ import ui10.layout.BoxConstraints;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static ui10.binding9.Bindings.onFirstChange;
 import static ui10.binding9.Bindings.repeatIfInvalidated;
 
 public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
 
-
     private final List<J2DRenderableElement<?>> children = new ArrayList<>();
+
+    private final Map<BoxConstraints, Size> prefSizeCache = new HashMap<>();
+    private final InvalidationPoint prefSizeIP = new InvalidationPoint();
+    private final Observer2 prefSizeObserver = new DelayedObserver() {
+
+        @Override
+        protected void invalidateImpl() {
+            Bindings.<Void>executeObserved(() -> {
+                for (Map.Entry<BoxConstraints, Size> entry : prefSizeCache.entrySet()) {
+                    Size expectedOutput = entry.getValue();
+                    Size actualOutput = LayoutProtocol.BOX.preferredSize(node, entry.getKey(), new LayoutContext1(null));
+                    if (!actualOutput.equals(expectedOutput)) {
+                        clear();
+                        prefSizeCache.clear();
+                        prefSizeIP.invalidate();
+                        return null;
+                    }
+                }
+                return null;
+            }, this);
+        }
+    };
 
     public J2DLayoutElement(J2DRenderer renderer, LayoutElement node) {
         super(renderer, node);
@@ -40,20 +63,14 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
     protected Size preferredSizeImpl(BoxConstraints constraints, LayoutContext1 context) {
         enumerateChildrenHelper(node, e -> e.initParent(this));
 
-        InvalidationPoint ip = new InvalidationPoint();
-        ip.subscribe();
+        prefSizeIP.subscribe();
 
-        return onFirstChange(() -> LayoutProtocol.BOX.preferredSize(node, constraints, context),
-                ip::invalidate);
+        return prefSizeCache.computeIfAbsent(constraints, c -> {
+            return Bindings.executeObserved(() -> {
+                return LayoutProtocol.BOX.preferredSize(node, constraints, context);
+            }, prefSizeObserver);
+        });
     }
-
-
-    /*
-    @Override
-    public void contentChanged() {
-        invalidateRendererData();
-    }
-     */
 
     @Override
     protected void drawImpl(Graphics2D g) {

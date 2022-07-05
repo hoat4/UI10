@@ -1,9 +1,8 @@
 package ui10.controls;
 
 import ui10.base.Element;
-import ui10.binding3.Model;
 
-public interface Action extends Model {
+public interface Action {
 
     void performAction();
 

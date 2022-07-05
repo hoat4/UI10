@@ -4,7 +4,6 @@ import ui10.base.Container;
 import ui10.base.Element;
 import ui10.controls.TextView;
 
-import static ui10.binding3.PropertyIdentifier.prop;
 import static ui10.layout.Layouts.vertically;
 
 // .dialog
@@ -14,10 +13,11 @@ public class DialogView extends Container {
 
     public DialogView(DialogContent content) {
         this.content = content;
+        /*
         content.subscribe(e -> {
             invalidateContainer();
         }, prop(DialogContent::text));
-
+*/
      //   withClass("dialog", this);
     }
 
