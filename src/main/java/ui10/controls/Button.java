@@ -9,9 +9,9 @@ public class Button extends ElementModel {
     public final Action action;
     public final Element content;
 
-    public final OVal<PressDetector.ButtonState> state = new OVal<>(new PressDetector.ButtonState(false, false, false)) {
+    public final OVal<ButtonState> state = new OVal<>(new ButtonState(false, false, false)) {
         @Override
-        protected void afterChange(PressDetector.ButtonState oldValue, PressDetector.ButtonState newValue) {
+        protected void afterChange(ButtonState oldValue, ButtonState newValue) {
             if (oldValue.press() && !newValue.press())
                 Button.this.action.execute();
         }
@@ -29,5 +29,8 @@ public class Button extends ElementModel {
         }
 
         void execute();
+    }
+
+    public record ButtonState(boolean hover, boolean focus, boolean press) {
     }
 }

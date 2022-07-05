@@ -5,15 +5,12 @@ import ui10.binding9.Bindings;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
-import ui10.input.pointer.MouseEvent;
 import ui10.layout.BoxConstraints;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
-
-import static ui10.binding9.Bindings.onInvalidated;
 
 public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRenderableElement<E> {
 
@@ -84,11 +81,13 @@ public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRe
     }
 
     @Override
-    public boolean captureMouseEvent(MouseEvent p, List<MouseTarget> l, EventContext eventContext) {
+    public boolean captureMouseEvent(Point p, List<Element> l) {
         for (J2DRenderableElement<?> item : children)
-            if (item.shape.contains(J2DUtil.point(p.point())) && item.captureMouseEvent(p, l, eventContext))
+            if (item.shape.contains(J2DUtil.point(p)) && item.captureMouseEvent(p, l))
                 return true;
-        return false;
+
+            l.add(this);
+        return true;
     }
 
     @Override

@@ -2,7 +2,6 @@ package ui10.controls;
 
 import ui10.base.Element;
 import ui10.binding3.Model;
-import ui10.input.keyboard.KeyCombination;
 
 public interface Action extends Model {
 
@@ -21,11 +20,11 @@ public interface Action extends Model {
     default Element icon() { // FX-ben "graphic"
         return null;
     }
-
+/*
     default KeyCombination accelerator() {
         return null;
     }
-
+*/
     interface ActionModelListener {
 
         void textChanged();

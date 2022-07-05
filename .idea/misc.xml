@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="3">
+    <list size="4">
       <item index="0" class="java.lang.String" itemvalue="ui10.base.Control.EventHandler" />
-      <item index="1" class="java.lang.String" itemvalue="ui10.decoration.views.StyleableView.Setup" />
-      <item index="2" class="java.lang.String" itemvalue="ui10.di.Provide" />
+      <item index="1" class="java.lang.String" itemvalue="ui10.base.Element.EventHandler" />
+      <item index="2" class="java.lang.String" itemvalue="ui10.decoration.views.StyleableView.Setup" />
+      <item index="3" class="java.lang.String" itemvalue="ui10.di.Provide" />
     </list>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />

@@ -36,7 +36,7 @@ public class Bindings {
         return onInvalidated(val::get, observer);
     }
 
-    public static <T> T onChangeOnce(Supplier<T> task, Observer observer) {
+    public static <T> T onFirstChange(Supplier<T> task, Observer observer) {
 
         class ObserverImpl extends ObserverData {
 

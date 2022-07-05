@@ -33,8 +33,6 @@ public class Main7 extends Container {
     private final ViewProvider decorableViewProvider = new DecorableControlViewProvider();
     @Provide
     private final StyleProvider styleProvider;
-    @Provide
-    private final FocusContext focusContext = new FocusContext();
 
     public Main7() throws IOException {
         CSSParser css;
@@ -49,7 +47,7 @@ public class Main7 extends Container {
     protected Element content() {
         textField.content.text("szövegmező");
         LinearLayout vbox = vertically(
-                new TextView("label"),
+                label,
                 button,
                 textField
         );

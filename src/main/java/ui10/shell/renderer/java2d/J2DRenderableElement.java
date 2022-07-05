@@ -1,9 +1,11 @@
 package ui10.shell.renderer.java2d;
 
+import ui10.base.Element;
+import ui10.base.ElementModel;
+import ui10.base.RenderableElement;
 import ui10.binding7.Invalidable;
+import ui10.geom.Point;
 import ui10.geom.shape.Shape;
-import ui10.input.pointer.MouseEvent;
-import ui10.base.*;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -72,8 +74,9 @@ public abstract class J2DRenderableElement<N extends ElementModel> extends Rende
 
     protected abstract void drawImpl(Graphics2D g);
 
-    public boolean captureMouseEvent(MouseEvent p, List<MouseTarget> l, EventContext eventContext) {
-        return false;
+    public boolean captureMouseEvent(Point p, List<Element> l) {
+        l.add(this);
+        return true;
     }
 
     private BufferedImage bufferedImage;

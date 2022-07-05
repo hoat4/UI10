@@ -6,7 +6,7 @@ import ui10.binding2.Property;
 import ui10.geom.Point;
 import ui10.input.InputEvent;
 import ui10.input.keyboard.KeyTypeEvent;
-import ui10.input.keyboard.Keyboard;
+import ui10.input.raw.Keyboard;
 import ui10.window.Cursor;
 
 import java.lang.annotation.Retention;

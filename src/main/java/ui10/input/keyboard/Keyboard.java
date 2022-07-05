@@ -1,12 +1,12 @@
-package ui10.input.keyboard;
+/*
+package ui10.input;
 
-import ui10.binding.EventBus;
 import ui10.binding.ObservableList;
 
 import java.util.Optional;
 import java.util.Set;
 
-public interface Keyboard {
+public interface Keyboard extends EventSource {
 
     ObservableList<Key> pressedKeys(); // TODO list vagy set legyen?
 
@@ -64,3 +64,4 @@ public interface Keyboard {
 
     enum StandardModifier {}
 }
+*/

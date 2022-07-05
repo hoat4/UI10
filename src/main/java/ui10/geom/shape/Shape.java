@@ -38,6 +38,10 @@ public abstract class Shape {
         return ShapeOperations.subtract(this, other);
     }
 
+    public boolean contains(Point p) {
+        return ShapeOperations.contains(this, p);
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Shape s && outlines().equals(s.outlines());

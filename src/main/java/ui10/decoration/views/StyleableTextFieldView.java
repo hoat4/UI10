@@ -1,28 +1,33 @@
 package ui10.decoration.views;
 
-import ui10.base.*;
+import ui10.base.ContentEditable;
+import ui10.base.Element;
+import ui10.base.LayoutContext1;
 import ui10.controls.InputField;
 import ui10.decoration.Style;
 import ui10.font.TextStyle;
+import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.graphics.ColorFill;
 import ui10.image.Colors;
-import ui10.input.keyboard.KeyTypeEvent;
-import ui10.input.keyboard.Keyboard;
-import ui10.input.pointer.MouseEvent;
+import ui10.input.Event;
 import ui10.layout.BoxConstraints;
 import ui10.layout.RectangularLayout;
-import ui10.window.Cursor;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import static ui10.input.keyboard.KeySymbol.StandardFunctionSymbol.*;
 
 // .text-field, .text, .caret, .selection
 public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
         extends StyleableView<InputField<?, P>, StyleableTextFieldView.TextFieldStyle>
-        implements InputHandler, ui10.binding7.InvalidationListener {
+        implements ui10.binding7.InvalidationListener {
 
     private final TextFieldContent textFieldContent = new TextFieldContent();
     private final ColorFill caret = new ColorFill().color(Colors.BLACK);
@@ -42,72 +47,63 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
 
     @Override
     protected Element contentImpl() {
-        return new TextFieldMouseTarget(textFieldContent);
+        return textFieldContent;
     }
 
-    private class TextFieldMouseTarget extends MouseTarget {
+    // cursor(Cursor.TEXT);
+    @EventHandler
+    private Event.ReleaseCallback beginPress(Event.BeginPress beginPress) {
+        @SuppressWarnings("unchecked")
+        P newPos = (P) model.content.pickPosition(beginPress.point());
 
-        private P selectionBegin;
+        model.caretPosition.set(newPos);
+        model.content.select(null);
 
-        {
-            cursor(Cursor.TEXT);
-        }
+        return new Event.ReleaseCallback() {
 
-        public TextFieldMouseTarget(Element content) {
-            super(content);
-        }
+            private P selectionBegin = newPos;
 
-        @Override
-        public DragHandler handlePress(MouseEvent.MousePressEvent event) {
-            focusContext().focusedControl.set(this);
+            @Override
+            public void drag(Point point) {
+                @SuppressWarnings("unchecked")
+                P p = (P) model.content.pickPosition(point);
 
-            @SuppressWarnings("unchecked")
-            P newPos = (P) model.content.pickPosition(event.point());
+                model.caretPosition.set(p);
 
-            model.caretPosition.set(newPos);
-            model.content.select(null);
-
-            selectionBegin = newPos;
-
-            return new DragHandler() {
-
-                @Override
-                public void drag(MouseEvent.MouseDragEvent event) {
-                    @SuppressWarnings("unchecked")
-                    P p = (P) model.content.pickPosition(event.point());
-
-                    model.caretPosition.set(p);
-
-                    P begin = ContentEditable.ContentPoint.min(selectionBegin, model.caretPosition.get());
-                    P end = ContentEditable.ContentPoint.max(selectionBegin, model.caretPosition.get());
-                    model.content.select(begin == end ? null : new ContentEditable.ContentRange<>(begin, end));
-                }
-
-                @Override
-                public void release(MouseEvent.MouseReleaseEvent event) {
-                }
-            };
-        }
-    }
-
-    private class TextFieldKeyTarget extends KeyTarget {
-
-        @Override
-        public void onKeyType(KeyTypeEvent event) {
-            switch (event.symbol()) {
-                case Keyboard.StandardTextSymbol textSymbol -> model.typeText(textSymbol.text());
-                case Keyboard.StandardFunctionSymbol functionSymbol -> {
-                    switch (functionSymbol) {
-                        case LEFT -> model.caretLeft();
-                        case RIGHT -> model.caretRight();
-                        case BACKSPACE -> model.backspace();
-                        case DELETE -> model.delete();
-                    }
-                }
-                default -> {
-                }
+                P begin = ContentEditable.ContentPoint.min(selectionBegin, model.caretPosition.get());
+                P end = ContentEditable.ContentPoint.max(selectionBegin, model.caretPosition.get());
+                model.content.select(begin == end ? null : new ContentEditable.ContentRange<>(begin, end));
             }
-        }
+
+            @Override
+            public void commit() {
+            }
+
+            @Override
+            public void cancel() {
+            }
+        };
+    }
+
+    @EventHandler
+    private Event.AcceptFocus focus(Event.Focus focusEvent) {
+        return new Event.AcceptFocus(()->{});
+    }
+
+    @EventHandler
+    private void enterContent(Event.EnterContent enterContent) throws IOException, UnsupportedFlavorException {
+        model.typeText((String) enterContent.transferable().getTransferData(DataFlavor.stringFlavor));
+    }
+
+    @EventHandler
+    private void functionKey(Event.KeyCombinationEvent keyCombinationAction) {
+        if (keyCombinationAction.keyCombination().keySymbol() instanceof StandardFunctionSymbol sym)
+            switch (sym) {
+                case LEFT -> model.caretLeft();
+                case RIGHT -> model.caretRight();
+                case BACKSPACE -> model.backspace();
+                case DELETE -> model.delete();
+            }
     }
 
     public interface TextFieldStyle extends Style {

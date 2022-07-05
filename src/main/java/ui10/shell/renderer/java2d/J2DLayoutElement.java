@@ -3,9 +3,9 @@ package ui10.shell.renderer.java2d;
 import ui10.base.*;
 import ui10.binding9.Bindings;
 import ui10.binding9.InvalidationPoint;
+import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
-import ui10.input.pointer.MouseEvent;
 import ui10.layout.BoxConstraints;
 
 import java.awt.Graphics2D;
@@ -13,7 +13,8 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ui10.binding9.Bindings.*;
+import static ui10.binding9.Bindings.onFirstChange;
+import static ui10.binding9.Bindings.repeatIfInvalidated;
 
 public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
 
@@ -28,7 +29,7 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
     public void initParent(Element parent) {
         super.initParent(parent);
 
-        repeatIfInvalidated(()-> enumerateChildrenHelper(node, e -> e.initParent(this)));
+        repeatIfInvalidated(() -> enumerateChildrenHelper(node, e -> e.initParent(this)));
     }
 
     @Override
@@ -42,7 +43,7 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
         InvalidationPoint ip = new InvalidationPoint();
         ip.subscribe();
 
-        return onChangeOnce(() -> LayoutProtocol.BOX.preferredSize(node, constraints, context),
+        return onFirstChange(() -> LayoutProtocol.BOX.preferredSize(node, constraints, context),
                 ip::invalidate);
     }
 
@@ -93,12 +94,15 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
     }
 
     @Override
-    public boolean captureMouseEvent(MouseEvent p, List<MouseTarget> l, EventContext eventContext) {
-        for (J2DRenderableElement<?> item : children)
-            if (item.shape.contains(J2DUtil.point(p.point())) && item.captureMouseEvent(p, l, eventContext))
+    public boolean captureMouseEvent(Point p, List<Element> l) {
+        for (int i = children.size() - 1; i >= 0; i--) {
+            J2DRenderableElement<?> item = children.get(i);
+            if (item.shape.contains(J2DUtil.point(p)) && item.captureMouseEvent(p, l))
                 return true;
+        }
 
-        return false;
+        l.add(this);
+        return true;
     }
 
     @Override

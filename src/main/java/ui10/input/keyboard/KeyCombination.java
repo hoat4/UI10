@@ -1,4 +1,4 @@
 package ui10.input.keyboard;
 
-public class KeyCombination {
+public record KeyCombination(KeySymbol keySymbol) {
 }

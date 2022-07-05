@@ -34,9 +34,6 @@ public class J2DViewProvider implements ViewProvider {
         if (n instanceof LayoutElement o)
             return new J2DLayoutElement(renderer, o);
 
-        if (n instanceof MouseTarget o)
-            return new J2DMouseTarget(renderer,  o);
-
         return null;
     }
 }

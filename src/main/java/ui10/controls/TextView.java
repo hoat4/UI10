@@ -70,7 +70,8 @@ public class TextView extends ui10.base.ElementModel implements ContentEditable<
             throw new RuntimeException(e); // ???
         }
 
-        text(s.substring(0, point.characterOffset()) + text + s.substring(point.characterOffset()));
+        String currentText = text();
+        text(currentText.substring(0, point.characterOffset()) + s + currentText.substring(point.characterOffset()));
         return new ContentRange<>(point, new StringContentPoint(point.characterOffset() + s.length(), this));
     }
 

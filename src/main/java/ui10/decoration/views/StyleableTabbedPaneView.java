@@ -1,13 +1,14 @@
 package ui10.decoration.views;
 
-import ui10.base.*;
+import ui10.base.Container;
+import ui10.base.Element;
 import ui10.binding9.OVal;
-import ui10.controls.TextView;
 import ui10.controls.TabbedPane;
+import ui10.controls.TextView;
 import ui10.decoration.Style;
 import ui10.decoration.StyleableContainer;
 import ui10.geom.Axis;
-import ui10.input.pointer.MouseEvent;
+import ui10.input.Event;
 import ui10.layout.Layouts;
 import ui10.layout.LinearLayout;
 import ui10.layout.LinearLayoutBuilder;
@@ -59,7 +60,7 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
         Element tabHeaderArea(Element element);
     }
 
-    public class TabButton extends StyleableContainer<Style> implements InputHandler {
+    public class TabButton extends StyleableContainer<Style> {
 
         private final Element tab;
         private final TextView tabButtonLabel;
@@ -70,15 +71,9 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
             tabButtonLabel = new TextView(TabbedPane.Tab.of(tab).title());
         }
 
-        @Override
-        protected Element content() {
-            return new MouseTarget(super.content()) {
-                @Override
-                public DragHandler handlePress(MouseEvent.MousePressEvent event) {
-                    model.selectedTab(tab);
-                    return null;
-                }
-            };
+        @EventHandler
+        private void press(Event.BeginPress beginPress) {
+            model.selectedTab(tab);
         }
 
         @Override

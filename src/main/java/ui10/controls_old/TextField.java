@@ -10,7 +10,7 @@ import ui10.geom.Size;
 import ui10.image.Colors;
 import ui10.input.InputEvent;
 import ui10.input.keyboard.KeyTypeEvent;
-import ui10.input.keyboard.Keyboard;
+import ui10.input.raw.Keyboard;
 import ui10.input.pointer.MouseEvent;
 import ui10.layout.AbsolutePositioned;
 import ui10.layout.FixedSize;

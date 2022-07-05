@@ -1,7 +1,8 @@
 package ui10.shell.renderer.java2d;
 
-import ui10.base.*;
-import ui10.input.pointer.MouseEvent;
+import ui10.base.Element;
+import ui10.base.ViewProvider;
+import ui10.geom.Point;
 import ui10.shell.awt.AWTDesktop;
 import ui10.shell.awt.AWTRenderer;
 
@@ -41,8 +42,8 @@ public class J2DRenderer extends AWTRenderer {
     }
 
     @Override
-    protected boolean captureMouseEvent(MouseEvent e, EventContext eventContext, List<MouseTarget> destinationList) {
-        return root.captureMouseEvent(e, destinationList, eventContext);
+    protected boolean captureMouseEvent(Point p, List<Element> destinationList) {
+        return root.captureMouseEvent(p, destinationList);
     }
 
     @Override

@@ -1,12 +1,16 @@
 package ui10.base;
 
+import ui10.binding5.ReflectionUtil;
 import ui10.binding7.Invalidable;
 import ui10.di.Component;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
+import ui10.input.Event;
+import ui10.input.Phase;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +42,7 @@ public sealed abstract class Element extends Invalidable implements Component
 
     public <T> List<T> lookupMultiple(Class<T> clazz) {
         List<T> list = new ArrayList<>();
-        collect(clazz, o->{
+        collect(clazz, o -> {
             Objects.requireNonNull(o);
             list.add(o);
         });
@@ -53,10 +57,6 @@ public sealed abstract class Element extends Invalidable implements Component
     public <T> void collect(Class<T> type, Consumer<T> consumer) {
         if (parent != null)
             parent.collect(type, consumer);
-    }
-
-    public FocusContext focusContext() {
-        return lookup(FocusContext.class);
     }
 
     public RenderableElement parentRenderable() {
@@ -92,10 +92,39 @@ public sealed abstract class Element extends Invalidable implements Component
 
     public abstract Shape shapeOfSelection(ContentEditable.ContentRange<?> range);
 
+    @SuppressWarnings("unchecked")
+    public <R extends Event.EventResponse> R handleEvent(Event<R> event, Phase phase) {
+        List<Method> methods = phase == Phase.BUBBLE
+                ? ReflectionUtil.methodsIn(getClass()) : ReflectionUtil.methodsIn2(getClass());
+
+
+        for (Method m : methods) {
+            EventHandler h = m.getAnnotation(EventHandler.class);
+            if (h != null && h.phase() == phase) {
+                Class<?>[] paramTypes = m.getParameterTypes();
+                if (paramTypes[0].isAssignableFrom(event.getClass())) {
+                    m.setAccessible(true);
+
+                    R response;
+                    try {
+                        response = (R) m.invoke(this, event);
+                    } catch (ReflectiveOperationException e) {
+                        throw new RuntimeException("can't invoke event handler " +
+                                m.getDeclaringClass().getSimpleName() + "." + m.getName() + ": " + e, e);
+                    }
+
+                    if (response != null)
+                        return response;
+                }
+            }
+        }
+        return null;
+    }
+
     public <E extends ElementExtra> E extra(Class<E> elementExtraClass) {
         for (ElementExtra e : extras) {
             if (elementExtraClass.isInstance(e))
-                return (E) e;
+                return elementExtraClass.cast(e);
         }
         return null;
     }
@@ -116,6 +145,16 @@ public sealed abstract class Element extends Invalidable implements Component
         Class<? extends ElementExtra> value();
     }
 
+    @Target(METHOD)
+    @Retention(RUNTIME)
+    protected @interface EventHandler {
+
+        Phase phase() default Phase.BUBBLE;
+    }
 
 
+    //private static void dispatchInputEvent(Event event, InputHandler ih, EventContext context, boolean capture) {
+        // reportolni kéne, hogy félrevezető az Stream::iterate-ben a hasNext elnevezése
+
+    //}
 }

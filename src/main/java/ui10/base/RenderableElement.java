@@ -1,15 +1,11 @@
 package ui10.base;
 
 import ui10.binding7.InvalidationListener;
-import ui10.binding9.Bindings;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -17,7 +13,6 @@ import java.util.function.Consumer;
 public non-sealed abstract class RenderableElement extends Element implements InvalidationListener {
 
     protected Shape shape;
-
     protected abstract void invalidateRendererData();
 
     // nevek 4-es layoutban computeSize és setBounds voltak

@@ -190,4 +190,10 @@ public class ShapeOperations {
             throw new UnsupportedOperationException(a + ", " + b);
         }
     }
+
+
+    public static boolean contains(Shape shape, Point p) {
+        System.out.println("contains not supported: " + shape + ", " + p + ", fallbacking to bounds contains");
+        return shape.bounds().contains(p);
+    }
 }
