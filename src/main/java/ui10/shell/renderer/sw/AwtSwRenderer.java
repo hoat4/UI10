@@ -1,22 +1,25 @@
-/*
-package ui10.shell.awt;
+package ui10.shell.renderer.sw;
 
 import jdk.incubator.foreign.MemorySegment;
-import ui10.base.Control;
-import ui10.base.EnduringElement;
-import ui10.base.EventContext;
+import ui10.base.*;
+import ui10.controls.TextElement;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
-import ui10.input.pointer.MouseEvent;
+import ui10.graphics.ColorFill;
+import ui10.graphics.LinearGradient;
+import ui10.graphics.Opacity;
+import ui10.shell.awt.AWTDesktop;
+import ui10.shell.awt.AWTRenderer;
 import ui10.shell.renderer.sw.SWRasterizer;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.*;
 import java.util.List;
 
 import static ui10.geom.Point.ORIGO;
 
-public class AwtSwRenderer extends AWTRenderer{
+public class AwtSwRenderer extends AWTRenderer {
 
     private final SWRasterizer swRasterizer = new SWRasterizer();
 
@@ -25,7 +28,7 @@ public class AwtSwRenderer extends AWTRenderer{
     }
 
     @Override
-    protected void initRoot(EnduringElement root) {
+    protected void initRoot(Element root) {
         swRasterizer.initRoot(root);
     }
 
@@ -45,8 +48,28 @@ public class AwtSwRenderer extends AWTRenderer{
     }
 
     @Override
-    protected boolean captureMouseEvent(MouseEvent e, EventContext eventContext, List<Control> destinationList) {
+    protected boolean captureMouseEvent(ui10.geom.Point point, List<Element> destinationList) {
         return false;
     }
+
+    @Override
+    public ViewProvider createViewProvider() {
+        return new AwtSwViewProvider();
+    }
+
+    private static class AwtSwViewProvider implements ViewProvider {
+
+        @Override
+        public ViewProviderResult makeView(Element model) {
+            return switch (model) {
+                case ColorFill c->NoViewResult.NO_VIEW;
+                case LinearGradient c->NoViewResult.NO_VIEW;
+                case Opacity c->NoViewResult.NO_VIEW;
+                case Container c->NoViewResult.NO_VIEW;
+                case LayoutElement c->NoViewResult.NO_VIEW;
+                case TextElement c->new ViewResult(new SWTextElement(c));
+                default -> NoViewResult.UNKNOWN_ELEMENT;
+            };
+        }
+    }
 }
-*/

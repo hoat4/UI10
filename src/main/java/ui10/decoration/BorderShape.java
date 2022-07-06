@@ -68,6 +68,15 @@ public class BorderShape extends Shape {
 
     @Override
     public void scan(Rectangle clip, Consumer<HLine> consumer) {
-        throw new UnsupportedOperationException("TODO");
+        bounds().scan(clip, consumer); // TODO
+    }
+
+    @Override
+    public String toString() {
+        return "BorderShape{" +
+                "rectangle=" + rectangle +
+                ", insets=" + insets +
+                ", radiuses=" + radiuses +
+                '}';
     }
 }

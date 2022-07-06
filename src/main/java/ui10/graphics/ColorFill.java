@@ -1,10 +1,13 @@
 package ui10.graphics;
 
-import ui10.base.ElementModel;
+import ui10.base.ContentEditable;
+import ui10.base.Element;
 import ui10.binding9.OVal;
+import ui10.geom.Point;
+import ui10.geom.shape.Shape;
 import ui10.image.Color;
 
-public class ColorFill extends ElementModel {
+public class ColorFill extends Element {
 
     private final OVal<Color> color = new OVal<>();
 

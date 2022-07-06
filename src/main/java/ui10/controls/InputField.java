@@ -3,6 +3,8 @@ package ui10.controls;
 import ui10.base.Element;
 import ui10.base.ContentEditable;
 import ui10.binding9.OVal;
+import ui10.geom.Point;
+import ui10.geom.shape.Shape;
 
 import java.awt.datatransfer.StringSelection;
 
@@ -11,7 +13,7 @@ import static ui10.base.ContentEditable.TraversalDirection.FORWARD;
 import static ui10.base.ContentEditable.TraversalUnit.CHARACTER;
 
 public class InputField<C extends Element & ContentEditable<P>, P extends ContentEditable.ContentPoint>
-        extends ui10.base.ElementModel {
+        extends Element {
 
     public final C content;
     public final OVal<P> caretPosition = new OVal<>();

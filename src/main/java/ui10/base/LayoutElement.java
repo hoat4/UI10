@@ -6,11 +6,28 @@ import ui10.layout.BoxConstraints;
 
 import java.util.function.Consumer;
 
-public abstract class LayoutElement extends ElementModel {
+import static ui10.binding9.Bindings.repeatIfInvalidated;
+
+public abstract class LayoutElement extends Element {
 
     protected abstract void enumerateChildren(Consumer<Element> element);
 
     protected abstract Size preferredSize(BoxConstraints constraints, LayoutContext1 context1);
 
     protected abstract void performLayout(Shape shape, LayoutContext2 context1);
+
+    public static void performLayoutHelper(LayoutElement e, Shape shape, LayoutContext2 context) {
+        e.performLayout(shape, context);
+    }
+
+    @Override
+    void initView() {
+        super.initView();
+        if (next == null)
+            repeatIfInvalidated(() -> enumerateChildren(e -> {
+                if (e == null)
+                    throw new RuntimeException("enumerateChildren gave null element in: "+this);
+                e.initParent(this);
+            }));
+    }
 }

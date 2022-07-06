@@ -1,12 +1,15 @@
 package ui10.controls;
 
-import ui10.base.ElementModel;
+import ui10.base.ContentEditable;
+import ui10.base.Element;
+import ui10.geom.Point;
+import ui10.geom.shape.Shape;
 
 import java.util.List;
 import java.util.function.Function;
 
 // "Table" element name
-public class Table<T> extends ElementModel {
+public class Table<T> extends Element {
 
     // ha nem lehet szerkeszteni, lehetne TableColumn<? super T> is
     public final List<? extends Column<T>> columns;

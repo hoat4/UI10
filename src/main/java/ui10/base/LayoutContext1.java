@@ -24,12 +24,7 @@ public class LayoutContext1 {
         if (e.parent() == null)
             throw new RuntimeException("no parent: " + e);
 
-        while (e instanceof ElementModel m)
-            // kikerüljük ElementModeleket, hogy ne dobozosítsunk alternatív layout protokollok esetén
-            // de így sem teljesen jó, mert így meg Containernél lesz ugyanez a probléma
-            e = m.view();
-
-        RenderableElement e2 = (RenderableElement) e;
+        Element e2 = e.renderableElement();
         O output = protocol.preferredSize(e2, constraints, this);
         Objects.requireNonNull(output, e::toString);
 

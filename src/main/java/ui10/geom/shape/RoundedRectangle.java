@@ -41,7 +41,7 @@ public class RoundedRectangle extends CompositeShape {
 
     @Override
     protected List<? extends Shape> makeSubshapes() {
-        Thread.dumpStack();
+        //Thread.dumpStack();
         int top = Math.max(topLeftRadius, topRightRadius);
         int bottom = Math.max(bottomLeftRadius, bottomRightRadius);
 

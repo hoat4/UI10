@@ -88,15 +88,13 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
     protected void onShapeApplied(Shape shape) {
         super.onShapeApplied(shape);
 
-        validateIfNeeded();
-
         children.clear();
 
         Bindings.onInvalidated(() -> {
             performLayoutHelper(node, new LayoutContext2(this) {
 
                 @Override
-                public void accept(RenderableElement e) {
+                public void accept(Element e) {
                     if (e.parentRenderable() == null)
                         throw new IllegalStateException("no parent renderable set for: " + e);
                         // régi komment: this should not occur, but currently does because decoration

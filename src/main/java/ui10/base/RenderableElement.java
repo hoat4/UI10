@@ -1,6 +1,5 @@
 package ui10.base;
 
-import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -9,9 +8,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 // if there are children, override enumerateStaticChildren and onShapeApplied in the subclass
-public non-sealed abstract class RenderableElement extends Element {
+public abstract class RenderableElement extends Element {
 
-    protected Shape shape;
     protected abstract void invalidateRendererData();
 
     // nevek 4-es layoutban computeSize és setBounds voltak
@@ -23,18 +21,19 @@ public non-sealed abstract class RenderableElement extends Element {
     }
 
     @Override
-    protected void applyShape(Shape shape, LayoutContext2 context) {
-        boolean changed = !Objects.equals(this.shape, shape);
-        this.shape = shape;
-        if (changed)
-            invalidateRendererData();
-
-        onShapeApplied(shape);
+    protected void shapeChanged() {
+        invalidateRendererData();
     }
 
     @Override
     public RenderableElement renderableElement() {
         return this;
+    }
+
+    @Override
+    protected void applyShape(Shape shape, LayoutContext2 context) {
+        super.applyShape(shape, context);
+        onShapeApplied(shape);
     }
 
     protected void onShapeApplied(Shape shape) {
@@ -65,6 +64,7 @@ public non-sealed abstract class RenderableElement extends Element {
         }
     }
 
+    @Override
     public void initParent(Element parent) {
         this.parent = parent;
 
@@ -72,37 +72,25 @@ public non-sealed abstract class RenderableElement extends Element {
             Objects.requireNonNull(e);
             e.initParent(this);
         });
+        nextInit = true;
     }
 
-    public Shape getShapeOrFail() {
+    public Shape shape() {
         if (shape == null)
             throw new IllegalStateException("no shape for " + this);
         return shape;
     }
 
+    @Override
+    public Element view() {
+        return null;
+    }
+
     protected static void performLayoutHelper(LayoutElement e, LayoutContext2 context) {
-        e.performLayout(e.getShapeOrFail(), context);
+        e.performLayout(e.shape(), context);
     }
 
     protected static void enumerateChildrenHelper(LayoutElement e, Consumer<Element> consumer) {
         e.enumerateChildren(consumer);
-    }
-
-    @Override
-    public ContentEditable.ContentPoint pickPosition(Point point) {
-        return new NullContentPoint(this);
-    }
-
-    @Override
-    public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
-        return shape.bounds().withSize(new Size(0, shape.bounds().height()));
-    }
-
-    public static record NullContentPoint(RenderableElement element) implements ContentEditable.ContentPoint {
-        @Override
-        public int compareTo(ContentEditable.ContentPoint o) {
-            assert o.element() == element;
-            return 0;
-        }
     }
 }

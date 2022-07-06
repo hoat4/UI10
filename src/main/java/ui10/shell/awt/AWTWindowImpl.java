@@ -2,7 +2,6 @@ package ui10.shell.awt;
 
 import ui10.base.Element;
 import ui10.base.LayoutContext2;
-import ui10.base.RenderableElement;
 import ui10.base.UIContext;
 import ui10.geom.Point;
 import ui10.input.Event;
@@ -11,6 +10,7 @@ import ui10.input.keyboard.KeyCombination;
 import ui10.input.keyboard.KeySymbol;
 import ui10.shell.renderer.java2d.J2DRenderer;
 import ui10.shell.renderer.java2d.J2DUtil;
+import ui10.shell.renderer.sw.AwtSwRenderer;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -42,7 +42,7 @@ public class AWTWindowImpl extends Frame {
         addNotify();
         createBufferStrategy(2);
 
-        //renderer = new AwtSwRenderer();
+        //renderer = new AwtSwRenderer(desktop);
         renderer = new J2DRenderer(desktop);
         renderer.awtWindow = this;
     }
@@ -54,7 +54,7 @@ public class AWTWindowImpl extends Frame {
                     (getHeight() - getInsets().top - getInsets().bottom) / scale);
             new LayoutContext2(window) {
                 @Override
-                public void accept(RenderableElement element) {
+                public void accept(Element element) {
                 }
             }.placeElement(window, J2DUtil.rect(rect));
         }));
@@ -150,7 +150,7 @@ public class AWTWindowImpl extends Frame {
                     if (!p.equals(lastMouseDragPos))
                         mouseFocus.response.drag(lastMouseDragPos = p);
                     try {
-                        if (mouseFocus.responder.getShapeOrFail().contains(p))
+                        if (mouseFocus.responder.shape().contains(p))
                             mouseFocus.response.commit();
                         else
                             mouseFocus.response.cancel();

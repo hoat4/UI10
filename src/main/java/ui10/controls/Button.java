@@ -1,10 +1,12 @@
 package ui10.controls;
 
+import ui10.base.ContentEditable;
 import ui10.base.Element;
-import ui10.base.ElementModel;
 import ui10.binding9.OVal;
+import ui10.geom.Point;
+import ui10.geom.shape.Shape;
 
-public class Button extends ElementModel {
+public class Button extends Element {
 
     public final Action action;
     public final Element content;

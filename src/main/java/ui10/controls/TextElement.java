@@ -1,13 +1,15 @@
 package ui10.controls;
 
+import ui10.base.ContentEditable;
 import ui10.base.Element;
-import ui10.base.ElementModel;
 import ui10.binding9.OVal;
 import ui10.font.TextStyle;
+import ui10.geom.Point;
+import ui10.geom.shape.Shape;
 import ui10.graphics.TextLayout;
 
 
-public class TextElement extends ElementModel {
+public class TextElement extends Element {
 /*
 
     public static final Property<Integer> FONT_SIZE_PROPERTY = new Property<>(true);

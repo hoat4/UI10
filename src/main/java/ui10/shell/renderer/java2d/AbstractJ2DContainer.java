@@ -12,10 +12,9 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRenderableElement<E> {
+public abstract class AbstractJ2DContainer<E extends Element> extends J2DRenderableElement<E> {
 
     private final List<J2DRenderableElement<?>> children = new ArrayList<>();
-    private Shape shape2;
 
     public AbstractJ2DContainer(J2DRenderer renderer, E node) {
         super(renderer, node);
@@ -37,7 +36,7 @@ public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRe
 
     @Override
     protected void validateImpl() {
-        if (shape2 == null)
+        if (!hasShape())
             return;
 
         Bindings.onInvalidated(() -> {
@@ -49,7 +48,7 @@ public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRe
             new LayoutContext2(this) {
 
                 @Override
-                public void accept(RenderableElement e) {
+                public void accept(Element e) {
                     if (e.parentRenderable() == null)
                         throw new IllegalStateException("no parent renderable set for: " + e);
                         // régi komment: this should not occur, but currently does because decoration
@@ -59,7 +58,7 @@ public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRe
                         throw new IllegalStateException("not a child of " + AbstractJ2DContainer.this + ": " + e + ", instead child of " + e.parentRenderable());
                     children.add((J2DRenderableElement<?>) e);
                 }
-            }.placeElement(content, shape2);
+            }.placeElement(content, shape());
         }, this::invalidateRenderableElementAndLayout);
     }
 
@@ -70,14 +69,6 @@ public abstract class AbstractJ2DContainer<E extends ElementModel> extends J2DRe
         Element content = getContent();
         content.initParent(this);
         return context.preferredSize(content, constraints);
-    }
-
-    @Override
-    protected void onShapeApplied(Shape shape) {
-        this.shape2 = shape;
-        super.onShapeApplied(shape);
-
-        validateIfNeeded();
     }
 
     @Override

@@ -1,12 +1,12 @@
 package ui10.graphics;
 
-import ui10.base.ElementModel;
+import ui10.base.ContentEditable;
 import ui10.base.Element;
 import ui10.geom.Fraction;
 
 import java.util.Objects;
 
-public class Opacity extends ElementModel {
+public class Opacity extends Element {
 
     public final Element content;
     public final Fraction fraction;

@@ -3,6 +3,8 @@ package ui10.controls;
 import ui10.base.ContentEditable;
 import ui10.base.Element;
 import ui10.binding9.OVal;
+import ui10.geom.Point;
+import ui10.geom.shape.Shape;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -10,7 +12,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-public class TextView extends ui10.base.ElementModel implements ContentEditable<TextView.StringContentPoint> {
+public class TextView extends Element implements ContentEditable<TextView.StringContentPoint> {
 
     public final OVal<String> text = new OVal<>() {
         @Override

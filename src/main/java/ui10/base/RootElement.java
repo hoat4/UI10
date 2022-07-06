@@ -6,7 +6,7 @@ import ui10.geom.shape.Shape;
 
 import java.util.function.Consumer;
 
-public non-sealed abstract class RootElement extends Element {
+public abstract class RootElement extends Element {
 
     @Override
     public abstract <T> void collect(Class<T> type, Consumer<T> consumer);
@@ -17,7 +17,7 @@ public non-sealed abstract class RootElement extends Element {
     }
 
     @Override
-    public Shape getShapeOrFail() {
+    public Shape shape() {
         throw new UnsupportedOperationException();
     }
 
@@ -43,6 +43,11 @@ public non-sealed abstract class RootElement extends Element {
 
     @Override
     public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Element view() {
         throw new UnsupportedOperationException();
     }
 }

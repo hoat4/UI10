@@ -11,7 +11,12 @@ import ui10.controls.dialog.DialogView;
 public class DecorableControlViewProvider implements ViewProvider {
 
     @Override
-    public Element makeView(ElementModel e) {
+    public ViewProviderResult makeView(Element e) {
+        e = makeViewImpl(e);
+        return e == null ? NoViewResult.UNKNOWN_ELEMENT : new ViewResult(e);
+    }
+
+    private Container makeViewImpl(Element e) {
         if (e instanceof TextView m)
             return new StyleableLabelView(m);
         if (e instanceof InputField m)

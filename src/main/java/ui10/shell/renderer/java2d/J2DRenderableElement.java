@@ -1,7 +1,6 @@
 package ui10.shell.renderer.java2d;
 
 import ui10.base.Element;
-import ui10.base.ElementModel;
 import ui10.base.RenderableElement;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
@@ -17,7 +16,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.List;
 
-public abstract class J2DRenderableElement<N extends ElementModel> extends RenderableElement {
+public abstract class J2DRenderableElement<N extends Element> extends RenderableElement {
 
     protected final J2DRenderer renderer;
     private boolean valid;
@@ -40,14 +39,11 @@ public abstract class J2DRenderableElement<N extends ElementModel> extends Rende
         }
     }
 
-    private void validate() {
-        validateImpl();
-    }
-
     @Override
     protected void onShapeApplied(Shape shape) {
         super.onShapeApplied(shape);
         this.shape = J2DUtil.shapeToPath2D(shape);
+        validateIfNeeded();
     }
 
     protected abstract void validateImpl();
@@ -59,7 +55,7 @@ public abstract class J2DRenderableElement<N extends ElementModel> extends Rende
 
     protected void validateIfNeeded() {
         if (!valid) {
-            validate();
+            validateImpl();
             valid = true;
         }
     }

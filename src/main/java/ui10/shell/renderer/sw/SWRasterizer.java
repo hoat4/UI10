@@ -1,10 +1,8 @@
-/*
 package ui10.shell.renderer.sw;
 
 import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.MemorySegment;
-import ui10.base.Container;
-import ui10.base.RenderableElement;
+import ui10.base.*;
 import ui10.geom.Fraction;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
@@ -16,12 +14,12 @@ import ui10.image.Color;
 
 public class SWRasterizer {
 
-    private RenderableElement root;
+    private Element root;
     public MemorySegment buffer;
     public Rectangle renderRect;
     private Fraction opacity;
 
-    public void initRoot(RenderableElement element) {
+    public void initRoot(Element element) {
         this.root = element;
     }
 
@@ -32,24 +30,30 @@ public class SWRasterizer {
         renderElement(root);
     }
 
-    private void renderElement(RenderableElement e) {
-        if (e.getShapeOrFail().bounds().intersectionWith(renderRect) == null)
+    private void renderElement(Element e) {
+        if (e.shape().bounds().intersectionWith(renderRect) == null)
             return;
 
         // MemoryAccess.setIntAtIndex(buffer, coord(Point.ORIGO), 0xFF880000);
 
+        e = e.renderableElement();
+
         switch (e) {
-            case Container p -> {
-                for (RenderableElement element : p.renderableElements())
-                    renderElement(element);
+            case LayoutElement p -> {
+                LayoutElement.performLayoutHelper(p, p.shape(), new LayoutContext2(p) {
+                    @Override
+                    public void accept(Element e) {
+                        renderElement(e);
+                    }
+                });
             }
             case ColorFill colorFill -> {
                 //Shape shape = colorFill.getShapeOrFail().intersectionWith(rect);
                 //if (shape != null)
-                fill(colorFill.color(), colorFill.getShapeOrFail());
+                fill(colorFill.color(), colorFill.shape());
             }
             case LinearGradient linearGradient -> {
-                fill(linearGradient.stops.get(0).color(), linearGradient.getShapeOrFail());
+                fill(linearGradient.stops.get(0).color(), linearGradient.shape());
             }
             case Opacity opacityElement -> {
                 Fraction prevOpacity = this.opacity;
@@ -57,8 +61,8 @@ public class SWRasterizer {
                 renderElement(opacityElement.content);
                 this.opacity = prevOpacity;
             }
-            case SWRenderableElement element ->{
-                element.draw(this, element.getShapeOrFail().bounds());
+            case SWRenderableElement element -> {
+                element.draw(this, element.shape().bounds());
             }
             default -> {
                 System.err.println("Unknown element: " + e);
@@ -67,6 +71,7 @@ public class SWRasterizer {
     }
 
     private void fill(Color color, Shape shape) {
+        System.out.println("fill "+shape+" with "+color);
         int argb = color.toRGBColor().toIntARGB(); // TODO opacity
         final Rectangle r = shape.bounds();
         shape.scan(r, scanline -> {
@@ -79,4 +84,3 @@ public class SWRasterizer {
         return p.y() * renderRect.width() + p.x();
     }
 }
-*/

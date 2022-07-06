@@ -1,14 +1,16 @@
 package ui10.graphics;
 
-import ui10.base.ElementModel;
+import ui10.base.ContentEditable;
+import ui10.base.Element;
 import ui10.geom.Point;
+import ui10.geom.shape.Shape;
 import ui10.image.Color;
 
 import java.util.ArrayList;
 import java.util.List;
 
 // TODO listener
-public class LinearGradient extends ElementModel {
+public class LinearGradient extends Element {
 
     private Point start, end;
     public final List<Stop> stops = new ArrayList<>();

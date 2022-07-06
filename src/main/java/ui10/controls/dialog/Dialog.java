@@ -1,12 +1,14 @@
 package ui10.controls.dialog;
 
+import ui10.base.ContentEditable;
 import ui10.base.Element;
-import ui10.base.ElementModel;
+import ui10.geom.Point;
+import ui10.geom.shape.Shape;
 
 import java.util.Collections;
 import java.util.List;
 
-public abstract class Dialog extends ElementModel {
+public abstract class Dialog extends Element {
 
     public String title() {
         return null;
@@ -43,7 +45,7 @@ public abstract class Dialog extends ElementModel {
         return Collections.emptyList();
     }
 
-    public abstract class DialogButton extends ElementModel{
+    public abstract class DialogButton extends Element {
 
         public abstract DialogActionKind kind();
 

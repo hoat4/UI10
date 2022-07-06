@@ -15,25 +15,25 @@ public class J2DViewProvider implements ViewProvider {
     }
 
     @Override
-    public Element makeView(ElementModel n) {
+    public ViewProviderResult makeView(Element n) {
         if (n instanceof ColorFill f)
-            return new J2DColorFillElement(renderer, f);
+            return new ViewResult(new J2DColorFillElement(renderer, f));
 
         if (n instanceof Container d)
-            return new J2DContainer(renderer, d);
+            return new ViewResult(new J2DContainer(renderer, d));
 
         if (n instanceof TextElement t)
-            return new J2DTextElement(renderer, t);
+            return new ViewResult(new J2DTextElement(renderer, t));
 
         if (n instanceof LinearGradient l)
-            return new J2DLinearGradient(renderer, l);
+            return new ViewResult(new J2DLinearGradient(renderer, l));
 
         if (n instanceof Opacity o)
-            return new J2DOpacityElement(renderer, o);
+            return new ViewResult(new J2DOpacityElement(renderer, o));
 
         if (n instanceof LayoutElement o)
-            return new J2DLayoutElement(renderer, o);
+            return new ViewResult(new J2DLayoutElement(renderer, o));
 
-        return null;
+        return NoViewResult.UNKNOWN_ELEMENT;
     }
 }

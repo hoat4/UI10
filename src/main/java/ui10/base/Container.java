@@ -3,7 +3,7 @@ package ui10.base;
 import ui10.binding9.Bindings;
 import ui10.binding9.OVal;
 
-public abstract class Container extends ElementModel {
+public abstract class Container extends Element {
 
     public final OVal<Element> contentProp = new OVal<>();
 
@@ -14,4 +14,12 @@ public abstract class Container extends ElementModel {
 
     protected abstract Element content();
 
+    @Override
+    void initView() {
+        super.initView();
+        if (next == null) {
+            next = contentProp.get(); // TODO módosítások értelmesebb kezelése
+            next.initParent(this);
+        }
+    }
 }

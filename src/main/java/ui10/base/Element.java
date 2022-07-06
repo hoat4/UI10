@@ -4,6 +4,7 @@ import ui10.binding5.ReflectionUtil;
 import ui10.binding9.Observer2;
 import ui10.di.Component;
 import ui10.geom.Point;
+import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.input.Event;
 import ui10.input.Phase;
@@ -20,13 +21,16 @@ import java.util.function.Supplier;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public sealed abstract class Element implements Component
-        permits ElementModel, RenderableElement, RootElement {
+public abstract class Element implements Component {
 
     public final List<ElementExtra> extras = new ArrayList<>();
     // content of this field should be deleted if child is removed from container, but this is not implemented
     public Element parent;
     public Component depParent;
+
+    Element next;
+    Shape shape;
+    boolean nextInit;
 
     public Element parent() {
         return parent;
@@ -62,38 +66,120 @@ public sealed abstract class Element implements Component
             depParent.collect(type, consumer);
     }
 
-    public RenderableElement parentRenderable() {
+    public Element parentRenderable() {
         Element e = parent;
-        while (!(e instanceof RenderableElement r)) {
-            if (e == null)
-                return null;
+        while (e != null && !e.isRenderableElement())
             e = e.parent;
-        }
-        return r;
+        return e;
     }
 
     public Point origin() {
-        return getShapeOrFail().bounds().topLeft();
+        return shape().bounds().topLeft();
     }
 
-    public abstract Shape getShapeOrFail();
+    public boolean hasShape() {
+        return shape != null;
+    }
 
-    public abstract RenderableElement renderableElement();
+    public Shape shape() {
+        ensureViewInit();
+        if (next != null)
+            return next.shape();
+        if (shape == null)
+            throw new IllegalStateException("no shape for " + this);
+        return shape;
+    }
 
-    protected abstract void applyShape(Shape shape, LayoutContext2 context);
+    public boolean isRenderableElement() {
+        ensureViewInit();
+        return next == null;
+    }
 
-    /**
-     * This can be used by decorators to walk the elementClass tree. When encountering a Pane, the decorator should
-     * set the Pane.decorator field because Panes usually recreate its children every time, so decorating them only once
-     * is useless.
-     */
-    protected abstract void enumerateStaticChildren(Consumer<Element> consumer); // this does not honor replacement
+    public Element renderableElement() {
+        ensureViewInit();
+        return next == null ? this : next.renderableElement();
+    }
 
-    public abstract void initParent(Element parent);
+    protected void preShapeChange(Shape shape) {
+    }
 
-    public abstract ContentEditable.ContentPoint pickPosition(Point point);
+    protected void applyShape(Shape shape, LayoutContext2 context) {
+        ensureViewInit(); // ezt a kettőt lehet hogy fel kéne cseréni
+        preShapeChange(shape);
 
-    public abstract Shape shapeOfSelection(ContentEditable.ContentRange<?> range);
+        boolean changed = !Objects.equals(this.shape, shape);
+        this.shape = shape;
+        if (changed)
+            shapeChanged();
+
+        if (next != null)
+            context.placeElement(next, shape);
+    }
+
+    protected void shapeChanged() {
+    }
+
+    protected void enumerateStaticChildren(Consumer<Element> consumer) {
+        if (view() != null)
+            view().enumerateStaticChildren(consumer);
+    }
+
+    public void initParent(Element parent) {
+        Element e = parent;
+        if (e == this.parent)
+            return;
+
+        if (nextInit)
+            throw new IllegalStateException(this + " already has view: " + next + " (old parent: " + this.parent + ", new parent: " + parent + ")");
+
+        this.parent = e;
+
+        // TODO ez a predicate nem jó ha csak megváltoztattuk a parentet
+        ReflectionUtil.invokeAnnotatedMethods(this, Element.OnChange.class,
+                ann -> !lookupMultiple(ann.value()).isEmpty());
+
+        initBeforeView();
+
+        initView();
+        nextInit = true;
+    }
+
+    void initView() {
+        next = ViewProvider.makeView(this, lookupMultiple(ViewProvider.class));
+        if (next != null)
+            next.initParent(this);
+    }
+
+    protected void initBeforeView() {
+    }
+
+    // TODO mi van ha változik a view?
+    public Element view() {
+        if (!nextInit)
+            throw new IllegalStateException("no view associated with " + this + " (parent: " + parent + ")");
+        return next;
+    }
+
+    public ContentEditable.ContentPoint pickPosition(Point point) {
+        ensureViewInit();
+        if (next == null)
+            return new NullContentPoint(this);
+        else
+            return next.pickPosition(point);
+    }
+
+    private void ensureViewInit() {
+        if (!nextInit)
+            throw new IllegalStateException(this + " is not initialized yet");
+    }
+
+    public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
+        ensureViewInit();
+        if (next == null)
+            return shape().bounds().withSize(new Size(0, shape().bounds().height()));
+        else
+            return view().shapeOfSelection(range);
+    }
 
     @SuppressWarnings("unchecked")
     public <R extends Event.EventResponse> R handleEvent(Event<R> event, Phase phase) {
@@ -178,4 +264,13 @@ public sealed abstract class Element implements Component
     // reportolni kéne, hogy félrevezető az Stream::iterate-ben a hasNext elnevezése
 
     //}
+
+
+    public static record NullContentPoint(Element element) implements ContentEditable.ContentPoint {
+        @Override
+        public int compareTo(ContentEditable.ContentPoint o) {
+            assert o.element() == element;
+            return 0;
+        }
+    }
 }
