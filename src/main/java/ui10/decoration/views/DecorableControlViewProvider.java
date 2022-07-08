@@ -16,7 +16,7 @@ public class DecorableControlViewProvider implements ViewProvider {
         return e == null ? NoViewResult.UNKNOWN_ELEMENT : new ViewResult(e);
     }
 
-    private Container makeViewImpl(Element e) {
+    private Element makeViewImpl(Element e) {
         if (e instanceof TextView m)
             return new StyleableLabelView(m);
         if (e instanceof InputField m)

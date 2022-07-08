@@ -4,7 +4,6 @@ import ui10.base.*;
 import ui10.binding9.Bindings;
 import ui10.binding9.InvalidationPoint;
 import ui10.binding9.Observer2;
-import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.layout.BoxConstraints;
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static ui10.binding9.Bindings.repeatIfInvalidated;
 
@@ -46,6 +46,12 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
 
     public J2DLayoutElement(J2DRenderer renderer, LayoutElement node) {
         super(renderer, node);
+    }
+
+
+    @Override
+    protected void enumerateStaticChildren(Consumer<Element> consumer) {
+        enumerateChildrenHelper(node, consumer);
     }
 
     @Override
@@ -106,18 +112,6 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
                 }
             });
         }, this::invalidateRenderableElementAndLayout);
-    }
-
-    @Override
-    public boolean captureMouseEvent(Point p, List<Element> l) {
-        for (int i = children.size() - 1; i >= 0; i--) {
-            J2DRenderableElement<?> item = children.get(i);
-            if (item.shape.contains(J2DUtil.point(p)) && item.captureMouseEvent(p, l))
-                return true;
-        }
-
-        l.add(this);
-        return true;
     }
 
     @Override

@@ -3,6 +3,7 @@ package ui10.shell.renderer.java2d;
 import ui10.base.*;
 import ui10.controls.TextElement;
 import ui10.graphics.ColorFill;
+import ui10.graphics.ImageView;
 import ui10.graphics.LinearGradient;
 import ui10.graphics.Opacity;
 
@@ -30,6 +31,9 @@ public class J2DViewProvider implements ViewProvider {
 
         if (n instanceof Opacity o)
             return new ViewResult(new J2DOpacityElement(renderer, o));
+
+        if (n instanceof ImageView o)
+            return new ViewResult(new J2DImageView(renderer, o));
 
         if (n instanceof LayoutElement o)
             return new ViewResult(new J2DLayoutElement(renderer, o));

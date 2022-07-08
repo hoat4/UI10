@@ -67,7 +67,5 @@ public abstract class AWTRenderer {
 
     protected abstract void draw(Graphics2D g);
 
-    protected abstract boolean captureMouseEvent(ui10.geom.Point point, List<Element> destinationList);
-
     public abstract ViewProvider createViewProvider();
 }

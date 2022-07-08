@@ -42,13 +42,13 @@ public class CSSStyle<V extends Element> implements Style {
     private static int findEmSize(Element e, CSSDecorator css) {
         int scale = 1 << 14;
         while (true) {
-            if (e instanceof StyleableView) {
-                ElementMirrorImpl elementMirror = new ElementMirrorImpl((StyleableView<?, ?>) e);
+            if (e instanceof StyleableContainer) {
+                ElementMirrorImpl elementMirror = new ElementMirrorImpl((StyleableContainer<?>) e);
                 Rule r = css.ruleOf(elementMirror);
                 Length l = r.get(CSSProperty.fontSize);
                 if (l != null) {
                     if (l.em() == 0 && l.relative() == 0)
-                        return l.px() >> 14;
+                        return (scale >> 7) * (l.px() >> 7) >> 14;
                     else
                         scale = scale * (l.em() + l.relative() >> 7) >> 7;
                 }

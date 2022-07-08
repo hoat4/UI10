@@ -42,11 +42,6 @@ public class J2DRenderer extends AWTRenderer {
     }
 
     @Override
-    protected boolean captureMouseEvent(Point p, List<Element> destinationList) {
-        return root.captureMouseEvent(p, destinationList);
-    }
-
-    @Override
     public ViewProvider createViewProvider() {
         return new J2DViewProvider(this);
     }

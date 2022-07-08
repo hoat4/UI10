@@ -16,6 +16,9 @@ public class DialogButtonView extends Container {
 
     @Override
     protected Element content() {
-        return new Button(new TextView(model.text()), model::performAction);
+        Button button = new Button(new TextView(model.text()), model::performAction);
+        if (model.kind() == Dialog.DialogButton.DialogActionStandardKind.OK)
+            button.role.set(Button.Role.DEFAULT);
+        return button;
     }
 }

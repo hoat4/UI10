@@ -9,6 +9,7 @@ import ui10.decoration.Style;
 import ui10.decoration.StyleableContainer;
 import ui10.geom.Axis;
 import ui10.input.Event;
+import ui10.input.EventInterpretation;
 import ui10.layout.Layouts;
 import ui10.layout.LinearLayout;
 import ui10.layout.LinearLayoutBuilder;
@@ -72,7 +73,7 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
         }
 
         @EventHandler
-        private void press(Event.BeginPress beginPress) {
+        private void press(EventInterpretation.BeginPress beginPress) {
             model.selectedTab(tab);
         }
 

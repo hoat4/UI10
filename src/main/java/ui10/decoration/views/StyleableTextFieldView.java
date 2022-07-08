@@ -12,7 +12,7 @@ import ui10.geom.Size;
 import ui10.geom.shape.Shape;
 import ui10.graphics.ColorFill;
 import ui10.image.Colors;
-import ui10.input.Event;
+import ui10.input.EventInterpretation;
 import ui10.layout.BoxConstraints;
 import ui10.layout.RectangularLayout;
 
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static ui10.input.keyboard.KeySymbol.StandardFunctionSymbol.*;
+import static ui10.input.keyboard.KeySymbol.StandardFunctionSymbol.StandardFunctionSymbol;
 
 // .text-field, .text, .caret, .selection
 public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
@@ -43,14 +43,14 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
 
     // cursor(Cursor.TEXT);
     @EventHandler
-    private Event.ReleaseCallback beginPress(Event.BeginPress beginPress) {
+    private EventInterpretation.ReleaseCallback beginPress(EventInterpretation.BeginMousePress beginPress) {
         @SuppressWarnings("unchecked")
         P newPos = (P) model.content.pickPosition(beginPress.point());
 
         model.caretPosition.set(newPos);
         model.content.select(null);
 
-        return new Event.ReleaseCallback() {
+        return new EventInterpretation.ReleaseCallback() {
 
             private P selectionBegin = newPos;
 
@@ -77,17 +77,18 @@ public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
     }
 
     @EventHandler
-    private Event.AcceptFocus focus(Event.Focus focusEvent) {
-        return new Event.AcceptFocus(()->{});
+    private EventInterpretation.AcceptFocus focus(EventInterpretation.Focus focusEvent) {
+        return new EventInterpretation.AcceptFocus(()->{});
     }
 
     @EventHandler
-    private void enterContent(Event.EnterContent enterContent) throws IOException, UnsupportedFlavorException {
+    private void enterContent(EventInterpretation.EnterContent enterContent) throws IOException, UnsupportedFlavorException {
+
         model.typeText((String) enterContent.transferable().getTransferData(DataFlavor.stringFlavor));
     }
 
     @EventHandler
-    private void functionKey(Event.KeyCombinationEvent keyCombinationAction) {
+    private void functionKey(EventInterpretation.KeyCombinationEvent keyCombinationAction) {
         if (keyCombinationAction.keyCombination().keySymbol() instanceof StandardFunctionSymbol sym)
             switch (sym) {
                 case LEFT -> model.caretLeft();

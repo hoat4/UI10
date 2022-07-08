@@ -10,12 +10,10 @@ import ui10.graphics.LinearGradient;
 import ui10.graphics.Opacity;
 import ui10.shell.awt.AWTDesktop;
 import ui10.shell.awt.AWTRenderer;
-import ui10.shell.renderer.sw.SWRasterizer;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.*;
-import java.util.List;
 
 import static ui10.geom.Point.ORIGO;
 
@@ -45,11 +43,6 @@ public class AwtSwRenderer extends AWTRenderer {
         WritableRaster raster = Raster.createWritableRaster(sm, buffer, new Point(0, 0));
         BufferedImage image = new BufferedImage(colorModel, raster, false, null);
         g.drawImage(image, 0, 0, size.width()*2, size.height()*2, null);
-    }
-
-    @Override
-    protected boolean captureMouseEvent(ui10.geom.Point point, List<Element> destinationList) {
-        return false;
     }
 
     @Override

@@ -62,11 +62,6 @@ public abstract class J2DRenderableElement<N extends Element> extends Renderable
 
     protected abstract void drawImpl(Graphics2D g);
 
-    public boolean captureMouseEvent(Point p, List<Element> l) {
-        l.add(this);
-        return true;
-    }
-
     private BufferedImage bufferedImage;
 
     public Paint asPaint() {

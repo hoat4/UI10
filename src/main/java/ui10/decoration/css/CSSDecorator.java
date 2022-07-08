@@ -1,26 +1,15 @@
 package ui10.decoration.css;
 
-public class CSSDecorator {
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 
-    //public static final Property<CSSDecorator> DECORATOR_PROPERTY = new Property<>(true);
+public class CSSDecorator {
 
     final CSSParser css;
 
     public CSSDecorator(CSSParser css) {
         this.css = css;
     }
-
-    /*
-    public void elementEvent(EnduringElement element, ElementEvent event) {
-        if (event instanceof ChangeEvent<?> c) {
-            if (pseudoClassProviders.stream().anyMatch(p -> p.dependencies().contains(c.property()))) {
-                System.out.println(element);
-                element.invalidateDecoration();
-            }
-        }
-    }
-
-     */
 
     public Rule ruleOf(ElementMirror e) {
         Rule rule = new Rule();
@@ -34,5 +23,14 @@ public class CSSDecorator {
         // TODO rule.applyTransitionsOf(e);
 
         return rule;
+    }
+
+    public Path resource(String name) {
+        try {
+            // TODO
+            return Path.of(getClass().getResource("/ui10/theme/modena-imitation/" + name).toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

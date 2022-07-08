@@ -1,6 +1,8 @@
 package ui10.decoration;
 
 import ui10.base.Element;
+import ui10.controls.Button;
+import ui10.controls.dialog.DialogView;
 import ui10.decoration.css.ElementMirror;
 import ui10.decoration.views.StyleableButtonView;
 import ui10.decoration.views.StyleableLabelView;
@@ -27,6 +29,8 @@ public class ElementMirrorImpl implements ElementMirror {
             return "Label";
         if (element instanceof StyleableTextFieldView)
             return "TextField";
+        if (element instanceof DialogView)
+            return "Dialog";
 
         return element.getClass().getSimpleName();
     }
@@ -34,6 +38,9 @@ public class ElementMirrorImpl implements ElementMirror {
     @Override
     public boolean hasClass(String className) {
         return switch (className) {
+            case "dialog-header" -> element instanceof DialogView.DialogHeader;
+            case "dialog-main" -> element instanceof DialogView.DialogMain;
+            case "default-button" -> element instanceof StyleableButtonView btn && btn.model.role.get() == Button.Role.DEFAULT;
             default -> false;
         };
     }

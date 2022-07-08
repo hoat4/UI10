@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class AbstractJ2DContainer<E extends Element> extends J2DRenderableElement<E> {
 
@@ -18,6 +19,11 @@ public abstract class AbstractJ2DContainer<E extends Element> extends J2DRendera
 
     public AbstractJ2DContainer(J2DRenderer renderer, E node) {
         super(renderer, node);
+    }
+
+    @Override
+    protected void enumerateStaticChildren(Consumer<Element> consumer) {
+        consumer.accept(getContent());
     }
 
     @Override
@@ -69,16 +75,6 @@ public abstract class AbstractJ2DContainer<E extends Element> extends J2DRendera
         Element content = getContent();
         content.initParent(this);
         return context.preferredSize(content, constraints);
-    }
-
-    @Override
-    public boolean captureMouseEvent(Point p, List<Element> l) {
-        for (J2DRenderableElement<?> item : children)
-            if (item.shape.contains(J2DUtil.point(p)) && item.captureMouseEvent(p, l))
-                return true;
-
-        l.add(this);
-        return true;
     }
 
     @Override

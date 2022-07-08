@@ -18,6 +18,7 @@ public class Button extends Element {
                 Button.this.action.execute();
         }
     };
+    public final OVal<Role> role = new OVal<>(); // ez lehetne sima final változó is
 
     public Button(Element content, Action action) {
         this.content = content;
@@ -34,5 +35,9 @@ public class Button extends Element {
     }
 
     public record ButtonState(boolean hover, boolean focus, boolean press) {
+    }
+
+    public enum Role {
+        CANCEL, DEFAULT
     }
 }

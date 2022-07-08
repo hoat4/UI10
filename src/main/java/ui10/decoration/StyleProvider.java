@@ -22,14 +22,12 @@ public class StyleProvider extends ElementExtra {
             return (D) new TextFieldCSS(v, css);
         if (view instanceof StyleableLabelView v)
             return (D) new TextViewCSS(v, css);
-        if (view instanceof StyleableContainerView v)
-            return (D) new CSSStyle<>(v, css);
         if (view instanceof StyleableTabbedPaneView v)
             return (D) new TabbedPaneCSS(v, css);
         if (view instanceof StyleableTabbedPaneView.TabButton v)
             return (D) new TabButtonCSS(v, css);
         if (view instanceof DialogView v)
             return (D) new DialogCSS(v, css);
-        throw new UnsupportedOperationException("unknown view: " + view);
+        return (D) new CSSStyle<>(view, css);
     }
 }

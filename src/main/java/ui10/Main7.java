@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 import static ui10.layout.Layouts.*;
 
-public class Main7 extends Container {
+public class Main7 extends LightweightContainer {
 
     private final TextView label = new TextView("Hello world!");
     private final TextField textField = new TextField("asdf");
@@ -40,7 +40,7 @@ public class Main7 extends Container {
 
     public Main7() throws IOException {
         CSSParser css;
-        try (Reader r = new InputStreamReader(getClass().getResourceAsStream("modena-imitation.css"))) {
+        try (Reader r = new InputStreamReader(getClass().getResourceAsStream("/ui10/theme/modena-imitation/modena-imitation.css"))) {
             css = new CSSParser(new CSSScanner(r));
             css.parseCSS();
         }
@@ -57,11 +57,13 @@ public class Main7 extends Container {
         );
         vbox.gap = 10;
 
+        button.role.set(Button.Role.DEFAULT);
+
         Element tab1 = centered(vbox);
         Element tab2 = empty();
         TabbedPane.Tab.of(tab1).title("Egyik tab");
         TabbedPane.Tab.of(tab2).title("Táblázat");
-        return new TabbedPane(List.of(tab1, tab2));
+        return new FocusBoundary(new TabbedPane(List.of(tab1, tab2)));
     }
 
     @Override

@@ -5,6 +5,7 @@ import ui10.controls.Button;
 import ui10.controls.Button.ButtonState;
 import ui10.decoration.Style;
 import ui10.input.Event;
+import ui10.input.EventInterpretation;
 
 public class StyleableButtonView extends StyleableView<Button, Style> {
 
@@ -18,9 +19,9 @@ public class StyleableButtonView extends StyleableView<Button, Style> {
     }
 
     @EventHandler
-    private Event.ReleaseCallback mousePress(Event.BeginPress beginPress) {
+    private EventInterpretation.ReleaseCallback mousePress(EventInterpretation.BeginPress beginPress) {
         model.state.set(new ButtonState(true, true, true));
-        return new Event.ReleaseCallback() {
+        return new EventInterpretation.ReleaseCallback() {
             @Override
             public void commit() {
                 model.state.set(new ButtonState(true, true, false));

@@ -66,7 +66,7 @@ public class TextElement extends Element {
     @Override
     public String toString() {
         return "TextElement{" +
-                "text='" + text + '\'' +
+                "text='" + text.get() + '\'' +
                 '}';
     }
 }

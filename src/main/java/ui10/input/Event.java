@@ -1,114 +1,28 @@
 package ui10.input;
 
-import ui10.geom.Point;
-import ui10.input.keyboard.KeyCombination;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import java.awt.datatransfer.Transferable;
+public class  Event {
 
-public interface Event<R extends Event.EventResponse> {
+    private final Instant timestamp;
 
-    record Focus() implements Event<AcceptFocus> {
+    // TODO ez ne legyen publikus, de most Element::dispatchEvent-nek kell egyelőre
+    public List<EventInterpretation<?>> interpretations = new ArrayList<>();
+
+    public Event(EventInterpretation<?> nativeInterpretation) {
+        this.timestamp = Instant.now();
+        this.interpretations.add(nativeInterpretation);
     }
 
-    /*
-    record BeginHover() implements Event {
+    public Event(List<EventInterpretation<?>> nativeInterpretations) {
+        this.timestamp = Instant.now();
+        this.interpretations.addAll(nativeInterpretations);
     }
 
-    record EndHover() implements Event {
-    }
-    */
-
-    record BeginPress(Point point) implements Event<ReleaseCallback> {
-        // ez a Point lehet hogy nem kéne ide
-    }
-
-    /*
-    record ShowContextMenu(Point origin) implements Event {
-    }
-
-    record DoubleClick() implements Event {
-    }
-
-    record Scroll(int deltaX, int deltaY) implements Event {
-    }
-
-    record WheelClick() implements Event {
-    }
-
-    record Drag(DragHandler dragHandler) implements Event {
-    }
-
-    record DragEnter(DropHandler dropHandler) implements Event {
-    }
-     */
-
-    record EnterContent(Transferable transferable) implements Event<OKResult> {
-    }
-
-    record Copy() implements Event<CopyResult> {
-    }
-
-    record Cut() implements Event<CopyResult> {
-    }
-
-    record KeyCombinationEvent(KeyCombination keyCombination) implements Event<OKResult> {
-    }
-
-    interface DragHandler {
-
-        void beginDrag(DragCallback callback);
-
-        void content(Transferable content);
-
-        interface DragCallback {
-
-            void moveTo(Point point);
-
-            void cancel();
-
-            void commit();
-        }
-    }
-
-    interface DropHandler {
-
-        Transferable content();
-
-        void accept(DropCallback callback);
-
-        void deny();
-
-        interface DropCallback {
-
-            void commitDrop();
-        }
-    }
-
-    interface EventResponse {
-
-    }
-
-    record CopyResult(Transferable content) implements EventResponse {
-    }
-
-    interface ReleaseCallback extends EventResponse {
-
-        default void drag(Point point) {
-        }
-
-        void commit();
-
-        void cancel();
-    }
-
-    record OKResult() implements EventResponse {
-    }
-
-    record AcceptFocus(FocusLostListener focusLostListener) implements EventResponse {
-    }
-
-    @FunctionalInterface
-    interface FocusLostListener {
-        void focusLost();
+    public List<EventInterpretation<?>> interpretations() {
+        return Collections.unmodifiableList(interpretations);
     }
 }

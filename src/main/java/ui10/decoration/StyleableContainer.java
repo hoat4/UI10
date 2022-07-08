@@ -2,7 +2,7 @@ package ui10.decoration;
 
 import ui10.base.*;
 
-public abstract class StyleableContainer<D extends Style> extends Container {
+public abstract class StyleableContainer<D extends Style> extends LightweightContainer {
 
     private D decoration;
 
@@ -36,6 +36,10 @@ public abstract class StyleableContainer<D extends Style> extends Container {
         Element content = contentImpl();
         if (content == null)
             throw new NullPointerException(getClass().getName()+"::contentImpl returned null: "+this);
+        return decorate(content);
+    }
+
+    protected Element decorate(Element content) {
         return decoration.wrapContent(content);
     }
 

@@ -6,20 +6,20 @@ import ui10.di.Component;
 import ui10.geom.Point;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
-import ui10.input.Event;
-import ui10.input.Phase;
+import ui10.input.*;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.util.Collections.emptyList;
 
 public abstract class Element implements Component {
 
@@ -40,8 +40,11 @@ public abstract class Element implements Component {
         List<T> list = lookupMultiple(clazz);
         if (list.isEmpty())
             throw new RuntimeException("unknown context type: " + clazz);
-        if (list.size() > 1)
-            throw new RuntimeException("multiple values found for context type " + clazz.getName() + ": " + list);
+
+        // TODO több UIContext-et talált dialógusból hívva. mi legyen ezzel?
+        // if (list.size() > 1)
+        //    throw new RuntimeException("multiple values found for context type " + clazz.getName() + ": " + list);
+
         return list.get(0);
     }
 
@@ -121,16 +124,18 @@ public abstract class Element implements Component {
 
     protected void enumerateStaticChildren(Consumer<Element> consumer) {
         if (view() != null)
-            view().enumerateStaticChildren(consumer);
+            consumer.accept(view());
     }
 
     public void initParent(Element parent) {
+        Objects.requireNonNull(parent);
+
         Element e = parent;
         if (e == this.parent)
             return;
 
-        if (nextInit)
-            throw new IllegalStateException(this + " already has view: " + next + " (old parent: " + this.parent + ", new parent: " + parent + ")");
+        if (this.parent != null)
+            throw new IllegalStateException(this + " already has parent: " + next + " (old parent: " + this.parent + ", new parent: " + parent + ")");
 
         this.parent = e;
 
@@ -140,8 +145,10 @@ public abstract class Element implements Component {
 
         initBeforeView();
 
-        initView();
-        nextInit = true;
+        if (!nextInit) {
+            initView();
+            nextInit = true;
+        }
     }
 
     void initView() {
@@ -182,14 +189,112 @@ public abstract class Element implements Component {
     }
 
     @SuppressWarnings("unchecked")
-    public <R extends Event.EventResponse> R handleEvent(Event<R> event, Phase phase) {
-        List<Method> methods = phase == Phase.BUBBLE
-                ? ReflectionUtil.methodsIn(getClass()) : ReflectionUtil.methodsIn2(getClass());
+    public final <R extends EventInterpretation.EventResponse> EventResultWrapper<R> dispatchEvent(
+            EventInterpretation<R> event) {
+        Event e = new Event(event);
+        return (EventResultWrapper<R>) dispatchEvent(e);
+    }
 
+    public final EventResultWrapper<?> dispatchEvent(Event event) {
+        return doDispatchEvent(event, new ArrayList<>());
+    }
+
+    private EventResultWrapper<? extends EventInterpretation.EventResponse> doDispatchEvent(Event event,
+                                                                                            List<EventInterpretation<?>> applyingEventInterpretations) {
+
+        List<AdditionalInterpretation<?, ?>> additionalInterpretations = additionalInterpretations(event);
+        int l = event.interpretations.size();
+        event.interpretations.addAll(additionalInterpretations.stream().map(ai -> ai.dst).collect(Collectors.toList()));
+
+        EventResultWrapper<?> result = dispatchEventImpl(event, applyingEventInterpretations);
+        for (int i = event.interpretations.size() - 1; i >= l; i--)
+            event.interpretations.remove(i);
+
+
+        additionalInterpretations.forEach(ai->{
+            if (applyingEventInterpretations.remove(ai.dst) && !applyingEventInterpretations.contains(ai.src))
+                applyingEventInterpretations.add(ai.src);
+        });
+
+        if (result != null && !event.interpretations().contains(result.eventInterpretation())) {
+            for (AdditionalInterpretation<?, ?> ai : additionalInterpretations) {
+                EventResultWrapper<?> convertedResult = tryConvertResultBack(result, ai);
+
+                // TODO itt a null kezelés nincs átgondolva
+                if (convertedResult != null)
+                    return convertedResult;
+            }
+            throw new RuntimeException();
+        }
+
+        return result;
+    }
+
+    private <R1 extends EventInterpretation.EventResponse, R2 extends EventInterpretation.EventResponse>
+    EventResultWrapper<R1> tryConvertResultBack(
+            EventResultWrapper<R2> result, AdditionalInterpretation<?, ?> ai) {
+
+        if (ai.dst.equals(result.eventInterpretation())) {
+            @SuppressWarnings("unchecked")
+            AdditionalInterpretation<R1, R2> ai2 = (AdditionalInterpretation<R1, R2>) ai;
+
+            return new EventResultWrapper<>(result.responder(), ai2.src, ai2.responseConverter.apply(result.response()));
+        }
+        return null;
+    }
+
+    private EventResultWrapper<? extends EventInterpretation.EventResponse> dispatchEventImpl(Event event,
+                                                                                              List<EventInterpretation<?>> applyingInterpretations) {
+        EventResultWrapper<?>[] b = new EventResultWrapper[1];
+        List<EventInterpretation<?>> appInts2 = new ArrayList<>(applyingInterpretations);
+        enumerateStaticChildren(e -> {
+            if (b[0] == null)
+                b[0] = e.doDispatchEvent(event, appInts2);
+        });
+        applyingInterpretations.clear();
+        applyingInterpretations.addAll(appInts2);
+
+        if (b[0] != null)
+            return b[0];
+
+        for (EventInterpretation<?> i : event.interpretations()) {
+            Element elem = this;
+            while (elem != null) {
+                boolean applies = applyingInterpretations.contains(i);
+                if (!applies && i.target().appliesTo(this)) {
+                    applies = true;
+                    applyingInterpretations.add(i);
+                }
+                if (applies) {
+                    EventResultWrapper<?> r = handleEventInterpretation(i);
+                    if (r != null)
+                        return r;
+                    break;
+                }
+                elem = elem.parent;
+            }
+        }
+        return null;
+    }
+
+    protected List<AdditionalInterpretation<?, ?>> additionalInterpretations(Event event) {
+        return emptyList();
+    }
+
+    protected record AdditionalInterpretation<R1 extends EventInterpretation.EventResponse,
+            R2 extends EventInterpretation.EventResponse>(
+            EventInterpretation<R1> src, EventInterpretation<R2> dst, Function<R2, R1> responseConverter) {
+    }
+
+    @SuppressWarnings("unchecked")
+    private <R extends EventInterpretation.EventResponse> EventResultWrapper<R> handleEventInterpretation(
+            EventInterpretation<R> event) {
+
+        List<Method> methods = ReflectionUtil.methodsIn(getClass());
 
         for (Method m : methods) {
             EventHandler h = m.getAnnotation(EventHandler.class);
-            if (h != null && h.phase() == phase) {
+            if (h != null) {
                 Class<?>[] paramTypes = m.getParameterTypes();
                 if (paramTypes[0].isAssignableFrom(event.getClass())) {
                     m.setAccessible(true);
@@ -203,7 +308,7 @@ public abstract class Element implements Component {
                     }
 
                     if (response != null)
-                        return response;
+                        return new EventResultWrapper<>(this, event, response);
                 }
             }
         }
@@ -272,5 +377,15 @@ public abstract class Element implements Component {
             assert o.element() == element;
             return 0;
         }
+    }
+
+    public List<Element> ancestors(Element e) {
+        List<Element> l = new ArrayList<>();
+        while (e != this.parent) {
+            l.add(e);
+            e = e.parent;
+        }
+        Collections.reverse(l);
+        return l;
     }
 }

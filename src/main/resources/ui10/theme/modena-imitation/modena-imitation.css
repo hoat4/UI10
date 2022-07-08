@@ -97,8 +97,7 @@ TabButtonInner > Label {
     font-size: 12px;
 }
 
-.dialog-main { padding: 10px; }
+Dialog { min-width: 360px; }
+.dialog-header { background: linear-gradient(to bottom, #F4F4F4, #F9F9F9); padding: 10px; border-bottom: 1px solid #C8C8C8; }
+.dialog-main { padding: 10px; font-size: .9em; }
 .dialog-button-bar { padding: 10px; flex-grow: 0; }
-
-/* nem világos a classnévből hogy ez az ablakra vagy a dialogview-ra vonatkozik */
-.dialog { min-width: 300px; }

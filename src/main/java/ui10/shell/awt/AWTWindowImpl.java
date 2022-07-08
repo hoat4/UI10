@@ -5,23 +5,25 @@ import ui10.base.LayoutContext2;
 import ui10.base.UIContext;
 import ui10.geom.Point;
 import ui10.input.Event;
-import ui10.input.Phase;
+import ui10.input.EventInterpretation;
+import ui10.input.EventResultWrapper;
+import ui10.input.EventTarget;
 import ui10.input.keyboard.KeyCombination;
 import ui10.input.keyboard.KeySymbol;
 import ui10.shell.renderer.java2d.J2DRenderer;
 import ui10.shell.renderer.java2d.J2DUtil;
-import ui10.shell.renderer.sw.AwtSwRenderer;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static java.awt.event.KeyEvent.*;
+import static java.util.Collections.emptyList;
 
 public class AWTWindowImpl extends Frame {
 
@@ -88,12 +90,17 @@ public class AWTWindowImpl extends Frame {
             switch (event.getID()) {
                 case KeyEvent.KEY_PRESSED -> {
                     char ch = event.getKeyChar();
-                    if (ch == KeyEvent.CHAR_UNDEFINED || ch == 8 || ch == 127) {
-                        KeyCombination keyCombination = keyCombination(event);
-                        if (keyCombination != null)
-                            dispatchEvent(new Event.KeyCombinationEvent(keyCombination), keyEventHandlerChain());
-                    } else
-                        dispatchEvent(new Event.EnterContent(new StringSelection(String.valueOf(ch))), keyEventHandlerChain());
+                    List<EventInterpretation<?>> events = new ArrayList<>();
+
+                    if (ch != KeyEvent.CHAR_UNDEFINED && ch != 8 && ch != 127) {
+                        events.add(new EventInterpretation.EnterContent(keyEventTarget(), new StringSelection(String.valueOf(ch))));
+                    }
+
+                    KeyCombination keyCombination = keyCombination(event);
+                    if (keyCombination != null)
+                        events.add(new EventInterpretation.KeyCombinationEvent(keyEventTarget(), keyCombination));
+
+                    window.dispatchEvent(new Event(events));
                 }
             }
         });
@@ -107,6 +114,8 @@ public class AWTWindowImpl extends Frame {
             case VK_UP -> KeySymbol.StandardFunctionSymbol.UP;
             case VK_BACK_SPACE -> KeySymbol.StandardFunctionSymbol.BACKSPACE;
             case VK_DELETE -> KeySymbol.StandardFunctionSymbol.DELETE;
+            case VK_ENTER -> KeySymbol.StandardFunctionSymbol.ENTER;
+            case VK_ESCAPE -> KeySymbol.StandardFunctionSymbol.ESCAPE;
             default -> null;
         };
         if (key == null)
@@ -114,7 +123,7 @@ public class AWTWindowImpl extends Frame {
         return new KeyCombination(key);
     }
 
-    private EventResultWrapper<Event.ReleaseCallback> mouseFocus;
+    private EventResultWrapper<EventInterpretation.ReleaseCallback> mouseFocus;
     private Point lastMouseDragPos;
 
     @Override
@@ -128,17 +137,17 @@ public class AWTWindowImpl extends Frame {
 
             switch (e.getID()) {
                 case java.awt.event.MouseEvent.MOUSE_PRESSED:
-                    List<Element> eventHandlerChain = mouseEventHandlerChain(p);
-
-                    EventResultWrapper<Event.AcceptFocus> acceptFocus = dispatchEvent(new Event.Focus(), eventHandlerChain);
+                    EventTarget eventHandlerChain = new EventTarget.PointTarget(p);
+                    EventResultWrapper<EventInterpretation.AcceptFocus> acceptFocus = window.dispatchEvent(
+                            new EventInterpretation.Focus(eventHandlerChain));
                     if (acceptFocus != null) {
                         if (keyFocusLostListener != null)
                             keyFocusLostListener.focusLost();
-                        keyFocus = ancestors(acceptFocus.responder());
+                        keyFocus = window.ancestors(acceptFocus.responder());
                         keyFocusLostListener = acceptFocus.response().focusLostListener();
                     }
 
-                    mouseFocus = dispatchEvent(new Event.BeginPress(p), eventHandlerChain);
+                    mouseFocus = window.dispatchEvent(new EventInterpretation.BeginMousePress(p));
                     lastMouseDragPos = p;
                     break;
                 case java.awt.event.MouseEvent.MOUSE_RELEASED:
@@ -148,12 +157,12 @@ public class AWTWindowImpl extends Frame {
                     }
 
                     if (!p.equals(lastMouseDragPos))
-                        mouseFocus.response.drag(lastMouseDragPos = p);
+                        mouseFocus.response().drag(lastMouseDragPos = p);
                     try {
-                        if (mouseFocus.responder.shape().contains(p))
-                            mouseFocus.response.commit();
+                        if (mouseFocus.responder().shape().contains(p))
+                            mouseFocus.response().commit();
                         else
-                            mouseFocus.response.cancel();
+                            mouseFocus.response().cancel();
                     } finally {
                         mouseFocus = null;
                     }
@@ -172,7 +181,7 @@ public class AWTWindowImpl extends Frame {
             switch (e.getID()) {
                 case java.awt.event.MouseEvent.MOUSE_MOVED:
                     if (mouseFocus != null) {
-                        System.err.println("Received mouse dragged event, but an element is pressed: " + mouseFocus.responder);
+                        System.err.println("Received mouse dragged event, but an element is pressed: " + mouseFocus.responder());
                         return;
                     }
 
@@ -185,61 +194,29 @@ public class AWTWindowImpl extends Frame {
                         return;
                     }
 
-                    mouseFocus.response.drag(lastMouseDragPos = p);
+                    mouseFocus.response().drag(lastMouseDragPos = p);
                     break;
             }
         });
     }
 
     private List<Element> keyFocus = new ArrayList<>();
-    private Event.FocusLostListener keyFocusLostListener;
+    private EventInterpretation.FocusLostListener keyFocusLostListener;
 
-    private List<Element> keyEventHandlerChain() {
+    private EventTarget keyEventTarget() {
+        if (keyFocus.isEmpty())
+            return new EventTarget.ElementTarget(window);
         for (int i = keyFocus.size() - 1; i >= 0; i--) {
             Element e = keyFocus.get(i);
-            List<Element> ancestors = ancestors(e);
-            if (ancestors.contains(window))
-                return keyFocus = ancestors;
+            List<Element> ancestors = window.ancestors(e);
+            if (ancestors.contains(window)) {
+                keyFocus = ancestors;
+                return new EventTarget.ElementTarget(keyFocus.get(keyFocus.size()-1));
+            }
         }
-        return Collections.emptyList();
+        throw new RuntimeException("should not reach here");
     }
 
-    private static List<Element> ancestors(Element e) {
-        List<Element> l = new ArrayList<>();
-        while (e != null) {
-            l.add(e);
-            e = e.parent;
-        }
-        Collections.reverse(l);
-        return l;
-    }
-
-    private List<Element> mouseEventHandlerChain(Point point) {
-        List<Element> elements = new ArrayList<>();
-        renderer.captureMouseEvent(point, elements);
-        return ancestors(elements.get(0));
-    }
-
-    private <R extends Event.EventResponse> EventResultWrapper<R> dispatchEvent(Event<R> event, List<Element> chain) {
-        for (int i = 0; i < chain.size(); i++) {
-            Element element = chain.get(i);
-            R response = element.handleEvent(event, Phase.CAPTURE);
-            if (response != null)
-                return new EventResultWrapper<>(element, response);
-        }
-
-        for (int i = chain.size() - 1; i >= 0; i--) {
-            Element element = chain.get(i);
-            R response = element.handleEvent(event, Phase.BUBBLE);
-            if (response != null)
-                return new EventResultWrapper<>(element, response);
-        }
-
-        return null;
-    }
-
-    private record EventResultWrapper<R extends Event.EventResponse>(Element responder, R response) {
-    }
 
     /*
     private MouseTarget.DragHandler dragHandler;

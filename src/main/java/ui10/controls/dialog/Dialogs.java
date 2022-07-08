@@ -39,7 +39,7 @@ public class Dialogs {
 
             @Override
             public void performAction() {
-  // TODO              desktop.windows.remove(window);
+                desktop.windows.remove(MessageDialog.this);
             }
 
             @Override

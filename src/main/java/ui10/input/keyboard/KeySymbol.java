@@ -9,7 +9,7 @@ public sealed interface KeySymbol {
     }
 
     enum StandardFunctionSymbol implements FunctionSymbol {
-        LEFT, RIGHT, UP, DOWN, BACKSPACE, DELETE
+        LEFT, RIGHT, UP, DOWN, BACKSPACE, DELETE, ENTER, ESCAPE
     }
 
 }
