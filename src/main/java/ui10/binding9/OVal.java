@@ -3,7 +3,7 @@ package ui10.binding9;
 import java.util.Objects;
 
 public class OVal<T> extends Observable {
-    
+
     private T value;
 
     public OVal() {
@@ -37,5 +37,15 @@ public class OVal<T> extends Observable {
         return value;
     }
 
-    protected void afterChange(T oldValue, T newValue) {}
+    protected void afterChange(T oldValue, T newValue) {
+    }
+
+    @Override
+    public String toString() {
+        return "OVal{" + value + '}';
+    }
+
+    public T snoop() {
+        return value;
+    }
 }

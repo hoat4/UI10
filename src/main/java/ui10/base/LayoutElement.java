@@ -23,7 +23,7 @@ public abstract class LayoutElement extends Element {
     @Override
     void initView() {
         super.initView();
-        if (next == null)
+        if (next.get() == null)
             repeatIfInvalidated(() -> enumerateChildren(e -> {
                 if (e == null)
                     throw new RuntimeException("enumerateChildren gave null element in: "+this);

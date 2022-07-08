@@ -1,12 +1,17 @@
 package ui10.base;
 
+import ui10.binding9.Bindings;
+
 public abstract class LightweightContainer extends Element {
 
     protected abstract Element content();
 
     @Override
     void initView() {
-        next = content();
-        next.initParent(this);
+        Bindings.repeatIfInvalidated(() -> {
+            Element content = content();
+            next.set(content);
+            content.initParent(this);
+        });
     }
 }

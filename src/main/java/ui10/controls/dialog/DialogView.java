@@ -31,9 +31,12 @@ public class DialogView extends StyleableView<Dialog, DialogView.DialogStyle> {
         );
     }
 
+    private final FocusBoundary focusBoundary = new FocusBoundary();
+
     @Override
     protected Element decorate(Element content) {
-        return new FocusBoundary(super.decorate(content));
+        focusBoundary.content().set(super.decorate(content));
+        return focusBoundary;
     }
 
     public class DialogHeader extends StyleableContainer<Style> {

@@ -6,10 +6,13 @@ import ui10.input.EventResultWrapper;
 import ui10.input.keyboard.KeyCombination;
 import ui10.input.keyboard.KeySymbol;
 
-public class FocusBoundary extends LightweightFixedContainer {
+public class FocusBoundary extends LightweightDirectContainer {
+
+    public FocusBoundary() {
+    }
 
     public FocusBoundary(Element content) {
-        super(content);
+        content().set(content);
     }
 
     @EventHandler

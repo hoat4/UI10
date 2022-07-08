@@ -3,15 +3,16 @@ package ui10.base;
 public abstract class LightweightFixedContainer extends Element {
 
     public LightweightFixedContainer(Element content) {
-        next = content;
+        next.set(content);
     }
 
     @Override
     void initView() {
-        next.initParent(this);
+        // ezzel az a baj hogy teleszemeteli a bindinges observert
+        next.get().initParent(this);
     }
 
     public final Element content() {
-        return next;
+        return next.get();
     }
 }

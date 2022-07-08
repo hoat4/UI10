@@ -17,9 +17,12 @@ public abstract class Container extends Element {
     @Override
     void initView() {
         super.initView();
-        if (next == null) {
-            next = contentProp.get(); // TODO módosítások értelmesebb kezelése
-            next.initParent(this);
+        if (next.get() == null) { // TODO itt miért van ez a feltétel?
+            Bindings.repeatIfInvalidated(() -> {
+                Element content = contentProp.get();
+                next.set(content);
+                content.initParent(this);
+            });
         }
     }
 }

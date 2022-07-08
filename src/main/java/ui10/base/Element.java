@@ -1,6 +1,7 @@
 package ui10.base;
 
 import ui10.binding5.ReflectionUtil;
+import ui10.binding9.OVal;
 import ui10.binding9.Observer2;
 import ui10.di.Component;
 import ui10.geom.Point;
@@ -28,7 +29,13 @@ public abstract class Element implements Component {
     public Element parent;
     public Component depParent;
 
-    Element next;
+    final OVal<Element> next = new OVal<>() {
+        @Override
+        protected void afterChange(Element oldValue, Element newValue) {
+            if (newValue != null && Element.this.parent != null)
+                newValue.initParent(Element.this);
+        }
+    };
     Shape shape;
     boolean nextInit;
 
@@ -86,8 +93,8 @@ public abstract class Element implements Component {
 
     public Shape shape() {
         ensureViewInit();
-        if (next != null)
-            return next.shape();
+        if (next.get() != null)
+            return next.get().shape();
         if (shape == null)
             throw new IllegalStateException("no shape for " + this);
         return shape;
@@ -95,12 +102,12 @@ public abstract class Element implements Component {
 
     public boolean isRenderableElement() {
         ensureViewInit();
-        return next == null;
+        return next.get() == null;
     }
 
     public Element renderableElement() {
         ensureViewInit();
-        return next == null ? this : next.renderableElement();
+        return next.get() == null ? this : next.get().renderableElement();
     }
 
     protected void preShapeChange(Shape shape) {
@@ -115,8 +122,8 @@ public abstract class Element implements Component {
         if (changed)
             shapeChanged();
 
-        if (next != null)
-            context.placeElement(next, shape);
+        if (next.get() != null)
+            context.placeElement(next.get(), shape);
     }
 
     protected void shapeChanged() {
@@ -134,8 +141,11 @@ public abstract class Element implements Component {
         if (e == this.parent)
             return;
 
+        // ennek hosszabb távon lehet hogy nem exceptionnek kéne lennie, hanem talán csak egy warningnak
+        // vagy ki kéne válogatni hogy mely esetekben legyen exception
         if (this.parent != null)
-            throw new IllegalStateException(this + " already has parent: " + next + " (old parent: " + this.parent + ", new parent: " + parent + ")");
+            throw new IllegalStateException(this + " already has parent (old parent: " + this.parent
+                    + ", new parent: " + parent + ", next: " + next.snoop());
 
         this.parent = e;
 
@@ -152,9 +162,7 @@ public abstract class Element implements Component {
     }
 
     void initView() {
-        next = ViewProvider.makeView(this, lookupMultiple(ViewProvider.class));
-        if (next != null)
-            next.initParent(this);
+        next.set(ViewProvider.makeView(this, lookupMultiple(ViewProvider.class)));
     }
 
     protected void initBeforeView() {
@@ -164,15 +172,15 @@ public abstract class Element implements Component {
     public Element view() {
         if (!nextInit)
             throw new IllegalStateException("no view associated with " + this + " (parent: " + parent + ")");
-        return next;
+        return next.get();
     }
 
     public ContentEditable.ContentPoint pickPosition(Point point) {
         ensureViewInit();
-        if (next == null)
+        if (next.get() == null)
             return new NullContentPoint(this);
         else
-            return next.pickPosition(point);
+            return next.get().pickPosition(point);
     }
 
     private void ensureViewInit() {
@@ -182,7 +190,7 @@ public abstract class Element implements Component {
 
     public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
         ensureViewInit();
-        if (next == null)
+        if (next.get() == null)
             return shape().bounds().withSize(new Size(0, shape().bounds().height()));
         else
             return view().shapeOfSelection(range);
@@ -211,7 +219,7 @@ public abstract class Element implements Component {
             event.interpretations.remove(i);
 
 
-        additionalInterpretations.forEach(ai->{
+        additionalInterpretations.forEach(ai -> {
             if (applyingEventInterpretations.remove(ai.dst) && !applyingEventInterpretations.contains(ai.src))
                 applyingEventInterpretations.add(ai.src);
         });
@@ -246,13 +254,14 @@ public abstract class Element implements Component {
     private EventResultWrapper<? extends EventInterpretation.EventResponse> dispatchEventImpl(Event event,
                                                                                               List<EventInterpretation<?>> applyingInterpretations) {
         EventResultWrapper<?>[] b = new EventResultWrapper[1];
-        List<EventInterpretation<?>> appInts2 = new ArrayList<>(applyingInterpretations);
         enumerateStaticChildren(e -> {
+            List<EventInterpretation<?>> appInts3 = new ArrayList<>();
             if (b[0] == null)
-                b[0] = e.doDispatchEvent(event, appInts2);
+                b[0] = e.doDispatchEvent(event, appInts3);
+            for (EventInterpretation<?> i : appInts3)
+                if (!applyingInterpretations.contains(i))
+                    applyingInterpretations.add(i);
         });
-        applyingInterpretations.clear();
-        applyingInterpretations.addAll(appInts2);
 
         if (b[0] != null)
             return b[0];
@@ -387,5 +396,10 @@ public abstract class Element implements Component {
         }
         Collections.reverse(l);
         return l;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "@" + Integer.toUnsignedString(hashCode(), 16);
     }
 }
