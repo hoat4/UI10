@@ -29,15 +29,4 @@ public abstract class StyleableView<M extends Element, D extends Style>
             throw new IllegalArgumentException();
         super.initParent(model);
     }
-
-    @Override
-    protected void initBeforeView() {
-        super.initBeforeView();
-        ReflectionUtil.invokeAnnotatedMethods(this, Setup.class, ann -> true);
-    }
-
-    @Target(METHOD)
-    @Retention(RUNTIME)
-    protected @interface Setup {
-    }
 }

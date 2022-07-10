@@ -1,9 +1,11 @@
 package ui10.decoration.views;
 
-import ui10.base.*;
+import ui10.base.ContentEditable;
+import ui10.base.Element;
+import ui10.base.LayoutContext1;
 import ui10.controls.TextAlign;
-import ui10.controls.TextView;
 import ui10.controls.TextElement;
+import ui10.controls.TextView;
 import ui10.decoration.Fill;
 import ui10.decoration.Style;
 import ui10.font.TextStyle;
@@ -19,7 +21,6 @@ import ui10.layout.RectangularLayout;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static ui10.binding9.Bindings.repeatIfInvalidated;
 import static ui10.layout.Layouts.horizontally;
 
 // TODO text-align legyen állítható CSS-ből
@@ -36,28 +37,28 @@ public class StyleableLabelView extends StyleableView<TextView, StyleableLabelVi
         super(model);
     }
 
-    @Setup
-    protected void initialize() {
-        repeatIfInvalidated(()->{
-            if (model.selection() == null) {
-                textElement.text(model.text());
-                textNodeSel.text(null);
-                textNodeAfterSel.text(null);
-            } else {
-                textElement.text(model.text().substring(0, p(model.selection().begin())));
-                textNodeSel.text(model.text().substring(p(model.selection().begin()), p(model.selection().end())));
-                textNodeAfterSel.text(model.text().substring(p(model.selection().end())));
-            }
-        });
-        repeatIfInvalidated(()->{
-            selectionFill = decoration().selectedPart().background().makeElement(decoration().decorationContext());
-            textElement.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
-            textNodeSel.fill(decoration().selectedPart().foreground().makeElement(decoration().decorationContext()));
-            textNodeAfterSel.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
-            textElement.textStyle(decoration().textStyle());
-            textNodeSel.textStyle(decoration().textStyle());
-            textNodeAfterSel.textStyle(decoration().textStyle());
-        });
+    @RepeatedInit
+    protected void init1() {
+        if (model.selection() == null) {
+            textElement.text(model.text());
+            textNodeSel.text(null);
+            textNodeAfterSel.text(null);
+        } else {
+            textElement.text(model.text().substring(0, p(model.selection().begin())));
+            textNodeSel.text(model.text().substring(p(model.selection().begin()), p(model.selection().end())));
+            textNodeAfterSel.text(model.text().substring(p(model.selection().end())));
+        }
+    }
+
+    @RepeatedInit
+    protected void init2() {
+        selectionFill = decoration().selectedPart().background().makeElement(decoration().decorationContext());
+        textElement.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
+        textNodeSel.fill(decoration().selectedPart().foreground().makeElement(decoration().decorationContext()));
+        textNodeAfterSel.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
+        textElement.textStyle(decoration().textStyle());
+        textNodeSel.textStyle(decoration().textStyle());
+        textNodeAfterSel.textStyle(decoration().textStyle());
     }
 
     private static int p(ContentEditable.ContentPoint p) {
@@ -95,7 +96,7 @@ public class StyleableLabelView extends StyleableView<TextView, StyleableLabelVi
 
     @Override
     public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
-        assert range.begin().element() == model:range.begin().element()+", "+model;
+        assert range.begin().element() == model : range.begin().element() + ", " + model;
         assert range.end().element() == model;
         int beginPos = ((TextView.StringContentPoint) range.begin()).characterOffset();
         int endPos = ((TextView.StringContentPoint) range.end()).characterOffset();

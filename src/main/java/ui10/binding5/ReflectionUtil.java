@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.invoke.MethodHandles.lookup;
@@ -269,6 +270,24 @@ public class ReflectionUtil {
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException(memberToShortString(m) + " threw exception: " + e.getCause(), e.getCause());
                 }
+            }
+        }
+    }
+
+    public static <A extends Annotation> void listMethods(Object obj, Class<A> annotationType, Consumer<Runnable> callback) {
+        for (Method m : methodsIn(obj.getClass())) {
+            A ann = m.getAnnotation(annotationType);
+            if (ann != null) {
+                callback.accept(() -> {
+                    m.setAccessible(true);
+                    try {
+                        m.invoke(obj);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException("should not reach here", e);
+                    } catch (InvocationTargetException e) {
+                        throw new RuntimeException(memberToShortString(m) + " threw exception: " + e.getCause(), e.getCause());
+                    }
+                });
             }
         }
     }

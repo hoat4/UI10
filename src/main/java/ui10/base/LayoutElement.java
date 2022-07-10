@@ -23,11 +23,13 @@ public abstract class LayoutElement extends Element {
     @Override
     void initView() {
         super.initView();
-        if (next.get() == null)
-            repeatIfInvalidated(() -> enumerateChildren(e -> {
-                if (e == null)
-                    throw new RuntimeException("enumerateChildren gave null element in: "+this);
-                e.initParent(this);
-            }));
+        repeatIfInvalidated(() -> {
+            if (next.get() == null)
+                enumerateChildren(e -> {
+                    if (e == null)
+                        throw new RuntimeException("enumerateChildren gave null element in: " + this);
+                    e.initParent(this);
+                });
+        });
     }
 }

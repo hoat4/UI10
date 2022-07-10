@@ -15,8 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import static ui10.binding9.Bindings.repeatIfInvalidated;
+import java.util.function.Supplier;
 
 public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
 
@@ -28,7 +27,7 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
 
         @Override
         protected void invalidateImpl() {
-            Bindings.<Void>executeObserved(() -> {
+            executeObserved((Supplier<Void>) () -> {
                 for (Map.Entry<BoxConstraints, Size> entry : prefSizeCache.entrySet()) {
                     Size expectedOutput = entry.getValue();
                     Size actualOutput = LayoutProtocol.BOX.preferredSize(node, entry.getKey(), new LayoutContext1(null));
@@ -40,7 +39,8 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
                     }
                 }
                 return null;
-            }, this);
+            }
+            );
         }
     };
 
@@ -54,11 +54,9 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
         enumerateChildrenHelper(node, consumer);
     }
 
-    @Override
-    public void initParent(Element parent) {
-        super.initParent(parent);
-
-        repeatIfInvalidated(() -> enumerateChildrenHelper(node, e -> e.initParent(this)));
+    @RepeatedInit
+    void initChildrenParent() {
+        enumerateChildrenHelper(node, e -> e.initParent(this));
     }
 
     @Override
@@ -72,9 +70,10 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
         prefSizeIP.subscribe();
 
         return prefSizeCache.computeIfAbsent(constraints, c -> {
-            return Bindings.executeObserved(() -> {
-                return LayoutProtocol.BOX.preferredSize(node, constraints, context);
-            }, prefSizeObserver);
+            return prefSizeObserver.executeObserved(() -> {
+                    return LayoutProtocol.BOX.preferredSize(node, constraints, context);
+                }
+            );
         });
     }
 

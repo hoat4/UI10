@@ -6,23 +6,24 @@ import java.util.function.Supplier;
 public class Bindings {
 
     public static <R2> R2 onInvalidated(Supplier<R2> task, Observer observer) {
-        return executeObserved(task, new Observer2() {
+        return new Observer2() {
             @Override
             protected void invalidate() {
                 observer.invalidate();
             }
-        });
+        }.executeObserved(task
+        );
     }
 
     public static void onInvalidated(Runnable task, Observer observer) {
-        executeObserved(() -> {
-            task.run();
-            return null;
-        }, new Observer2() {
+        new Observer2() {
             @Override
             protected void invalidate() {
                 observer.invalidate();
             }
+        }.executeObserved(() -> {
+            task.run();
+            return null;
         });
     }
 
@@ -46,7 +47,7 @@ public class Bindings {
             @Override
             protected void invalidate() {
                 assert state == 1 : state+", "+observer;
-                T newValue = executeObserved(task, this);
+                T newValue = executeObserved(task);
                 if (!Objects.equals(prevValue, newValue)) {
                     state = 2;
                     clear();
@@ -56,22 +57,9 @@ public class Bindings {
         }
 
         ObserverImpl o = new ObserverImpl();
-        o.prevValue = executeObserved(task, o);
+        o.prevValue = o.executeObserved(task);
         o.state = 1;
         return o.prevValue;
-    }
-
-    public static <R> R executeObserved(Supplier<R> task, Observer2 observer) {
-        Observer2 previous = Observer2.currentObserverHolder.get();
-        Observer2.currentObserverHolder.set(observer);
-        try {
-            return task.get();
-        } finally {
-            if (previous == null)
-                Observer2.currentObserverHolder.remove();
-            else
-                Observer2.currentObserverHolder.set(previous);
-        }
     }
 
     public static void withoutObserver(Runnable runnable) {

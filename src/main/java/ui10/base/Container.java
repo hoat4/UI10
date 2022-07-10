@@ -7,9 +7,9 @@ public abstract class Container extends Element {
 
     public final OVal<Element> contentProp = new OVal<>();
 
-    @Override
-    protected void initBeforeView() {
-        Bindings.repeatIfInvalidated(() -> contentProp.set(content()));
+    @RepeatedInit
+    void initContent() {
+        contentProp.set(content());
     }
 
     protected abstract Element content();

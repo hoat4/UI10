@@ -27,17 +27,19 @@ public class StyleableTabbedPaneView extends StyleableView<TabbedPane, Styleable
 
     public StyleableTabbedPaneView(TabbedPane model) {
         super(model);
+    }
 
-        repeatIfInvalidated(() -> {
-            tabButtons.elements().clear();
-            tabButtons.elements().addAll(model.tabs().stream().map(TabButton::new).collect(Collectors.toList()));
-        });
+    @RepeatedInit
+    void initTabButtons() {
+        tabButtons.elements().clear();
+        tabButtons.elements().addAll(model.tabs().stream().map(TabButton::new).collect(Collectors.toList()));
+    }
 
-        repeatIfInvalidated(() -> {
-            if (prevSelected != null)
-                prevSelected.selected.set(false);
-            (prevSelected = tabButton(model.selectedTab())).selected.set(true);
-        });
+    @RepeatedInit
+    void initSelectedTab() {
+        if (prevSelected != null)
+            prevSelected.selected.set(false);
+        (prevSelected = tabButton(model.selectedTab())).selected.set(true);
     }
 
     @Override

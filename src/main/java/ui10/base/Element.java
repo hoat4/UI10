@@ -1,6 +1,7 @@
 package ui10.base;
 
 import ui10.binding5.ReflectionUtil;
+import ui10.binding9.Bindings;
 import ui10.binding9.OVal;
 import ui10.binding9.Observer2;
 import ui10.di.Component;
@@ -88,13 +89,17 @@ public abstract class Element implements Component {
     }
 
     public boolean hasShape() {
+        Element n = next.get();
+        if (n != null)
+            return n.hasShape();
         return shape != null;
     }
 
     public Shape shape() {
         ensureViewInit();
-        if (next.get() != null)
-            return next.get().shape();
+        Element n = next.get();
+        if (n != null)
+            return n.shape();
         if (shape == null)
             throw new IllegalStateException("no shape for " + this);
         return shape;
@@ -166,6 +171,8 @@ public abstract class Element implements Component {
     }
 
     protected void initBeforeView() {
+        ReflectionUtil.listMethods(this, OneTimeInit.class, Runnable::run);
+        ReflectionUtil.listMethods(this, RepeatedInit.class, Bindings::repeatIfInvalidated);
     }
 
     // TODO mi van ha változik a view?
@@ -401,5 +408,15 @@ public abstract class Element implements Component {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "@" + Integer.toUnsignedString(hashCode(), 16);
+    }
+
+    @Target(METHOD)
+    @Retention(RUNTIME)
+    protected @interface OneTimeInit {
+    }
+
+    @Target(METHOD)
+    @Retention(RUNTIME)
+    protected @interface RepeatedInit {
     }
 }
