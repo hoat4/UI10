@@ -10,9 +10,11 @@ import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
+import ui10.graphics.FontWeight;
 import ui10.graphics.TextLayout;
 import ui10.layout.BoxConstraints;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.Objects;
 
@@ -35,6 +37,7 @@ public class J2DTextElement extends J2DRenderableElement<TextElement> implements
         fill = (J2DRenderableElement<?>) node.fill().renderableElement();
 
         textLayout = new J2DTextLayout(node.text(), (AWTTextStyle) node.textStyle());
+        node.fontWeight.get();
 
         // TODO cache textlayout vagy glyphvector vagy amit kell
     }
@@ -42,7 +45,8 @@ public class J2DTextElement extends J2DRenderableElement<TextElement> implements
     @Override
     protected void drawImpl(Graphics2D g) {
         AWTTextStyle textStyle = (AWTTextStyle) node.textStyle();
-        g.setFont(textStyle.font);
+        Font font = node.fontWeight.get() == FontWeight.BOLD ? textStyle.font.deriveFont(Font.BOLD) : textStyle.font;
+        g.setFont(font);
         g.setPaint(fill.asPaint());
         g.drawString(node.text(), shape.getBounds().x, shape.getBounds().y + textStyle.fontMetrics.getAscent());
     }

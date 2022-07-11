@@ -65,14 +65,11 @@ public abstract class RenderableElement extends Element {
     }
 
     @Override
-    public void initParent(Element parent) {
-        this.parent = parent;
-
+    void initView() {
         enumerateStaticChildren(e -> {
-            Objects.requireNonNull(e);
+            Objects.requireNonNull(e,()->this.toString());
             e.initParent(this);
         });
-        nextInit = true;
     }
 
     public Shape shape() {

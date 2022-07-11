@@ -106,7 +106,8 @@ public class J2DLayoutElement extends J2DRenderableElement<LayoutElement> {
                         // e.parent = ui10.base.Container.this;
 
                     else if (e.parentRenderable() != J2DLayoutElement.this)
-                        throw new IllegalStateException(e + " is not a child of " + J2DLayoutElement.this + ", instead child of " + e.parentRenderable());
+                        throw new IllegalStateException(e + " is not a child of " + J2DLayoutElement.this
+                                + ", instead child of " + e.parentRenderable());
                     children.add((J2DRenderableElement<?>) e);
                 }
             });

@@ -6,6 +6,7 @@ import ui10.binding9.OVal;
 import ui10.font.TextStyle;
 import ui10.geom.Point;
 import ui10.geom.shape.Shape;
+import ui10.graphics.FontWeight;
 import ui10.graphics.TextLayout;
 
 
@@ -28,6 +29,7 @@ public class TextElement extends Element {
 
     public final OVal<Element> fill = new OVal<>();
     public final OVal<TextStyle> textStyle = new OVal<>();
+    public final OVal<FontWeight> fontWeight = new OVal<>(FontWeight.NORMAL); // ennek inkább TextStyle-be kéne tartoznia
 
 
     public String text() {

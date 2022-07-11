@@ -21,7 +21,7 @@ public class Rule {
     public Selector selector;
 
     Object[] props = new Object[8];
-    Object[] dcbProps = new Object[CSSProperty.DCB_PROPS];
+    public Object[] dcbProps = new Object[CSSProperty.DCB_PROPS];
     public int dcbMask;
 
     private final List<Transition<?>> transitions = new ArrayList<>();

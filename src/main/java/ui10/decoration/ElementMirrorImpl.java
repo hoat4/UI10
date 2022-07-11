@@ -4,20 +4,15 @@ import ui10.base.Element;
 import ui10.controls.Button;
 import ui10.controls.dialog.DialogView;
 import ui10.decoration.css.ElementMirror;
-import ui10.decoration.views.StyleableButtonView;
-import ui10.decoration.views.StyleableLabelView;
-import ui10.decoration.views.StyleableTabbedPaneView;
-import ui10.decoration.views.StyleableTextFieldView;
+import ui10.decoration.views.*;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 public class ElementMirrorImpl implements ElementMirror {
 
-    final StyleableContainer<?> element;
+    final StyleableContainer element;
 
-    public ElementMirrorImpl(StyleableContainer<?> element) {
+    public ElementMirrorImpl(StyleableContainer element) {
         this.element = element;
     }
 
@@ -29,8 +24,10 @@ public class ElementMirrorImpl implements ElementMirror {
             return "Label";
         if (element instanceof StyleableTextFieldView)
             return "TextField";
-        if (element instanceof DialogView)
-            return "Dialog";
+
+        ElementName ann = element.getClass().getAnnotation(ElementName.class);
+        if (ann != null)
+            return ann.value();
 
         return element.getClass().getSimpleName();
     }
@@ -40,8 +37,15 @@ public class ElementMirrorImpl implements ElementMirror {
         return switch (className) {
             case "dialog-header" -> element instanceof DialogView.DialogHeader;
             case "dialog-main" -> element instanceof DialogView.DialogMain;
+            case "dialog-button-bar" -> element instanceof DialogView.DialogButtonBar;
             case "default-button" -> element instanceof StyleableButtonView btn && btn.model.role.get() == Button.Role.DEFAULT;
-            default -> false;
+            default -> {
+                if (element instanceof StyleableView<?> view) {
+                    ClassName ann = view.model.getClass().getAnnotation(ClassName.class);
+                    yield ann != null && className.equals(ann.value());
+                }else
+                    yield false;
+            }
         };
     }
 
@@ -74,8 +78,8 @@ public class ElementMirrorImpl implements ElementMirror {
     @Override
     public ElementMirror parent() {
         Element e = element.parent();
-        while (e != null && !(e instanceof StyleableContainer<?>))
+        while (e != null && !(e instanceof StyleableContainer))
             e = e.parent();
-        return e == null ? null : new ElementMirrorImpl((StyleableContainer<?>) e);
+        return e == null ? null : new ElementMirrorImpl((StyleableContainer) e);
     }
 }

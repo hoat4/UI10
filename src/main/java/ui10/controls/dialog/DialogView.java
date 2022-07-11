@@ -1,22 +1,20 @@
 package ui10.controls.dialog;
 
-import ui10.base.Container;
 import ui10.base.Element;
 import ui10.base.FocusBoundary;
 import ui10.controls.TextView;
-import ui10.decoration.DecorationContext;
-import ui10.decoration.Style;
 import ui10.decoration.StyleableContainer;
+import ui10.decoration.views.ElementName;
 import ui10.decoration.views.StyleableView;
+import ui10.graphics.ImageData;
+import ui10.graphics.ImageView;
 import ui10.layout.Layouts;
 import ui10.layout.LinearLayoutBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static ui10.layout.Layouts.*;
 
-public class DialogView extends StyleableView<Dialog, DialogView.DialogStyle> {
+@ElementName("Dialog")
+public class DialogView extends StyleableView<Dialog> {
 
     public DialogView(Dialog content) {
         super(content);
@@ -24,22 +22,14 @@ public class DialogView extends StyleableView<Dialog, DialogView.DialogStyle> {
 
     @Override
     protected Element contentImpl() {
-        return vertically(
+        return new FocusBoundary(vertically(
                 new DialogHeader(),
                 new DialogMain(),
-                halign(HorizontalAlignment.RIGHT, decoration().dialogButtonBar(horizontally(model.actions())))
-        );
+                halign(HorizontalAlignment.RIGHT, new DialogButtonBar())
+        ));
     }
 
-    private final FocusBoundary focusBoundary = new FocusBoundary();
-
-    @Override
-    protected Element decorate(Element content) {
-        focusBoundary.content().set(super.decorate(content));
-        return focusBoundary;
-    }
-
-    public class DialogHeader extends StyleableContainer<Style> {
+    public class DialogHeader extends StyleableContainer {
 
         @Override
         protected Element contentImpl() {
@@ -47,12 +37,16 @@ public class DialogView extends StyleableView<Dialog, DialogView.DialogStyle> {
             return LinearLayoutBuilder.horizontal()
                     .add(0, valign(VerticalAlignment.CENTER, new TextView(headingText)))
                     .add(1, Layouts.empty())
-                    .add(0, DialogView.this.decoration().dialogIcon(model.kind()))
+                    .add(0, dialogIcon(model.kind()))
                     .build();
+        }
+
+        private Element dialogIcon(Dialog.Kind kind) {
+            return new ImageView(ImageData.of(css.resource("dialog-information.png")));
         }
     }
 
-    public class DialogMain extends StyleableContainer<Style> {
+    public class DialogMain extends StyleableContainer {
 
         @Override
         protected Element contentImpl() {
@@ -60,11 +54,12 @@ public class DialogView extends StyleableView<Dialog, DialogView.DialogStyle> {
         }
     }
 
-    public interface DialogStyle extends Style {
+    // .dialog-button-bar b
+    public class DialogButtonBar extends StyleableContainer {
 
-        // .dialog-button-bar b
-        Element dialogButtonBar(Element element);
-
-        Element dialogIcon(Dialog.Kind dialogKind);
+        @Override
+        protected Element contentImpl() {
+            return horizontally(model.actions());
+        }
     }
 }

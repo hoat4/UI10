@@ -3,11 +3,9 @@ package ui10.decoration.views;
 import ui10.base.Element;
 import ui10.controls.Button;
 import ui10.controls.Button.ButtonState;
-import ui10.decoration.Style;
-import ui10.input.Event;
 import ui10.input.EventInterpretation;
 
-public class StyleableButtonView extends StyleableView<Button, Style> {
+public class StyleableButtonView extends StyleableView<Button> {
 
     public StyleableButtonView(Button model) {
         super(model);

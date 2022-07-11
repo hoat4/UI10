@@ -34,4 +34,17 @@ public abstract class Observer2 {
                 currentObserverHolder.set(previous);
         }
     }
+
+    public void executeObserved(Runnable task) {
+        Observer2 previous = Observer2.currentObserverHolder.get();
+        currentObserverHolder.set(this);
+        try {
+            task.run();
+        } finally {
+            if (previous == null)
+                currentObserverHolder.remove();
+            else
+                currentObserverHolder.set(previous);
+        }
+    }
 }

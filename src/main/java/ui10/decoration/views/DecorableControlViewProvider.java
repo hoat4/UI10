@@ -1,10 +1,7 @@
 package ui10.decoration.views;
 
 import ui10.base.*;
-import ui10.controls.Button;
-import ui10.controls.TextView;
-import ui10.controls.TabbedPane;
-import ui10.controls.InputField;
+import ui10.controls.*;
 import ui10.controls.dialog.Dialog;
 import ui10.controls.dialog.DialogView;
 
@@ -29,6 +26,8 @@ public class DecorableControlViewProvider implements ViewProvider {
             return new DialogView(m);
         if (e instanceof Dialog.DialogButton m)
             return new DialogButtonView(m);
+        if (e instanceof Table t)
+            return new TableView<>(t);
 
         if (e instanceof Container m && !(e instanceof StyleableView))
             return new StyleableContainerView(m);

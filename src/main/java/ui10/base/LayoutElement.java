@@ -10,7 +10,7 @@ import static ui10.binding9.Bindings.repeatIfInvalidated;
 
 public abstract class LayoutElement extends Element {
 
-    protected abstract void enumerateChildren(Consumer<Element> element);
+    protected abstract void enumerateChildren(Consumer<Element> consumer);
 
     protected abstract Size preferredSize(BoxConstraints constraints, LayoutContext1 context1);
 

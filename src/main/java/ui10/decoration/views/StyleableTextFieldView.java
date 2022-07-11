@@ -15,6 +15,7 @@ import ui10.image.Colors;
 import ui10.input.EventInterpretation;
 import ui10.layout.BoxConstraints;
 import ui10.layout.RectangularLayout;
+import ui10.shell.renderer.java2d.AWTTextStyle;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -22,11 +23,12 @@ import java.io.IOException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static ui10.decoration.css.Length.em;
 import static ui10.input.keyboard.KeySymbol.StandardFunctionSymbol.StandardFunctionSymbol;
 
 // .text-field, .text, .caret, .selection
 public class StyleableTextFieldView<P extends ContentEditable.ContentPoint>
-        extends StyleableView<InputField<?, P>, StyleableTextFieldView.TextFieldStyle> {
+        extends StyleableView<InputField<?, P>> {
 
     private final TextFieldContent textFieldContent = new TextFieldContent();
     private final ColorFill caret = new ColorFill().color(Colors.BLACK);

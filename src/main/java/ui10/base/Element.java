@@ -1,7 +1,6 @@
 package ui10.base;
 
 import ui10.binding5.ReflectionUtil;
-import ui10.binding9.Bindings;
 import ui10.binding9.OVal;
 import ui10.binding9.Observer2;
 import ui10.di.Component;
@@ -22,6 +21,7 @@ import java.util.stream.Collectors;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
 
 public abstract class Element implements Component {
 
@@ -39,6 +39,8 @@ public abstract class Element implements Component {
     };
     Shape shape;
     boolean nextInit;
+
+    private final Set<MethodInvalidationPoint> dirtySet = new HashSet<>();
 
     public Element parent() {
         return parent;
@@ -96,7 +98,7 @@ public abstract class Element implements Component {
     }
 
     public Shape shape() {
-        ensureViewInit();
+        checkInitialized();
         Element n = next.get();
         if (n != null)
             return n.shape();
@@ -106,12 +108,12 @@ public abstract class Element implements Component {
     }
 
     public boolean isRenderableElement() {
-        ensureViewInit();
+        checkInitialized();
         return next.get() == null;
     }
 
     public Element renderableElement() {
-        ensureViewInit();
+        checkInitialized();
         return next.get() == null ? this : next.get().renderableElement();
     }
 
@@ -119,7 +121,7 @@ public abstract class Element implements Component {
     }
 
     protected void applyShape(Shape shape, LayoutContext2 context) {
-        ensureViewInit(); // ezt a kettőt lehet hogy fel kéne cseréni
+        checkInitialized(); // ezt a kettőt lehet hogy fel kéne cseréni
         preShapeChange(shape);
 
         boolean changed = !Objects.equals(this.shape, shape);
@@ -154,10 +156,6 @@ public abstract class Element implements Component {
 
         this.parent = e;
 
-        // TODO ez a predicate nem jó ha csak megváltoztattuk a parentet
-        ReflectionUtil.invokeAnnotatedMethods(this, Element.OnChange.class,
-                ann -> !lookupMultiple(ann.value()).isEmpty());
-
         initBeforeView();
 
         if (!nextInit) {
@@ -171,8 +169,89 @@ public abstract class Element implements Component {
     }
 
     protected void initBeforeView() {
-        ReflectionUtil.listMethods(this, OneTimeInit.class, Runnable::run);
-        ReflectionUtil.listMethods(this, RepeatedInit.class, Bindings::repeatIfInvalidated);
+        for (Initializer initializer : Initializer.CV.get(getClass()))
+            initializer.execute(this);
+    }
+
+    private static abstract class Initializer {
+
+        final Method m;
+        private final int stage;
+
+        public Initializer(Method m, int stage) {
+            this.m = m;
+            this.stage = stage;
+        }
+
+        static final ClassValue<List<Initializer>> CV = new ClassValue<>() {
+            @Override
+            protected List<Initializer> computeValue(Class<?> type) {
+                return ReflectionUtil.methodsIn2(type).stream().
+                        map(m -> {
+                            OneTimeInit ann1 = m.getAnnotation(OneTimeInit.class);
+                            if (ann1 != null)
+                                return new OneTimeInitializer(m, ann1);
+                            RepeatedInit ann2 = m.getAnnotation(RepeatedInit.class);
+                            if (ann2 != null)
+                                return new RepeatedInitializer(m, ann2);
+                            return null;
+                        }).
+                        filter(Objects::nonNull).
+                        sorted(comparing(initializer -> initializer.stage)).
+                        toList();
+            }
+        };
+
+        abstract void execute(Element element);
+
+        static class OneTimeInitializer extends Initializer{
+
+            public OneTimeInitializer(Method m, OneTimeInit ann) {
+                super(m, ann.value());
+            }
+
+            @Override
+            void execute(Element element) {
+                ReflectionUtil.invokeMethod(m, element);
+            }
+        }
+
+        static class RepeatedInitializer extends Initializer{
+
+            public RepeatedInitializer(Method m, RepeatedInit ann) {
+                super(m, ann.value());
+            }
+
+            @Override
+            void execute(Element element) {
+                element.new MethodInvalidationPoint(m).executeObserved(() -> ReflectionUtil.invokeMethod(m, element));
+            }
+        }
+    }
+
+    private void revalidate() {
+        Set<MethodInvalidationPoint> dirtySetCopy = new HashSet<>(dirtySet);
+        dirtySet.clear();
+        for (MethodInvalidationPoint p : dirtySetCopy) {
+            p.executeObserved(() -> ReflectionUtil.invokeMethod(p.method, this));
+        }
+    }
+
+    private class MethodInvalidationPoint extends Observer2 {
+
+        final Method method;
+
+        public MethodInvalidationPoint(Method method) {
+            this.method = method;
+        }
+
+        @Override
+        protected void invalidate() {
+            boolean wasEmpty = dirtySet.isEmpty();
+            dirtySet.add(this);
+            if (wasEmpty && parent != null)
+                lookup(UIContext.class).eventLoop().runLater(Element.this::revalidate);
+        }
     }
 
     // TODO mi van ha változik a view?
@@ -183,20 +262,20 @@ public abstract class Element implements Component {
     }
 
     public ContentEditable.ContentPoint pickPosition(Point point) {
-        ensureViewInit();
+        checkInitialized();
         if (next.get() == null)
             return new NullContentPoint(this);
         else
             return next.get().pickPosition(point);
     }
 
-    private void ensureViewInit() {
+    protected void checkInitialized() {
         if (!nextInit)
             throw new IllegalStateException(this + " is not initialized yet");
     }
 
     public Shape shapeOfSelection(ContentEditable.ContentRange<?> range) {
-        ensureViewInit();
+        checkInitialized();
         if (next.get() == null)
             return shape().bounds().withSize(new Size(0, shape().bounds().height()));
         else
@@ -319,6 +398,10 @@ public abstract class Element implements Component {
                     try {
                         response = (R) m.invoke(this, event);
                     } catch (ReflectiveOperationException e) {
+                        if (e.getCause() instanceof Error error)
+                            throw error;
+                        if (e.getCause() instanceof RuntimeException re)
+                            throw re;
                         throw new RuntimeException("can't invoke event handler " +
                                 m.getDeclaringClass().getSimpleName() + "." + m.getName() + ": " + e, e);
                     }
@@ -347,12 +430,6 @@ public abstract class Element implements Component {
         E e = supplier.get();
         extras.add(e);
         return e;
-    }
-
-    @Target(METHOD)
-    @Retention(RUNTIME)
-    protected @interface OnChange {
-        Class<? extends ElementExtra> value();
     }
 
     @Target(METHOD)
@@ -413,10 +490,14 @@ public abstract class Element implements Component {
     @Target(METHOD)
     @Retention(RUNTIME)
     protected @interface OneTimeInit {
+
+        int value() default 0;
     }
 
     @Target(METHOD)
     @Retention(RUNTIME)
     protected @interface RepeatedInit {
+
+        int value() default 0;
     }
 }

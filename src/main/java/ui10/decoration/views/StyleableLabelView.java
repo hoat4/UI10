@@ -7,37 +7,67 @@ import ui10.controls.TextAlign;
 import ui10.controls.TextElement;
 import ui10.controls.TextView;
 import ui10.decoration.Fill;
-import ui10.decoration.Style;
+import ui10.decoration.css.CSSProperty;
+import ui10.decoration.css.ElementMirror;
+import ui10.decoration.css.Length;
+import ui10.decoration.css.Rule;
 import ui10.font.TextStyle;
 import ui10.geom.Point;
 import ui10.geom.Rectangle;
 import ui10.geom.Size;
 import ui10.geom.shape.Shape;
+import ui10.graphics.FontWeight;
 import ui10.layout.BoxConstraints;
 import ui10.layout.Layouts;
 import ui10.layout.LinearLayout;
 import ui10.layout.RectangularLayout;
+import ui10.shell.renderer.java2d.AWTTextStyle;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static ui10.decoration.css.Length.em;
 import static ui10.layout.Layouts.horizontally;
 
 // TODO text-align legyen állítható CSS-ből
 // .label
-public class StyleableLabelView extends StyleableView<TextView, StyleableLabelView.TextViewStyle> {
+public class StyleableLabelView extends StyleableView<TextView> {
 
     private final TextElement textElement = new TextElement(); // .label-text
     private final TextElement textNodeSel = new TextElement();
     private final TextElement textNodeAfterSel = new TextElement();
     private Element selectionFill;
     private final TextViewContent content = new TextViewContent();
-
+    private Rule selectionRule;
+    
     public StyleableLabelView(TextView model) {
         super(model);
     }
 
-    @RepeatedInit
+    @OneTimeInit(0)
+    protected void init0() {
+        ElementMirror selectionElementMirror = new ElementMirror() {
+
+            @Override
+            public boolean isPseudoElement(String pseudoElementName) {
+                return pseudoElementName.equals("selection");
+            }
+
+            @Override
+            public Optional<Integer> indexInSiblings() {
+                return Optional.empty();
+            }
+
+            @Override
+            public ElementMirror parent() {
+                return elementMirror;
+            }
+        };
+        selectionRule = css.ruleOf(selectionElementMirror);
+    }
+
+    @RepeatedInit(1)
     protected void init1() {
         if (model.selection() == null) {
             textElement.text(model.text());
@@ -50,15 +80,31 @@ public class StyleableLabelView extends StyleableView<TextView, StyleableLabelVi
         }
     }
 
-    @RepeatedInit
+    @RepeatedInit(2)
     protected void init2() {
-        selectionFill = decoration().selectedPart().background().makeElement(decoration().decorationContext());
-        textElement.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
-        textNodeSel.fill(decoration().selectedPart().foreground().makeElement(decoration().decorationContext()));
-        textNodeAfterSel.fill(decoration().nonSelectedPart().foreground().makeElement(decoration().decorationContext()));
-        textElement.textStyle(decoration().textStyle());
-        textNodeSel.textStyle(decoration().textStyle());
-        textNodeAfterSel.textStyle(decoration().textStyle());
+        Fill nonSelBG = dc-> Layouts.empty(), nonSelFG = rule.get(CSSProperty.textColor);
+        Fill selBG = selectionRule.get(CSSProperty.background), selFG = selectionRule.get(CSSProperty.textColor);
+        selectionFill = selBG.makeElement(decorContext);
+        textElement.fill(nonSelFG.makeElement(decorContext));
+        textNodeSel.fill(selFG.makeElement(decorContext));
+        textNodeAfterSel.fill(nonSelFG.makeElement(decorContext));
+
+        TextStyle textStyle = textStyle();
+        textElement.textStyle(textStyle);
+        textNodeSel.textStyle(textStyle);
+        textNodeAfterSel.textStyle(textStyle);
+
+        FontWeight fontWeight = rule.get(CSSProperty.fontWeight);
+        textElement.fontWeight.set(fontWeight);
+        textNodeSel.fontWeight.set(fontWeight);
+        textNodeAfterSel.fontWeight.set(fontWeight);
+    }
+
+    private TextStyle textStyle() {
+        Length len = rule.get(CSSProperty.fontSize);
+        if (len == null)
+            len = em(1);
+        return AWTTextStyle.of(decorContext.length(len), false);
     }
 
     private static int p(ContentEditable.ContentPoint p) {
@@ -67,7 +113,7 @@ public class StyleableLabelView extends StyleableView<TextView, StyleableLabelVi
 
     @Override
     protected Element contentImpl() {
-        return switch (decoration().textAlign()) {
+        return switch (rule.get(CSSProperty.textAlign)) {
             case LEFT -> content;
             case CENTER -> Layouts.halign(Layouts.HorizontalAlignment.CENTER, content);
             case RIGHT -> Layouts.halign(Layouts.HorizontalAlignment.RIGHT, content);
@@ -140,25 +186,5 @@ public class StyleableLabelView extends StyleableView<TextView, StyleableLabelVi
             return textElement.textStyle().textSize(model.text().substring(0, x)).width();
         }
 
-    }
-
-    public interface TextViewStyle extends Style {
-
-        TextAlign textAlign();
-
-        Fill textFill();
-
-        TextStyle textStyle();
-
-        TextViewPartDecoration nonSelectedPart();
-
-        TextViewPartDecoration selectedPart();
-
-        interface TextViewPartDecoration {
-
-            Fill foreground();
-
-            Fill background();
-        }
     }
 }

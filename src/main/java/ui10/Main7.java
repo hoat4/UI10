@@ -1,15 +1,18 @@
 package ui10;
 
-import ui10.base.*;
+import ui10.base.Element;
+import ui10.base.FocusBoundary;
+import ui10.base.LightweightContainer;
+import ui10.base.ViewProvider;
 import ui10.controls.*;
 import ui10.controls.dialog.Dialogs;
-import ui10.decoration.StyleProvider;
 import ui10.decoration.css.CSSDecorator;
 import ui10.decoration.css.CSSParser;
 import ui10.decoration.css.CSSScanner;
 import ui10.decoration.views.DecorableControlViewProvider;
 import ui10.di.Provide;
 import ui10.di.ProvideHandler;
+import ui10.geom.Insets;
 import ui10.layout.LinearLayout;
 import ui10.shell.awt.AWTDesktop;
 
@@ -34,7 +37,7 @@ public class Main7 extends LightweightContainer {
     @Provide
     private final ViewProvider decorableViewProvider = new DecorableControlViewProvider();
     @Provide
-    private final StyleProvider styleProvider;
+    private final CSSDecorator styleProvider;
 
     public static Main7 main;
 
@@ -44,11 +47,18 @@ public class Main7 extends LightweightContainer {
             css = new CSSParser(new CSSScanner(r));
             css.parseCSS();
         }
-        this.styleProvider = new StyleProvider(new CSSDecorator(css));
+        this.styleProvider = new CSSDecorator(css);
     }
 
     @Override
     protected Element content() {
+        List<String> list = List.of("Hello", "world!");
+
+        Table<String> table = new Table<>(List.of(
+                new Table.Column<>("Col1", s -> s),
+                new Table.Column<>("Col2", s -> String.valueOf(s.length()))
+        ), list);
+
         textField.content.text("szövegmező");
         LinearLayout vbox = vertically(
                 label,
@@ -60,7 +70,7 @@ public class Main7 extends LightweightContainer {
         button.role.set(Button.Role.DEFAULT);
 
         Element tab1 = centered(vbox);
-        Element tab2 = empty();
+        Element tab2 = padding(table, new Insets(50));
         TabbedPane.Tab.of(tab1).title("Egyik tab");
         TabbedPane.Tab.of(tab2).title("Táblázat");
         return new FocusBoundary(new TabbedPane(List.of(tab1, tab2)));
